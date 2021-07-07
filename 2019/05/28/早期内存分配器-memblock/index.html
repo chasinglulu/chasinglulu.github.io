@@ -1,0 +1,1790 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+  
+  
+  <link rel="stylesheet" href="/lib/needsharebutton/needsharebutton.css">
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+  <meta name="google-site-verification" content="vuSkRYPVceK1DXhqZWm7wVxYV4YmmnI1Dv_C1M8rJJM" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Monda:300,300italic,400,400italic,700,700italic|Roboto Slab:300,300italic,400,400italic,700,700italic|Lobster Two:300,300italic,400,400italic,700,700italic|PT Mono:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.2" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.2">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.2" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '6.4.2',
+    sidebar: {"position":"right","width":300,"display":"always","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="&amp;ensp;&amp;ensp;&amp;ensp;&amp;ensp;内核启动初期，常用内存分配器（memory allocator）还未被初始化而不能使用，在此期间memblock是一种用于管理内存区域的方法。memblock也是一种内存分配器，在内核启动阶段它是第一个被启用的内存分配器，在其他内存分配器可用之前使用它向内核注册指定的物理内存区间。memblock主要在启动阶段被使用，但若启用了内存热插拔机制，在内核">
+<meta name="keywords" content="memblock">
+<meta property="og:type" content="article">
+<meta property="og:title" content="早期内存分配器：memblock">
+<meta property="og:url" content="http://chasinglulu.github.io/2019/05/28/早期内存分配器-memblock/index.html">
+<meta property="og:site_name" content="点滴汇聚">
+<meta property="og:description" content="&amp;ensp;&amp;ensp;&amp;ensp;&amp;ensp;内核启动初期，常用内存分配器（memory allocator）还未被初始化而不能使用，在此期间memblock是一种用于管理内存区域的方法。memblock也是一种内存分配器，在内核启动阶段它是第一个被启用的内存分配器，在其他内存分配器可用之前使用它向内核注册指定的物理内存区间。memblock主要在启动阶段被使用，但若启用了内存热插拔机制，在内核">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://chasinglulu.github.io/2019/05/28/早期内存分配器-memblock/memblock_struct.svg">
+<meta property="og:image" content="http://chasinglulu.github.io/2019/05/28/早期内存分配器-memblock/memblock_config_struct.svg">
+<meta property="og:image" content="http://chasinglulu.github.io/2019/05/28/早期内存分配器-memblock/memblock_add.svg">
+<meta property="og:image" content="http://chasinglulu.github.io/2019/05/28/早期内存分配器-memblock/arm64_memblock_init.svg">
+<meta property="og:image" content="http://chasinglulu.github.io/2019/05/28/早期内存分配器-memblock/memblock_alloc.svg">
+<meta property="og:image" content="http://chasinglulu.github.io/2019/05/28/早期内存分配器-memblock/memblock_find.svg">
+<meta property="og:image" content="http://chasinglulu.github.io/2019/05/28/早期内存分配器-memblock/memblock_example_iteration.svg">
+<meta property="og:image" content="http://chasinglulu.github.io/2019/05/28/早期内存分配器-memblock/memblock_add_node.svg">
+<meta property="og:image" content="http://chasinglulu.github.io/2019/05/28/早期内存分配器-memblock/memblock_merge.svg">
+<meta property="og:image" content="http://chasinglulu.github.io/2019/05/28/早期内存分配器-memblock/memblock_merge_II.svg">
+<meta property="og:image" content="http://chasinglulu.github.io/2019/05/28/早期内存分配器-memblock/memblock_remove.svg">
+<meta property="og:image" content="http://chasinglulu.github.io/2019/05/28/早期内存分配器-memblock/memblock_isolate_range.svg">
+<meta property="og:updated_time" content="2021-07-06T09:36:32.378Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="早期内存分配器：memblock">
+<meta name="twitter:description" content="&amp;ensp;&amp;ensp;&amp;ensp;&amp;ensp;内核启动初期，常用内存分配器（memory allocator）还未被初始化而不能使用，在此期间memblock是一种用于管理内存区域的方法。memblock也是一种内存分配器，在内核启动阶段它是第一个被启用的内存分配器，在其他内存分配器可用之前使用它向内核注册指定的物理内存区间。memblock主要在启动阶段被使用，但若启用了内存热插拔机制，在内核">
+<meta name="twitter:image" content="http://chasinglulu.github.io/2019/05/28/早期内存分配器-memblock/memblock_struct.svg">
+
+
+
+
+
+
+  <link rel="canonical" href="http://chasinglulu.github.io/2019/05/28/早期内存分配器-memblock/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>早期内存分配器：memblock | 点滴汇聚</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-right page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">点滴汇聚</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">不积跬步无以至千里，不积小流无以成江海</p>
+      
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首页</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+    <a href="/categories/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-th"></i> <br />分类</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />归档</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+    <a href="/tags/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />标签</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+    <a href="/about/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-user"></i> <br />关于</a>
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://chasinglulu.github.io/2019/05/28/早期内存分配器-memblock/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Xinlu Wang">
+      <meta itemprop="description" content="不积跬步无以至千里，不积小流无以成江海">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="点滴汇聚">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">早期内存分配器：memblock
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-05-28 20:27:47" itemprop="dateCreated datePublished" datetime="2019-05-28T20:27:47+08:00">2019-05-28</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2021-07-06 17:36:32" itemprop="dateModified" datetime="2021-07-06T17:36:32+08:00">2021-07-06</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/memory-management/" itemprop="url" rel="index"><span itemprop="name">memory management</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <span class="post-meta-item-text">评论数：</span>
+                <a href="/2019/05/28/早期内存分配器-memblock/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count valine-comment-count" data-xid="/2019/05/28/早期内存分配器-memblock/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2019/05/28/早期内存分配器-memblock/" class="leancloud_visitors" data-flag-title="早期内存分配器：memblock">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数：</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>&ensp;&ensp;&ensp;&ensp;内核启动初期，常用内存分配器（memory allocator）还未被初始化而不能使用，在此期间memblock是一种用于管理内存区域的方法。memblock也是一种内存分配器，在内核启动阶段它是第一个被启用的内存分配器，在其他内存分配器可用之前使用它向内核注册指定的物理内存区间。memblock主要在启动阶段被使用，但若启用了内存热插拔机制，在内核运行时也需要使用memblock功能。2010年内核v.2.6.35版本首次引入memblock补丁，在此之前使用的内存分配器是bootmem。bootmem仅能管理启动时所需的部分物理内存（lowmem），但memblock能管理全部可用物理内存。在内核的buddy allocator（也是一种page allocator）可用之前，memblock是唯一能够在早期启动阶段管理内存的内存分配器。因此，这正是早期内存分配器（early memory allocator）术语的由来。</p>
+<a id="more"></a>
+<hr>
+<ul>
+<li><strong>Target Platform:</strong> <a href="https://www.96boards.org/product/rock960c/" target="_blank" rel="noopener">Rock960c</a></li>
+<li><strong>ARCH:</strong>arm64</li>
+<li><strong>Linux Kernel:</strong>linux-4.19.27</li>
+</ul>
+<hr>
+<h3 id="memblock结构"><a href="#memblock结构" class="headerlink" title="memblock结构"></a>memblock结构</h3><p>memblock可分为如下三种类型：</p>
+<ul>
+<li>memory类型：memory类型用于描述可用的物理内存区域。通过设置内核参数能够仅注册实际物理内存的有限部分。最初，该类型的regions数组最多可以描述128个内存区域，但可以调整这个数组的大小，每次扩大都是以翻倍的形式扩充数组。</li>
+<li>reserved类型：reserved类型用于描述正在使用的或即将被使用的物理内存块。起初，该类型的regions数组最多可以描述128个物理内存块，但可以通过翻倍的形式扩充这个数组。</li>
+<li>physmem类型：physmem类型是在2014年额外添加的一种类型，用于描述硬件探查到的真实物理内存区间，一旦注册了将不能改变这个区间的大小。与memory类型的区间不同，physmem类型的区间只能是真实大小的物理内存区域，而不能是通过内核参数指定的，目前s390架构相关代码会注册这种类型的内存区域。该类型的regions数组起初最多可以描述四个物理内存区域。<ul>
+<li><a href="https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=70210ed950b538ee7eb811dccc402db9df1c9be4" target="_blank" rel="noopener">mm/memblock: add physical memory list</a></li>
+</ul>
+</li>
+</ul>
+<p>如图1所示给出了memblock的内存区间类型和memblock数据结构的关系。</p>
+<div align="center"><img src="memblock_struct.svg" alt="memblock_struct.svg"><br>图1 memblock结构</div>
+
+<p>&ensp;&ensp;&ensp;&ensp;如图2所示给出了一个例子，用一个memblock_region实例描述memory类型的1GiB可用物理内存区间，并用两个memblock_region实例描述reserved类型的两个子区间，指示两个子内存区间正在被使用而保留。</p>
+<div align="center"><img src="memblock_config_struct.svg" alt="memblock_config_struct.svg"><br>图2 物理内存配置与memblock数据结构的联系</div>
+
+<p>通过下面三个表格分别说明memblock、memblock_type和memblock_region三个数据结构及其各个字段含义。</p>
+<div align="center">表1 memblock 数据结构说明<br><table style="border-collapse:collapse;border-spacing:0;border-color:#9ABAD9;margin:0px auto" class="tg"><tr><th style="font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#fff;background-color:#409cff;text-align:center">字段类型</th><th style="font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#fff;background-color:#409cff;text-align:center">字段名</th><th style="font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#fff;background-color:#409cff;text-align:center">含义解释</th></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:center">bool</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#D2E4FC;text-align:center">bottom_up</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:left">在分配内存时决定是自底向上地还是自顶向下地搜寻空闲内存区间，不管哪种方式都适用于x86_64 NUMA系统。若在NUMA系统启用了hotplug功能，不管哪种方式也都能有效地分配热插拔内存。比如尝试从内存低地址处开始搜寻空闲内存时，应尽量从某一个内存节点分配空闲内存区间，这样能使从其他节点获取内存区间的频率最小化（true=自底向上）<br></td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:center">phys_addr_t</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#D2E4FC;text-align:center">current_limit</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:left">用于限定分配的物理地址。比如在64位系统，由于所有物理内存能与虚拟内存直接映射，那也就不存在低端内存(lowmem)，所以该字段会被设置为MEMBLOCK_ALLOC_ANYWHERE(0xffffffff_ffffffff)</td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:center">struct memblock_type</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#D2E4FC;text-align:center">memory</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:left">可用的物理内存区域<br></td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:center">struct memblock_type<br></td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#D2E4FC;text-align:center">reserved<br></td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:left">正被使用而保留的内存区间<br></td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:center">struct memblock_type<br></td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#D2E4FC;text-align:center">physmem<br></td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:left">系统存在的所有物理内存区域（只有部分体系架构支持</td></tr></table></div>
+
+
+<div align="center">表2 memblock_type数据结构说明<br><table style="border-collapse:collapse;border-spacing:0;border-color:#9ABAD9;margin:0px auto" class="tg"><tr><th style="font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 10px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#fff;background-color:#409cff;text-align:center">字段类型</th><th style="font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 10px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#fff;background-color:#409cff;text-align:center">字段名</th><th style="font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 10px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#fff;background-color:#409cff;text-align:center">含义解释</th></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 10px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center">unsigned long</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 10px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#D2E4FC;text-align:center">cnt</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 10px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:left">当前regions数组的大小</td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 10px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center">unsigned long</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 10px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#D2E4FC;text-align:center">max</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 10px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:left">regions数组最大容量，也就是最多能描述的物理内存区间个数</td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 10px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center">phys_addr_t</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 10px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#D2E4FC;text-align:center">total_size</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 10px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:left">所有已注册内存区间的长度总和</td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 10px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center">struct memblock_region &#42;</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 10px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#D2E4FC;text-align:center">regions</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 10px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:left">指向描述内存区间的数组</td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 10px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center">char &#42;</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 10px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#D2E4FC;text-align:center">name</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 10px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:left">内存区间的类型名称</td></tr></table></div>
+
+<div align="center">表3 memblock_region数据结构说明<br><table style="border-collapse:collapse;border-spacing:0;border-color:#9ABAD9;margin:0px auto" class="tg"><tr><th style="font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#fff;background-color:#409cff;text-align:center">字段类型</th><th style="font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#fff;background-color:#409cff;text-align:center">字段名</th><th style="font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#fff;background-color:#409cff;text-align:center">含义解释</th></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:center">phys_addr_t<br></td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#D2E4FC;text-align:center">base</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:left">物理内存区间的起始地址（基地址）<br></td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:center">phys_addr_t</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#D2E4FC;text-align:center">size</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:left">物理内存区间的长度（大小）<br></td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:center">enum memblock_flags<br></td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#D2E4FC;text-align:center">flags</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:left">物理内存区间的属性，flags可以单独使用如下四个宏常量，也可以通过组合使用最后三个bit flag：<br>1. MEMBLOCK_NONE(0x0)：没有具体要求<br>2. MEMBLOCK_HOTPLUG(0x1)：可热插拔的内存区间<br>3. MEMBLOCK_MIRROR(0x2)：像镜子一样的内存区域<br>4. MEMBLOCK_NOMAP(0x4)：不能加入内核直接映射(kernel direct mapping)的内存区间</td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:center">int</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#D2E4FC;text-align:center">nid</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:left">内存节点编号<br></td></tr></table></div>
+
+<h3 id="memblock初始化"><a href="#memblock初始化" class="headerlink" title="memblock初始化"></a>memblock初始化</h3><p>我们先看一下在编译时memblock的初始值。<br><em>mm/memblock.c</em><br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="class"><span class="keyword">struct</span> <span class="title">memblock_region</span> </span></span><br><span class="line"><span class="class">	<span class="title">memblock_memory_init_regions</span>[<span class="title">INIT_MEMBLOCK_REGIONS</span>] __<span class="title">initdata_memblock</span>;</span></span><br><span class="line"><span class="keyword">static</span> <span class="class"><span class="keyword">struct</span> <span class="title">memblock_region</span> </span></span><br><span class="line"><span class="class">	<span class="title">memblock_reserved_init_regions</span>[<span class="title">INIT_MEMBLOCK_REGIONS</span>] __<span class="title">initdata_memblock</span>;</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">ifdef</span> CONFIG_HAVE_MEMBLOCK_PHYS_MAP</span></span><br><span class="line"><span class="keyword">static</span> <span class="class"><span class="keyword">struct</span> <span class="title">memblock_region</span> </span></span><br><span class="line"><span class="class">	<span class="title">memblock_physmem_init_regions</span>[<span class="title">INIT_PHYSMEM_REGIONS</span>] __<span class="title">initdata_memblock</span>;</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">memblock</span> <span class="title">memblock</span> __<span class="title">initdata_memblock</span> = &#123;</span></span><br><span class="line">	.memory.regions		= memblock_memory_init_regions,</span><br><span class="line">	.memory.cnt		= <span class="number">1</span>,	<span class="comment">/* empty dummy entry */</span></span><br><span class="line">	.memory.max		= INIT_MEMBLOCK_REGIONS,</span><br><span class="line">	.memory.name		= <span class="string">"memory"</span>,</span><br><span class="line"></span><br><span class="line">	.reserved.regions	= memblock_reserved_init_regions,</span><br><span class="line">	.reserved.cnt		= <span class="number">1</span>,	<span class="comment">/* empty dummy entry */</span></span><br><span class="line">	.reserved.max		= INIT_MEMBLOCK_REGIONS,</span><br><span class="line">	.reserved.name		= <span class="string">"reserved"</span>,</span><br><span class="line"></span><br><span class="line">#ifdef CONFIG_HAVE_MEMBLOCK_PHYS_MAP</span><br><span class="line">	.physmem.regions	= memblock_physmem_init_regions,</span><br><span class="line">	.physmem.cnt		= <span class="number">1</span>,	<span class="comment">/* empty dummy entry */</span></span><br><span class="line">	.physmem.max		= INIT_PHYSMEM_REGIONS,</span><br><span class="line">	.physmem.name		= <span class="string">"physmem"</span>,</span><br><span class="line">#endif</span><br><span class="line"></span><br><span class="line">	.bottom_up		= <span class="literal">false</span>,</span><br><span class="line">	.current_limit		= MEMBLOCK_ALLOC_ANYWHERE,</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<ul>
+<li>1～8行：在编译时memblock定义了三种描述内存区间的数组<ul>
+<li>memory memblock准备了能描述128个内存区域的数组</li>
+<li>reserved memblock也准备了能描述128个内存区间的数组</li>
+<li>physmem memblock 只准备了能描述4个内存区域的数组</li>
+</ul>
+</li>
+</ul>
+<h4 id="memory-memblock添加内存区域"><a href="#memory-memblock添加内存区域" class="headerlink" title="memory memblock添加内存区域"></a>memory memblock添加内存区域</h4><p>&ensp;&ensp;&ensp;&ensp;内核通过解析DTB文件的memory节点获得可用物理内存的起始地址和大小，并能通过类memblock_add的API往memory.regions数组添加一个memblock_region实例，用于管理这个物理内存区域。不过，某些特别的体系架构还支持自动识别出已安装内存的起始地址和大小等属性。若通过解析DTB文件添加物理内存区域，memory节点的reg属性给出内存的起始地址和大小，内核执行如下的函数调用路径来完成物理内存区域的注册。如图3所示显示了解析设备树和通过memblock_add API注册物理内存区间的处理流程。</p>
+<div align="center"><img src="memblock_add.svg" alt="memblock_add.svg"><br>图3 memblock_add调用流程</div>
+
+<p>&ensp;&ensp;&ensp;&ensp;不管ARM还是ARM64都能够人为地限定可用物理内存的大小。在ARM64系统，若已安装DRAM的大小超过了虚拟内存的寻址界限（VA39-1，VA42-1，VA48-1等），则超过的物理内存区间目前将不能被利用。通过<code>mem=</code>内核参数能够限定可用物理内存的大小。</p>
+<h4 id="arm64-memblock-init：初始化memblock"><a href="#arm64-memblock-init：初始化memblock" class="headerlink" title="arm64_memblock_init：初始化memblock"></a>arm64_memblock_init：初始化memblock</h4><p>&ensp;&ensp;&ensp;&ensp;在内核启动初始化阶段，会使用reserved类型的memblock_region实例来描述下列物理内存区间，表示物理内存区间被预留和使用。根据不同架构和平台的配置，所预留的物理内存区间也是存在差异的。</p>
+<ul>
+<li>存放kernel映像的内存区间</li>
+<li>存放initrd数据的内存区间</li>
+<li>存放页表（page table）的内存区间</li>
+<li>存放DTB文件和其中<code>reserved-mem</code>节点指定的内存区间</li>
+<li>用于CMA-DMA的内存区间</li>
+</ul>
+<p>&ensp;&ensp;&ensp;&ensp;此外，DTB文件中<code>chosen</code>节点的<code>linux,usable-memory-range</code>属性能指定可用物理内存的范围，在此范围外的物理内存区间将从memory memblock移除。如图4所示显示了arm64_memblock_init函数会预留的物理内存区间。</p>
+<div align="center"><img src="arm64_memblock_init.svg" alt="arm64_memblock_init.svg"><br>图4 arm64_memblock_init会预留的物理内存区间</div>
+
+<p>在arch/arm64/mm/init.c中arm64_memblock_init函数（1/2）：<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> __<span class="function">init <span class="title">arm64_memblock_init</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="keyword">const</span> s64 linear_region_size = -(s64)PAGE_OFFSET;</span><br><span class="line"></span><br><span class="line">	<span class="comment">/* Handle linux,usable-memory-range property */</span></span><br><span class="line">	fdt_enforce_memory_region();</span><br><span class="line"></span><br><span class="line">	<span class="comment">/* Remove memory above our supported physical address size */</span></span><br><span class="line">	memblock_remove(<span class="number">1U</span>LL &lt;&lt; PHYS_MASK_SHIFT, ULLONG_MAX);</span><br><span class="line"></span><br><span class="line">	BUILD_BUG_ON(linear_region_size != BIT(VA_BITS - <span class="number">1</span>));</span><br><span class="line"></span><br><span class="line">	memstart_addr = round_down(memblock_start_of_DRAM(),</span><br><span class="line">				   ARM64_MEMSTART_ALIGN);</span><br><span class="line"></span><br><span class="line">	memblock_remove(<span class="keyword">max_t</span>(u64, memstart_addr + linear_region_size,</span><br><span class="line">			__pa_symbol(_end)), ULLONG_MAX);</span><br><span class="line">	<span class="keyword">if</span> (memstart_addr + linear_region_size &lt; memblock_end_of_DRAM()) &#123;</span><br><span class="line">		<span class="comment">/* ensure that memstart_addr remains sufficiently aligned */</span></span><br><span class="line">		memstart_addr = round_up(memblock_end_of_DRAM() - linear_region_size,</span><br><span class="line">					 ARM64_MEMSTART_ALIGN);</span><br><span class="line">		memblock_remove(<span class="number">0</span>, memstart_addr);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> (memory_limit != PHYS_ADDR_MAX) &#123;</span><br><span class="line">		memblock_mem_limit_remove_map(memory_limit);</span><br><span class="line">		memblock_add(__pa_symbol(_text), (u64)(_end - _text));</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> (IS_ENABLED(CONFIG_BLK_DEV_INITRD) &amp;&amp; initrd_start) &#123;</span><br><span class="line">		u64 base = initrd_start &amp; PAGE_MASK;</span><br><span class="line">		u64 size = PAGE_ALIGN(initrd_end) - base;</span><br><span class="line"></span><br><span class="line">		<span class="keyword">if</span> (WARN(base &lt; memblock_start_of_DRAM() ||</span><br><span class="line">			 base + size &gt; memblock_start_of_DRAM() +</span><br><span class="line">				       linear_region_size,</span><br><span class="line">			<span class="string">"initrd not fully accessible via the linear mapping -- please check your bootloader ...\n"</span>)) &#123;</span><br><span class="line">			initrd_start = <span class="number">0</span>;</span><br><span class="line">		&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">			memblock_remove(base, size); <span class="comment">/* clear MEMBLOCK_ flags */</span></span><br><span class="line">			memblock_add(base, size);</span><br><span class="line">			memblock_reserve(base, size);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	.......</span><br></pre></td></tr></table></figure></p>
+<ul>
+<li>3行：在arm64内核，linear_region_size正好等于虚拟地址空间大小的二分之一，比如虚拟内存大小为512GiB（VA_BITS=39），那么linear_region_size = 256GiB</li>
+<li>13～14行：鉴于内核不同配置，通过向下舍去方式使DRAM起始地址对齐<code>SECTION_SIZE</code>或<code>PUD_SIZE</code>或<code>PMD_SIZE</code>，memstart_addr得到一个合适的物理内存基地址</li>
+<li>16～17行：内核映像有可能位于物理内存的顶端，顶部多余的物理内存区间将从memory memblock移除</li>
+<li>18～23行：若物理内存还超过linear mapping region的大小，底部超过的物理内存区间将从memory memblock移除。比如VA_BITS=39和DRAM=1TiB，linear mapping region只能有256GiB，其他768GiB内存区间不能被linear mapping容纳，需要从memory memblock中删除。</li>
+<li>25～28行：通过<code>mem=</code>内核参数缩减FDT指定的物理内存，多出的内存区间需从memory memblock剔除 </li>
+<li>30～44行：在reserved memblock添加用于保存initrd数据的内存区间</li>
+</ul>
+<p>在arch/arm64/mm/init.c中arm64_memblock_init函数（2/2）：<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line">	......</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> (IS_ENABLED(CONFIG_RANDOMIZE_BASE)) &#123;</span><br><span class="line">		<span class="keyword">extern</span> u16 memstart_offset_seed;</span><br><span class="line">		u64 range = linear_region_size -</span><br><span class="line">			    (memblock_end_of_DRAM() - memblock_start_of_DRAM());</span><br><span class="line"></span><br><span class="line">		<span class="keyword">if</span> (memstart_offset_seed &gt; <span class="number">0</span> &amp;&amp; range &gt;= ARM64_MEMSTART_ALIGN) &#123;</span><br><span class="line">			range = range / ARM64_MEMSTART_ALIGN + <span class="number">1</span>;</span><br><span class="line">			memstart_addr -= ARM64_MEMSTART_ALIGN *</span><br><span class="line">					 ((range * memstart_offset_seed) &gt;&gt; <span class="number">16</span>);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	memblock_reserve(__pa_symbol(_text), _end - _text);</span><br><span class="line"><span class="meta">#<span class="meta-keyword">ifdef</span> CONFIG_BLK_DEV_INITRD</span></span><br><span class="line">	<span class="keyword">if</span> (initrd_start) &#123;</span><br><span class="line">		memblock_reserve(initrd_start, initrd_end - initrd_start);</span><br><span class="line"></span><br><span class="line">		<span class="comment">/* the generic initrd code expects virtual addresses */</span></span><br><span class="line">		initrd_start = __phys_to_virt(initrd_start);</span><br><span class="line">		initrd_end = __phys_to_virt(initrd_end);</span><br><span class="line">	&#125;</span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br><span class="line"></span><br><span class="line">	early_init_fdt_scan_reserved_mem();</span><br><span class="line"></span><br><span class="line">	<span class="comment">/* 4GB maximum for 32-bit only capable devices */</span></span><br><span class="line">	<span class="keyword">if</span> (IS_ENABLED(CONFIG_ZONE_DMA32))</span><br><span class="line">		arm64_dma_phys_limit = max_zone_dma_phys();</span><br><span class="line">	<span class="keyword">else</span></span><br><span class="line">		arm64_dma_phys_limit = PHYS_MASK + <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">	reserve_crashkernel();</span><br><span class="line"></span><br><span class="line">	reserve_elfcorehdr();</span><br><span class="line"></span><br><span class="line">	high_memory = __va(memblock_end_of_DRAM() - <span class="number">1</span>) + <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">	dma_contiguous_reserve(arm64_dma_phys_limit);</span><br><span class="line"></span><br><span class="line">	memblock_allow_resize();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<ul>
+<li>3～14行：出于安全考虑，CONFIG_RANDOMIZE_BASE选项决定是否随机地改变物理内存起始地址memstart_addr</li>
+<li>15行：保留kernel 映像的内存区间</li>
+<li>17～23行：在（1/2）代码片段中为initrd保留了足够的内存区间，这里将物理地址initrd_start和initrd_end转换成对应的虚拟地址并保存</li>
+<li>26行：将保留与DTB有关的三种内存区间：<ul>
+<li>用于存储DTB的内存区间</li>
+<li>DTB头部的off_mem_rsvmap成员会指向描述预留内存区块的信息（二进制形式），解析并保留这些内存区间</li>
+<li>DTB中<code>reserved-mem</code>节点指定的内存区间</li>
+</ul>
+</li>
+<li>29～40行：在reserved memblock中保留设备驱动（DMA for Coherent / CMA for DMA）所需的DMA物理内存区间，并交给CMA（Contiguous Memory Allocator）进行管理。为了初始化CMA，将已保留的连续内存区间注册入cma_areas数组。</li>
+<li>42行：允许memblock regions数组扩容</li>
+</ul>
+<h3 id="memblock分配"><a href="#memblock分配" class="headerlink" title="memblock分配"></a>memblock分配</h3><p>&ensp;&ensp;&ensp;&ensp;在内核启动的早期和内存热插拔「hotplug」过程都会使用涉及内存分配与释放的各种memblock API。如下图所示给出了在分配内时memblock API的调用流程。</p>
+<div align="center"><img src="memblock_alloc.svg" alt="memblock_alloc.svg"><br>图5 memblock_alloc的调用关系</div>
+
+<p>&ensp;&ensp;&ensp;&ensp;接下来，让我们仔细研究一下memblcok分配过程中涉及的各种函数。</p>
+<h4 id="memblock-alloc：从memblock中分配内存"><a href="#memblock-alloc：从memblock中分配内存" class="headerlink" title="memblock_alloc：从memblock中分配内存"></a>memblock_alloc：从memblock中分配内存</h4><p>&ensp;&ensp;&ensp;&ensp;size是从memblock分配时要求的内存区间长度，align是使内存区间起始地址对齐的数值，这两参数直接传递给被调用的memblock_alloc_base函数。此外，指定max_addr为MEMBLOCK_ALLOC_ACCESSIBLE来限定可分配内存的最大物理地址。<br><em>mm/memblock.c</em><br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">phys_addr_t</span> __<span class="function">init <span class="title">memblock_alloc</span><span class="params">(<span class="keyword">phys_addr_t</span> size, <span class="keyword">phys_addr_t</span> align)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="keyword">return</span> memblock_alloc_base(size, align, MEMBLOCK_ALLOC_ACCESSIBLE);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>理解了上面的函数后，我们查看下面这个函数的实现。<br><em>mm/memblock.c</em><br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">phys_addr_t</span> __<span class="function">init <span class="title">memblock_alloc_base</span><span class="params">(<span class="keyword">phys_addr_t</span> size, <span class="keyword">phys_addr_t</span> align, <span class="keyword">phys_addr_t</span> max_addr)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="keyword">phys_addr_t</span> alloc;</span><br><span class="line"></span><br><span class="line">	alloc = __memblock_alloc_base(size, align, max_addr);</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> (alloc == <span class="number">0</span>)</span><br><span class="line">		panic(<span class="string">"ERROR: Failed to allocate %pa bytes below %pa.\n"</span>,</span><br><span class="line">		      &amp;size, &amp;max_addr);</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> alloc;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>下面的代码尝试在没有NUMA内存节点（nid）和flags限定的情况下分配空闲内存区间。<br>mm/memblock.c<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">phys_addr_t</span> __init __memblock_alloc_base(<span class="keyword">phys_addr_t</span> size, <span class="keyword">phys_addr_t</span> align, <span class="keyword">phys_addr_t</span> max_addr)</span><br><span class="line">&#123;</span><br><span class="line">	<span class="keyword">return</span> memblock_alloc_base_nid(size, align, max_addr, NUMA_NO_NODE,</span><br><span class="line">				       MEMBLOCK_NONE);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>下面代码指定了memblock分配范围的起始为0。<br><em>mm/memblock.c</em><br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">phys_addr_t</span> __<span class="function">init <span class="title">memblock_alloc_base_nid</span><span class="params">(<span class="keyword">phys_addr_t</span> size,</span></span></span><br><span class="line"><span class="function"><span class="params">					<span class="keyword">phys_addr_t</span> align, <span class="keyword">phys_addr_t</span> max_addr,</span></span></span><br><span class="line"><span class="function"><span class="params">					<span class="keyword">int</span> nid, <span class="keyword">enum</span> memblock_flags flags)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="keyword">return</span> memblock_alloc_range_nid(size, align, <span class="number">0</span>, max_addr, nid, flags);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h4 id="memblock-alloc-range-nid：从特定memblock范围分配内存"><a href="#memblock-alloc-range-nid：从特定memblock范围分配内存" class="headerlink" title="memblock_alloc_range_nid：从特定memblock范围分配内存"></a>memblock_alloc_range_nid：从特定memblock范围分配内存</h4><p>&ensp;&ensp;&ensp;&ensp;在分配范围、NUMA内存节点和flags限定的情况下寻找空闲内存区间，并将合适的内存区间插入reserved memblock，指示该区间已被使用和保留。<br><em>mm/memblock.c</em><br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="keyword">phys_addr_t</span> __<span class="function">init <span class="title">memblock_alloc_range_nid</span><span class="params">(<span class="keyword">phys_addr_t</span> size,</span></span></span><br><span class="line"><span class="function"><span class="params">					<span class="keyword">phys_addr_t</span> align, <span class="keyword">phys_addr_t</span> start,</span></span></span><br><span class="line"><span class="function"><span class="params">					<span class="keyword">phys_addr_t</span> end, <span class="keyword">int</span> nid,</span></span></span><br><span class="line"><span class="function"><span class="params">					<span class="keyword">enum</span> memblock_flags flags)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="keyword">phys_addr_t</span> found;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> (!align)</span><br><span class="line">		align = SMP_CACHE_BYTES;</span><br><span class="line"></span><br><span class="line">	found = memblock_find_in_range_node(size, align, start, end, nid,</span><br><span class="line">					    flags);</span><br><span class="line">	<span class="keyword">if</span> (found &amp;&amp; !memblock_reserve(found, size)) &#123;</span><br><span class="line">		kmemleak_alloc_phys(found, size, <span class="number">0</span>, <span class="number">0</span>);</span><br><span class="line">		<span class="keyword">return</span> found;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<ul>
+<li>8～9行：若align未设置，将系统的硬件高速缓存行大小赋值给align</li>
+<li>11～12行：使用要求的分配范围、内存节点和flags搜寻一个合适的空闲内存区间</li>
+<li>13～17行：如果寻找到了，将空闲内存区间插入reserved memblock，指示这段区间已被使用保留。若分配失败，返回0。</li>
+</ul>
+<p>&ensp;&ensp;&ensp;&ensp;如图6所示显示了memblock_find_in_range_node的处理流程。</p>
+<div align="center"><img src="memblock_find.svg" alt="memblock_find.svg"><br>图6 搜寻特定大小内存块的处理流程</div>
+
+<p><em>mm/memblock.c</em><br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="keyword">phys_addr_t</span> __init_memblock</span><br><span class="line">__memblock_find_range_top_down(<span class="keyword">phys_addr_t</span> start, <span class="keyword">phys_addr_t</span> end,</span><br><span class="line">			       <span class="keyword">phys_addr_t</span> size, <span class="keyword">phys_addr_t</span> align, <span class="keyword">int</span> nid,</span><br><span class="line">			       <span class="keyword">enum</span> memblock_flags flags)</span><br><span class="line">&#123;</span><br><span class="line">	<span class="keyword">phys_addr_t</span> this_start, this_end, cand;</span><br><span class="line">	u64 i;</span><br><span class="line"></span><br><span class="line">	for_each_free_mem_range_reverse(i, nid, flags, &amp;this_start, &amp;this_end,</span><br><span class="line">					<span class="literal">NULL</span>) &#123;</span><br><span class="line">		this_start = clamp(this_start, start, end);</span><br><span class="line">		this_end = clamp(this_end, start, end);</span><br><span class="line"></span><br><span class="line">		<span class="keyword">if</span> (this_end &lt; size)</span><br><span class="line">			<span class="keyword">continue</span>;</span><br><span class="line"></span><br><span class="line">		cand = round_down(this_end - size, align);</span><br><span class="line">		<span class="keyword">if</span> (cand &gt;= this_start)</span><br><span class="line">			<span class="keyword">return</span> cand;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>9～20行：自顶向下地搜寻空闲内存区间，即包含在memory membock但不包含在reserved memblock。如果寻找到的空闲内存来自指定的内存节点（@nid），位于@start~@end范围内，那么从中截取一个子区间，使其起始地址与@align对齐，区间长度大于等于@size，最后得到一个满足这些条件的子区间，并返回该子区间的首地址。</p>
+<ul>
+<li>循环逐个地搜寻空闲内存区间</li>
+<li>若空闲内存区间的尾地址小于size，那么舍弃这个区间，继续进行下一轮搜寻</li>
+<li>以this_end为准线向下延伸得到一个不小于@size的子区间，并且通过向下取整的方式使其起始地址对齐@align</li>
+</ul>
+<p>&ensp;&ensp;&ensp;&ensp;如图7所示，假如在执行__memblock_find_range_top_down函数时内存已有这些使用和保留，那么在循环搜寻时会得到7个空闲内存区间，不过只有4个内存区间在要求的范围内，因此会依次从这4个内存区间寻找符合要求的子区间。 </p>
+<div align="center"><img src="memblock_example_iteration.svg" alt="memblock_example_iteration.svg"><br>图7 </div>
+
+<p>&ensp;&ensp;&ensp;&ensp;若不考虑内存节点属性，使用下面函数直接将一个基地址（base）和区间长度（size）给定的内存区间加入reserved memblock。<br><em>mm/memblock.c</em><br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> __<span class="function">init_memblock <span class="title">memblock_reserve</span><span class="params">(<span class="keyword">phys_addr_t</span> base, <span class="keyword">phys_addr_t</span> size)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="keyword">phys_addr_t</span> end = base + size - <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">	memblock_dbg(<span class="string">"memblock_reserve: [%pa-%pa] %pF\n"</span>,</span><br><span class="line">		     &amp;base, &amp;end, (<span class="keyword">void</span> *)_RET_IP_);</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> memblock_add_range(&amp;memblock.reserved, base, size, MAX_NUMNODES, <span class="number">0</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="memblock增添"><a href="#memblock增添" class="headerlink" title="memblock增添"></a>memblock增添</h3><p>&ensp;&ensp;&ensp;&ensp;memblock_add函数只能用于非NUMA系统添加可用物理内存。NUMA系统需要使用具有nid参数的memblock_add_node函数添加NUMA节点中可用物理内存。尽管在设计芯片时会考虑绝不让各个物理内存区域互相重叠，但是可能存在例外情况，并不能保证注册的内存区域一定不与已注册的内存区域出现重叠。如图8所示显示了向memory memblock添加可用物理内存区域的处理流程。</p>
+<div align="center"><img src="memblock_add_node.svg" alt="memblock_add_node.svg"><br>图8 memblock添加的处理流程</div>
+
+<p>&ensp;&ensp;&ensp;&ensp;如图9所示，如果不考虑区间的内存节点属性，当在插入新的内存区域时有可能与已有区间重叠，这时会出现memblock的第一种合并。</p>
+<div align="center"><img src="memblock_merge.svg" alt="memblock_merge.svg"><br>图9 第一种memblock合并</div>
+
+<h4 id="memblock-add-向memory-memblock添加内存区域"><a href="#memblock-add-向memory-memblock添加内存区域" class="headerlink" title="memblock_add: 向memory memblock添加内存区域"></a>memblock_add: 向memory memblock添加内存区域</h4><p>&ensp;&ensp;&ensp;&ensp;由于这个函数只用于注册UMA系统中可用物理内存，因此不必设置描述内存区间的所有属性。只需设置base和size来指定起始物理地址和区间长度，区间所属的内存节点nid默认地设定为MAX_NUMNODES，以及区间flags默认地设为0，指示区间无任何特殊要求。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> __<span class="function">init_memblock <span class="title">memblock_add</span><span class="params">(<span class="keyword">phys_addr_t</span> base, <span class="keyword">phys_addr_t</span> size)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="keyword">return</span> memblock_add_range(&amp;memblock.memory, base, size, MAX_NUMNODES, <span class="number">0</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>上面函数将直接调用memblock_add_range函数。</p>
+<h4 id="memblock-add-range-将特定内存区间注册入memblock"><a href="#memblock-add-range-将特定内存区间注册入memblock" class="headerlink" title="memblock_add_range: 将特定内存区间注册入memblock"></a>memblock_add_range: 将特定内存区间注册入memblock</h4><p>&ensp;&ensp;&ensp;&ensp;这个函数将具体的内存区间添加到特定类型的memblock。即使新插入的内存区间与已存有的内存区间出现重叠，在插入新内存区间时并不会改变重叠的内存区间，只是将没有重叠的新内存区间插入。在插入之后，相邻且属性兼容的内存区间会合并成一个内存区间。这个函数返回值只是0。</p>
+<p>在mm/memblock.c中的memblock_add_range函数(1/2)<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> __<span class="function">init_memblock <span class="title">memblock_add_range</span><span class="params">(struct memblock_type *type,</span></span></span><br><span class="line"><span class="function"><span class="params">				<span class="keyword">phys_addr_t</span> base, <span class="keyword">phys_addr_t</span> size,</span></span></span><br><span class="line"><span class="function"><span class="params">				<span class="keyword">int</span> nid, <span class="keyword">enum</span> memblock_flags flags)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="keyword">bool</span> insert = <span class="literal">false</span>;</span><br><span class="line">	<span class="keyword">phys_addr_t</span> obase = base;</span><br><span class="line">	<span class="keyword">phys_addr_t</span> end = base + memblock_cap_size(base, &amp;size);</span><br><span class="line">	<span class="keyword">int</span> idx, nr_new;</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">memblock_region</span> *<span class="title">rgn</span>;</span></span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> (!size)</span><br><span class="line">		<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">	<span class="comment">/* special case for empty array */</span></span><br><span class="line">	<span class="keyword">if</span> (type-&gt;regions[<span class="number">0</span>].size == <span class="number">0</span>) &#123;</span><br><span class="line">		WARN_ON(type-&gt;cnt != <span class="number">1</span> || type-&gt;total_size);</span><br><span class="line">		type-&gt;regions[<span class="number">0</span>].base = base;</span><br><span class="line">		type-&gt;regions[<span class="number">0</span>].size = size;</span><br><span class="line">		type-&gt;regions[<span class="number">0</span>].flags = flags;</span><br><span class="line">		memblock_set_region_node(&amp;type-&gt;regions[<span class="number">0</span>], nid);</span><br><span class="line">		type-&gt;total_size = size;</span><br><span class="line">		<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">	&#125;</span><br><span class="line">repeat:</span><br><span class="line">	base = obase;</span><br><span class="line">	nr_new = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">	for_each_memblock_type(idx, type, rgn) &#123;</span><br><span class="line">		<span class="keyword">phys_addr_t</span> rbase = rgn-&gt;base;</span><br><span class="line">		<span class="keyword">phys_addr_t</span> rend = rbase + rgn-&gt;size;</span><br><span class="line"></span><br><span class="line">		<span class="keyword">if</span> (rbase &gt;= end)</span><br><span class="line">			<span class="keyword">break</span>;</span><br><span class="line">		<span class="keyword">if</span> (rend &lt;= base)</span><br><span class="line">			<span class="keyword">continue</span>;</span><br><span class="line"></span><br><span class="line">		<span class="keyword">if</span> (rbase &gt; base) &#123;</span><br><span class="line"><span class="meta">#<span class="meta-keyword">ifdef</span> CONFIG_HAVE_MEMBLOCK_NODE_MAP</span></span><br><span class="line">			WARN_ON(nid != memblock_get_region_node(rgn));</span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br><span class="line">			WARN_ON(flags != rgn-&gt;flags);</span><br><span class="line">			nr_new++;</span><br><span class="line">			<span class="keyword">if</span> (insert)</span><br><span class="line">				memblock_insert_region(type, idx++, base,</span><br><span class="line">						       rbase - base, nid,</span><br><span class="line">						       flags);</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="comment">/* area below @rend is dealt with, forget about it */</span></span><br><span class="line">		base = min(rend, end);</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	......</span><br></pre></td></tr></table></figure></p>
+<ul>
+<li>15～22行：如果memblock还没有具体的内存区间，不需要考虑重叠问题，直接根据参数设置第一个内存区间，然后退出这个函数。</li>
+<li>24行：借助repeat标签能够再重复执行一次插入过程，第一次执行插入被成为first round，第二次执行插入被成为second round。在first round仅更新nr_new来统计需要插入的内存区间个数，在second round才真正地将这些非重叠的内存区间逐个插入特定类型的memblock。</li>
+<li>28行：通过循环遍历特定类型的memblock内存区间，判断是否与新插入的区间重叠。</li>
+<li>32行：新内存区间位于相比较的内存区间之下且不重叠，因此不必再继续循环遍历。</li>
+<li>34行：新内存区间位于相比较的内存区间之上且不重叠，因而需要继续循环遍历并与下一区间进行比较。</li>
+<li>37行：新内存区间与相比较内存区间的底部重叠，所以在此，新内存区间的非重叠部分将会被插入，并且插入的内存区间肯定与比较区间相邻。</li>
+<li>49行：若请求的新内存区间还存在需要被插入的子内存区间，提前更新base为下一个待插入子区间的起始地址。</li>
+</ul>
+<p>在mm/memblock.c中的memblock_add_range函数(2/2)<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">	......</span><br><span class="line"></span><br><span class="line">	<span class="comment">/* insert the remaining portion */</span></span><br><span class="line">	<span class="keyword">if</span> (base &lt; end) &#123;</span><br><span class="line">		nr_new++;</span><br><span class="line">		<span class="keyword">if</span> (insert)</span><br><span class="line">			memblock_insert_region(type, idx, base, end - base,</span><br><span class="line">					       nid, flags);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> (!nr_new)</span><br><span class="line">		<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> (!insert) &#123;</span><br><span class="line">		<span class="keyword">while</span> (type-&gt;cnt + nr_new &gt; type-&gt;max)</span><br><span class="line">			<span class="keyword">if</span> (memblock_double_array(type, obase, size) &lt; <span class="number">0</span>)</span><br><span class="line">				<span class="keyword">return</span> -ENOMEM;</span><br><span class="line">		insert = <span class="literal">true</span>;</span><br><span class="line">		<span class="keyword">goto</span> repeat;</span><br><span class="line">	&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">		memblock_merge_regions(type);</span><br><span class="line">		<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<ul>
+<li>4行：在循环遍历结束后，若新内存区间的末端还有需要插入的子区间，这里将待插入子区间加入特定类型的memblock</li>
+<li>14行：在first round，只要已有区间个数和待插入区间个数的总和超过memblock最多能管理的区间个数，将重复调用memblock_double_array函数使memblock regions数组空间（regions数组的元素数量）翻倍。</li>
+<li>20行：在second round， 如果新插入的区间与已有区间相邻且有相同flag，将使用memblock_merge_regions函数将这些区间合并。</li>
+</ul>
+<h4 id="memblock-insert-region函数：将内存区间插入memblock"><a href="#memblock-insert-region函数：将内存区间插入memblock" class="headerlink" title="memblock_insert_region函数：将内存区间插入memblock"></a>memblock_insert_region函数：将内存区间插入memblock</h4><p>&ensp;&ensp;&ensp;&ensp;将内存区间插入到具体memblock的给定位置，即在regions数组的指定位置插入一个memblock_region实例。memblock_type实例的cnt字段增加1，total_size字段累加size。</p>
+<p>mm/memblock.c<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="keyword">void</span> __<span class="function">init_memblock <span class="title">memblock_insert_region</span><span class="params">(struct memblock_type *type,</span></span></span><br><span class="line"><span class="function"><span class="params">						   <span class="keyword">int</span> idx, <span class="keyword">phys_addr_t</span> base,</span></span></span><br><span class="line"><span class="function"><span class="params">						   <span class="keyword">phys_addr_t</span> size,</span></span></span><br><span class="line"><span class="function"><span class="params">						   <span class="keyword">int</span> nid,</span></span></span><br><span class="line"><span class="function"><span class="params">						   <span class="keyword">enum</span> memblock_flags flags)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">memblock_region</span> *<span class="title">rgn</span> = &amp;<span class="title">type</span>-&gt;<span class="title">regions</span>[<span class="title">idx</span>];</span></span><br><span class="line"></span><br><span class="line">	BUG_ON(type-&gt;cnt &gt;= type-&gt;max);</span><br><span class="line">	memmove(rgn + <span class="number">1</span>, rgn, (type-&gt;cnt - idx) * <span class="keyword">sizeof</span>(*rgn));</span><br><span class="line">	rgn-&gt;base = base;</span><br><span class="line">	rgn-&gt;size = size;</span><br><span class="line">	rgn-&gt;flags = flags;</span><br><span class="line">	memblock_set_region_node(rgn, nid);</span><br><span class="line">	type-&gt;cnt++;</span><br><span class="line">	type-&gt;total_size += size;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<ul>
+<li>10行：从给定位置的区间到末尾区间都往后移动一个位置。</li>
+<li>14行：设置区间的nid（node ID）属性，更好地支持NUMA架构系统。</li>
+</ul>
+<h4 id="memblock-double-array函数：使memblock能管理的区间翻倍"><a href="#memblock-double-array函数：使memblock能管理的区间翻倍" class="headerlink" title="memblock_double_array函数：使memblock能管理的区间翻倍"></a>memblock_double_array函数：使memblock能管理的区间翻倍</h4><p>&ensp;&ensp;&ensp;&ensp;用于描述内存区间的memblock regions数组初始化时较小，因此在需要扩大时调用这个函数使数组大小翻倍。根据如下代码分析memblock_double_array函数。</p>
+<p>在mm/memblock.c中memblock_double_array函数（1/2）<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="keyword">int</span> __<span class="function">init_memblock <span class="title">memblock_double_array</span><span class="params">(struct memblock_type *type,</span></span></span><br><span class="line"><span class="function"><span class="params">						<span class="keyword">phys_addr_t</span> new_area_start,</span></span></span><br><span class="line"><span class="function"><span class="params">						<span class="keyword">phys_addr_t</span> new_area_size)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">memblock_region</span> *<span class="title">new_array</span>, *<span class="title">old_array</span>;</span></span><br><span class="line">	<span class="keyword">phys_addr_t</span> old_alloc_size, new_alloc_size;</span><br><span class="line">	<span class="keyword">phys_addr_t</span> old_size, new_size, addr, new_end;</span><br><span class="line">	<span class="keyword">int</span> use_slab = slab_is_available();</span><br><span class="line">	<span class="keyword">int</span> *in_slab;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> (!memblock_can_resize)</span><br><span class="line">		<span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line"></span><br><span class="line">	<span class="comment">/* Calculate new doubled size */</span></span><br><span class="line">	old_size = type-&gt;max * <span class="keyword">sizeof</span>(struct memblock_region);</span><br><span class="line">	new_size = old_size &lt;&lt; <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">	old_alloc_size = PAGE_ALIGN(old_size);</span><br><span class="line">	new_alloc_size = PAGE_ALIGN(new_size);</span><br><span class="line"></span><br><span class="line">	<span class="comment">/* Retrieve the slab flag */</span></span><br><span class="line">	<span class="keyword">if</span> (type == &amp;memblock.memory)</span><br><span class="line">		in_slab = &amp;memblock_memory_in_slab;</span><br><span class="line">	<span class="keyword">else</span></span><br><span class="line">		in_slab = &amp;memblock_reserved_in_slab;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> (use_slab) &#123;</span><br><span class="line">		new_array = kmalloc(new_size, GFP_KERNEL);</span><br><span class="line">		addr = new_array ? __pa(new_array) : <span class="number">0</span>;</span><br><span class="line">	&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">		<span class="comment">/* only exclude range when trying to double reserved.regions */</span></span><br><span class="line">		<span class="keyword">if</span> (type != &amp;memblock.reserved)</span><br><span class="line">			new_area_start = new_area_size = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">		addr = memblock_find_in_range(new_area_start + new_area_size,</span><br><span class="line">						memblock.current_limit,</span><br><span class="line">						new_alloc_size, PAGE_SIZE);</span><br><span class="line">		<span class="keyword">if</span> (!addr &amp;&amp; new_area_size)</span><br><span class="line">			addr = memblock_find_in_range(<span class="number">0</span>,</span><br><span class="line">				min(new_area_start, memblock.current_limit),</span><br><span class="line">				new_alloc_size, PAGE_SIZE);</span><br><span class="line"></span><br><span class="line">		new_array = addr ? __va(addr) : <span class="literal">NULL</span>;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	......</span><br></pre></td></tr></table></figure></p>
+<ul>
+<li>11～12行：memblock_allow_resize函数用于设置全局变量memblock_can_resize。如果memblock_allow_resize函数没有调用，那么memblock_can_resize未被设置为1，因此这个函数将不起作用。</li>
+<li>16行：计算准备重新分配的regions数组大小，其是已有regions数组大小的两陪。</li>
+<li>22行：为了明确指定类型（memblock_type实例）的regions数组是编译时static定义的或通过memblock操作动态分配的，还是通过slab操作动态分配的。</li>
+<li>27行：当正式的slab内存分配器起作用时，通过kmalloc函数给regions数组分配需要的内存。</li>
+<li>32行：如果slab不可用，尝试使用来自memblock_add函数的memblock_find_in_range函数去寻找一段空闲内存空间，存放用于管理区间的regions数组。如果指定memblock的类型不是reserved类型，即memory类型，那么要求的分配范围将从0开始。<br>如果在可用物理内存注册入memory类型的memblock期间需要扩充regions数组，那么新分配的内存空间只可能从以前注册的物理内存中搜寻得到。无论如何，新分配的内存空间不能与已用的内存区间相互干涉。因此为了避免与指定内存范围重叠，在第一次搜寻时会从该范围之上的内存寻找空闲内存区间。</li>
+<li>38行：如果memblock的类型是reserved且在第一次搜寻没有找到合适的内存空间，为了避免与指定内存范围重叠，将从该范围之下的内存搜寻空闲内存区间。</li>
+</ul>
+<p>memblock_double_array函数（2/2）<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">	......</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> (!addr) &#123;</span><br><span class="line">		pr_err(<span class="string">"memblock: Failed to double %s array from %ld to %ld entries !\n"</span>,</span><br><span class="line">		       type-&gt;name, type-&gt;max, type-&gt;max * <span class="number">2</span>);</span><br><span class="line">		<span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	new_end = addr + new_size - <span class="number">1</span>;</span><br><span class="line">	memblock_dbg(<span class="string">"memblock: %s is doubled to %ld at [%pa-%pa]"</span>,</span><br><span class="line">			type-&gt;name, type-&gt;max * <span class="number">2</span>, &amp;addr, &amp;new_end);</span><br><span class="line"></span><br><span class="line">	<span class="built_in">memcpy</span>(new_array, type-&gt;regions, old_size);</span><br><span class="line">	<span class="built_in">memset</span>(new_array + type-&gt;max, <span class="number">0</span>, old_size);</span><br><span class="line">	old_array = type-&gt;regions;</span><br><span class="line">	type-&gt;regions = new_array;</span><br><span class="line">	type-&gt;max &lt;&lt;= <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">	<span class="comment">/* Free old array. We needn't free it if the array is the static one */</span></span><br><span class="line">	<span class="keyword">if</span> (*in_slab)</span><br><span class="line">		kfree(old_array);</span><br><span class="line">	<span class="keyword">else</span> <span class="keyword">if</span> (old_array != memblock_memory_init_regions &amp;&amp;</span><br><span class="line">		 old_array != memblock_reserved_init_regions)</span><br><span class="line">		memblock_free(__pa(old_array), old_alloc_size);</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> (!use_slab)</span><br><span class="line">		BUG_ON(memblock_reserve(addr, new_alloc_size));</span><br><span class="line"></span><br><span class="line">	*in_slab = use_slab;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<ul>
+<li>13～17行：将已有regions数组的所有内容全部复制到新分配的内存空间内，剩余未用的部分全部清零。而且还要更新memblock_type实例的max字段为原来值的两倍。</li>
+<li>21行：将老regions数组占用的内存空间释放。但由于最初的regions数组是在编译时定义的，因此不能删除和舍弃。只要regions数组不是最初的那个，会根据分配器类型对其采用不同释放方法。<ul>
+<li>如果已使用了slab，用kfree函数释放占用的内存空间</li>
+<li>如果slab还不可用，用memblock_free函数释放已用的内存空间</li>
+</ul>
+</li>
+</ul>
+<h4 id="memblock-merge-regions函数：将memblock的相邻内存区间合并"><a href="#memblock-merge-regions函数：将memblock的相邻内存区间合并" class="headerlink" title="memblock_merge_regions函数：将memblock的相邻内存区间合并"></a>memblock_merge_regions函数：将memblock的相邻内存区间合并</h4><p>&ensp;&ensp;&ensp;&ensp;如果相邻内存区间具有相同flags和nid，合并这两区间为一个较大区间。</p>
+<p>mm/memblock.c<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="keyword">void</span> __<span class="function">init_memblock <span class="title">memblock_merge_regions</span><span class="params">(struct memblock_type *type)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="keyword">int</span> i = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">	<span class="comment">/* cnt never goes below 1 */</span></span><br><span class="line">	<span class="keyword">while</span> (i &lt; type-&gt;cnt - <span class="number">1</span>) &#123;</span><br><span class="line">		<span class="class"><span class="keyword">struct</span> <span class="title">memblock_region</span> *<span class="title">this</span> = &amp;<span class="title">type</span>-&gt;<span class="title">regions</span>[<span class="title">i</span>];</span></span><br><span class="line">		<span class="class"><span class="keyword">struct</span> <span class="title">memblock_region</span> *<span class="title">next</span> = &amp;<span class="title">type</span>-&gt;<span class="title">regions</span>[<span class="title">i</span> + 1];</span></span><br><span class="line"></span><br><span class="line">		<span class="keyword">if</span> (<span class="keyword">this</span>-&gt;base + <span class="keyword">this</span>-&gt;size != next-&gt;base ||</span><br><span class="line">		    memblock_get_region_node(<span class="keyword">this</span>) !=</span><br><span class="line">		    memblock_get_region_node(next) ||</span><br><span class="line">		    <span class="keyword">this</span>-&gt;flags != next-&gt;flags) &#123;</span><br><span class="line">			BUG_ON(<span class="keyword">this</span>-&gt;base + <span class="keyword">this</span>-&gt;size &gt; next-&gt;base);</span><br><span class="line">			i++;</span><br><span class="line">			<span class="keyword">continue</span>;</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		<span class="keyword">this</span>-&gt;size += next-&gt;size;</span><br><span class="line">		<span class="comment">/* move forward from next + 1, index of which is i + 2 */</span></span><br><span class="line">		memmove(next, next + <span class="number">1</span>, (type-&gt;cnt - (i + <span class="number">2</span>)) * <span class="keyword">sizeof</span>(*next));</span><br><span class="line">		type-&gt;cnt--;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<ul>
+<li>6行：一旦合并，指定类型memblock中的区间个数（cnt）会递减，从而减少循环次数。</li>
+<li>10行：如果两个区间不相邻或区间的flags不同，这对区间不能合并，继续检查下一对区间。</li>
+<li>19行：若确定这对区间符合限定条件，合并它们。</li>
+</ul>
+<p>如图10所示，除非具有不同的nid或flags属性，否则相邻的多个区间将被合并。</p>
+<div align="center"><img src="memblock_merge_II.svg" alt="memblock_merge_II.svg"><br>图10 第二种memblock合并</div>
+
+<h3 id="memblock删除"><a href="#memblock删除" class="headerlink" title="memblock删除"></a>memblock删除</h3><p>&ensp;&ensp;&ensp;&ensp;当调用memblock_free和memblock_remove函数时，会执行如图11所示的处理流程。</p>
+<div align="center"><img src="memblock_remove.svg" alt="memblock_remove.svg"><br>图11 memblock_remove函数的执行流程</div>
+
+<h4 id="memblock-free函数：从reserved-memblock中移除一个内存区间"><a href="#memblock-free函数：从reserved-memblock中移除一个内存区间" class="headerlink" title="memblock_free函数：从reserved memblock中移除一个内存区间"></a>memblock_free函数：从reserved memblock中移除一个内存区间</h4><p>&ensp;&ensp;&ensp;&ensp;如果memblock_free函数被调用，则调用memblock_remove_range函数将由起始物理地址base和区间长度size限定的内存区间从reserved memblock中删除。</p>
+<p><em>mm/memblock.c</em><br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> __<span class="function">init_memblock <span class="title">memblock_free</span><span class="params">(<span class="keyword">phys_addr_t</span> base, <span class="keyword">phys_addr_t</span> size)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="keyword">phys_addr_t</span> end = base + size - <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">	memblock_dbg(<span class="string">"   memblock_free: [%pa-%pa] %pF\n"</span>,</span><br><span class="line">		     &amp;base, &amp;end, (<span class="keyword">void</span> *)_RET_IP_);</span><br><span class="line"></span><br><span class="line">	kmemleak_free_part_phys(base, size);</span><br><span class="line">	<span class="keyword">return</span> memblock_remove_range(&amp;memblock.reserved, base, size);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h4 id="memblock-remove函数：从memory-memblock中移除一个内存空间"><a href="#memblock-remove函数：从memory-memblock中移除一个内存空间" class="headerlink" title="memblock_remove函数：从memory memblock中移除一个内存空间"></a>memblock_remove函数：从memory memblock中移除一个内存空间</h4><p>&ensp;&ensp;&ensp;&ensp;与memblock_free函数相似，这个函数调用memblock_remove_range函数将由起始物理地址base和区间长度size限定的内存区间从memory memblock中移除。</p>
+<p><em>mm/memblock.c</em><br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> __<span class="function">init_memblock <span class="title">memblock_remove</span><span class="params">(<span class="keyword">phys_addr_t</span> base, <span class="keyword">phys_addr_t</span> size)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="keyword">phys_addr_t</span> end = base + size - <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">	memblock_dbg(<span class="string">"memblock_remove: [%pa-%pa] %pS\n"</span>,</span><br><span class="line">		     &amp;base, &amp;end, (<span class="keyword">void</span> *)_RET_IP_);</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> memblock_remove_range(&amp;memblock.memory, base, size);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h4 id="memblock-remove-range函数：从一个memblock中移除指定区间"><a href="#memblock-remove-range函数：从一个memblock中移除指定区间" class="headerlink" title="memblock_remove_range函数：从一个memblock中移除指定区间"></a>memblock_remove_range函数：从一个memblock中移除指定区间</h4><p>&ensp;&ensp;&ensp;&ensp;从指定类型的memblock中移除请求的区间。</p>
+<p><em>mm/memblock.c</em><br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="keyword">int</span> __<span class="function">init_memblock <span class="title">memblock_remove_range</span><span class="params">(struct memblock_type *type,</span></span></span><br><span class="line"><span class="function"><span class="params">					  <span class="keyword">phys_addr_t</span> base, <span class="keyword">phys_addr_t</span> size)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="keyword">int</span> start_rgn, end_rgn;</span><br><span class="line">	<span class="keyword">int</span> i, ret;</span><br><span class="line"></span><br><span class="line">	ret = memblock_isolate_range(type, base, size, &amp;start_rgn, &amp;end_rgn);</span><br><span class="line">	<span class="keyword">if</span> (ret)</span><br><span class="line">		<span class="keyword">return</span> ret;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">for</span> (i = end_rgn - <span class="number">1</span>; i &gt;= start_rgn; i--)</span><br><span class="line">		memblock_remove_region(type, i);</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<ul>
+<li>7行：将待删除区间从已存在内存区间分离出来</li>
+<li>11行：从end待删除区间的索引值到start待删除区间的索引值逆序地循环调用memblock_remove_region函数将对应的区间删除。相反顺序的循环是为了减少内存复制的大小（内存移动的数据量）。</li>
+</ul>
+<h4 id="memblock-isolate-range函数：-从给定memblock中分离出请求的区间"><a href="#memblock-isolate-range函数：-从给定memblock中分离出请求的区间" class="headerlink" title="memblock_isolate_range函数： 从给定memblock中分离出请求的区间"></a>memblock_isolate_range函数： 从给定memblock中分离出请求的区间</h4><p>&ensp;&ensp;&ensp;&ensp;从与请求区间重叠的memblock区间中分离出待删除区间。起始待删除区间的索引值保存在输出参数start_rgn中，而末尾待删除区间的索引值保存在end_rgn中。如果memblock任意区间都没有与请求区间重叠，两个输出参数的值都是0.</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="keyword">int</span> __<span class="function">init_memblock <span class="title">memblock_isolate_range</span><span class="params">(struct memblock_type *type,</span></span></span><br><span class="line"><span class="function"><span class="params">					<span class="keyword">phys_addr_t</span> base, <span class="keyword">phys_addr_t</span> size,</span></span></span><br><span class="line"><span class="function"><span class="params">					<span class="keyword">int</span> *start_rgn, <span class="keyword">int</span> *end_rgn)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="keyword">phys_addr_t</span> end = base + memblock_cap_size(base, &amp;size);</span><br><span class="line">	<span class="keyword">int</span> idx;</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">memblock_region</span> *<span class="title">rgn</span>;</span></span><br><span class="line"></span><br><span class="line">	*start_rgn = *end_rgn = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> (!size)</span><br><span class="line">		<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">	<span class="comment">/* we'll create at most two more regions */</span></span><br><span class="line">	<span class="keyword">while</span> (type-&gt;cnt + <span class="number">2</span> &gt; type-&gt;max)</span><br><span class="line">		<span class="keyword">if</span> (memblock_double_array(type, base, size) &lt; <span class="number">0</span>)</span><br><span class="line">			<span class="keyword">return</span> -ENOMEM;</span><br><span class="line"></span><br><span class="line">	for_each_memblock_type(idx, type, rgn) &#123;</span><br><span class="line">		<span class="keyword">phys_addr_t</span> rbase = rgn-&gt;base;</span><br><span class="line">		<span class="keyword">phys_addr_t</span> rend = rbase + rgn-&gt;size;</span><br><span class="line"></span><br><span class="line">		<span class="keyword">if</span> (rbase &gt;= end)</span><br><span class="line">			<span class="keyword">break</span>;</span><br><span class="line">		<span class="keyword">if</span> (rend &lt;= base)</span><br><span class="line">			<span class="keyword">continue</span>;</span><br><span class="line"></span><br><span class="line">		<span class="keyword">if</span> (rbase &lt; base) &#123;</span><br><span class="line">			<span class="comment">/*</span></span><br><span class="line"><span class="comment">			 * @rgn intersects from below.  Split and continue</span></span><br><span class="line"><span class="comment">			 * to process the next region - the new top half.</span></span><br><span class="line"><span class="comment">			 */</span></span><br><span class="line">			rgn-&gt;base = base;</span><br><span class="line">			rgn-&gt;size -= base - rbase;</span><br><span class="line">			type-&gt;total_size -= base - rbase;</span><br><span class="line">			memblock_insert_region(type, idx, rbase, base - rbase,</span><br><span class="line">					       memblock_get_region_node(rgn),</span><br><span class="line">					       rgn-&gt;flags);</span><br><span class="line">		&#125; <span class="keyword">else</span> <span class="keyword">if</span> (rend &gt; end) &#123;</span><br><span class="line">			<span class="comment">/*</span></span><br><span class="line"><span class="comment">			 * @rgn intersects from above.  Split and redo the</span></span><br><span class="line"><span class="comment">			 * current region - the new bottom half.</span></span><br><span class="line"><span class="comment">			 */</span></span><br><span class="line">			rgn-&gt;base = end;</span><br><span class="line">			rgn-&gt;size -= end - rbase;</span><br><span class="line">			type-&gt;total_size -= end - rbase;</span><br><span class="line">			memblock_insert_region(type, idx--, rbase, end - rbase,</span><br><span class="line">					       memblock_get_region_node(rgn),</span><br><span class="line">					       rgn-&gt;flags);</span><br><span class="line">		&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">			<span class="comment">/* @rgn is fully contained, record it */</span></span><br><span class="line">			<span class="keyword">if</span> (!*end_rgn)</span><br><span class="line">				*start_rgn = idx;</span><br><span class="line">			*end_rgn = idx + <span class="number">1</span>;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>5行：防止内存区间的结束物理地址超过体系架构支持的最大物理地址。</li>
+<li>15行：扩充管理区间的regions数组，使其容量是原来的两倍。如果扩充失败，将返回<code>-ENOMEM</code>指示系统内存不足。</li>
+<li>19行：会从memblock的第一区间循环遍历到最后一个区间，rbase和rend分别指的是当前遍历区间的起始物理地址和结束物理地址。</li>
+<li>23行：如果当前区间的起始地址rbase不小于请求区间的结束地址，则不必再继续遍历后面的区间（下图所示的条件A）。</li>
+<li>25行：如果当前区间的结束地址rend不大于请求区间的起始地址，则不可能重叠，因此需要继续遍历下一个区间（下图所示的条件B）。</li>
+<li>28行：如果当前区间的起始物理地址小于请求区间的起始地址，也就是说，请求区间的起始地址位于当前区间内，两者出现重叠子区间，则按如下方式处理：（如下图所示的条件C）<br>首先以base为分界线从当前区间分离出包含重叠的上半部子区间，并且将上半部区间向上移动一个索引位置，其次将非重叠的下半部区间重新插入在给定memblock的当前索引位置。因此，这样会将当前区间拆分出两个子区间。</li>
+<li>39行：如果当前区间的结束物理地址大于请求区间的结束物理地址，也就是说，请求区间的结束物理地址位于当前区间内，两者出现重叠子区间，则按如下方式处理：（如下图所示的条件D）：<br>首先以end为分界线从当前区间分离出非重叠的上半部子区间，并且将上半部区间向上移动一个索引位置，其次将包含重叠的下半部区间重新插入在给定memblock的当前索引位置，而且索引值idx减1。因此，这样也会将当前区间拆分出两个子区间。</li>
+<li>50行：由于不满足上面任何一个条件，所以当前区间被包含于请求区间。在这种情况下，只有end_rgn还未更新，start_rgn才记录当前区间的索引值，但无论如何都会用当前索引值 + 1更新end_rgn。</li>
+</ul>
+<div align="center"><img src="memblock_isolate_range.svg" alt="memblock_isolate_range.svg"><br>图12 memblock_isolate_range函数的执行流程</div>
+
+<h4 id="memblock-remove-region函数：从具体memblock中删除指定区间"><a href="#memblock-remove-region函数：从具体memblock中删除指定区间" class="headerlink" title="memblock_remove_region函数：从具体memblock中删除指定区间"></a>memblock_remove_region函数：从具体memblock中删除指定区间</h4><p>&ensp;&ensp;&ensp;&ensp;从给定类型的memblock中删除指定索引位置的区间。</p>
+<p><em>mm/memblock.c</em><br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="keyword">void</span> __<span class="function">init_memblock <span class="title">memblock_remove_region</span><span class="params">(struct memblock_type *type, <span class="keyword">unsigned</span> <span class="keyword">long</span> r)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	type-&gt;total_size -= type-&gt;regions[r].size;</span><br><span class="line">	memmove(&amp;type-&gt;regions[r], &amp;type-&gt;regions[r + <span class="number">1</span>],</span><br><span class="line">		(type-&gt;cnt - (r + <span class="number">1</span>)) * <span class="keyword">sizeof</span>(type-&gt;regions[r]));</span><br><span class="line">	type-&gt;cnt--;</span><br><span class="line"></span><br><span class="line">	<span class="comment">/* Special case for empty arrays */</span></span><br><span class="line">	<span class="keyword">if</span> (type-&gt;cnt == <span class="number">0</span>) &#123;</span><br><span class="line">		WARN_ON(type-&gt;total_size != <span class="number">0</span>);</span><br><span class="line">		type-&gt;cnt = <span class="number">1</span>;</span><br><span class="line">		type-&gt;regions[<span class="number">0</span>].base = <span class="number">0</span>;</span><br><span class="line">		type-&gt;regions[<span class="number">0</span>].size = <span class="number">0</span>;</span><br><span class="line">		type-&gt;regions[<span class="number">0</span>].flags = <span class="number">0</span>;</span><br><span class="line">		memblock_set_region_node(&amp;type-&gt;regions[<span class="number">0</span>], MAX_NUMNODES);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<ul>
+<li>3～6行：将带删除区间后面的所有区间都向前移动一个位置，并将cnt减1以及从total_size减去已删除区间的大小。</li>
+<li>9行：如果彻底移除了当前memblock的所有区间，则要将type-&gt;cnt更新为1而不是0。出于设计缘故，即使memblock没有内存区间，type-&gt;cnt也要设置为1，但base和size字段需要清零。</li>
+</ul>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Xinlu Wang</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://chasinglulu.github.io/2019/05/28/早期内存分配器-memblock/" title="早期内存分配器：memblock">http://chasinglulu.github.io/2019/05/28/早期内存分配器-memblock/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/memblock/" rel="tag"><i class="fa fa-tag"></i> memblock</a>
+          
+        </div>
+      
+
+      
+      
+        <div class="post-widgets">
+        
+
+        
+
+        
+          
+          <div class="social_share">
+            
+            
+               <div id="needsharebutton-postbottom">
+                 <span class="btn">
+                    <i class="fa fa-share-alt" aria-hidden="true"></i>
+                 </span>
+               </div>
+            
+          </div>
+        
+        </div>
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/05/28/关于Exynos4412-SoC的启动分析/" rel="next" title="关于Exynos4412 SoC的启动分析">
+                <i class="fa fa-chevron-left"></i> 关于Exynos4412 SoC的启动分析
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/05/29/内存模型「memory-model」/" rel="prev" title="内存模型「memory model」">
+                内存模型「memory model」 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+    <div class="comments" id="comments">
+    </div>
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Xinlu Wang</p>
+              <p class="site-description motion-element" itemprop="description">不积跬步无以至千里，不积小流无以成江海</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">36</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">9</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">59</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/chasinglulu" target="_blank" title="GitHub"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="mailto:wangkart@aliyun.com" target="_blank" title="E-Mail"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="https://weibo.com/5052275150" target="_blank" title="Weibo"><i class="fa fa-fw fa-weibo"></i>Weibo</a>
+                  
+                </span>
+              
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#memblock结构"><span class="nav-number">1.</span> <span class="nav-text">memblock结构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#memblock初始化"><span class="nav-number">2.</span> <span class="nav-text">memblock初始化</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#memory-memblock添加内存区域"><span class="nav-number">2.1.</span> <span class="nav-text">memory memblock添加内存区域</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#arm64-memblock-init：初始化memblock"><span class="nav-number">2.2.</span> <span class="nav-text">arm64_memblock_init：初始化memblock</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#memblock分配"><span class="nav-number">3.</span> <span class="nav-text">memblock分配</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#memblock-alloc：从memblock中分配内存"><span class="nav-number">3.1.</span> <span class="nav-text">memblock_alloc：从memblock中分配内存</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#memblock-alloc-range-nid：从特定memblock范围分配内存"><span class="nav-number">3.2.</span> <span class="nav-text">memblock_alloc_range_nid：从特定memblock范围分配内存</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#memblock增添"><span class="nav-number">4.</span> <span class="nav-text">memblock增添</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#memblock-add-向memory-memblock添加内存区域"><span class="nav-number">4.1.</span> <span class="nav-text">memblock_add: 向memory memblock添加内存区域</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#memblock-add-range-将特定内存区间注册入memblock"><span class="nav-number">4.2.</span> <span class="nav-text">memblock_add_range: 将特定内存区间注册入memblock</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#memblock-insert-region函数：将内存区间插入memblock"><span class="nav-number">4.3.</span> <span class="nav-text">memblock_insert_region函数：将内存区间插入memblock</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#memblock-double-array函数：使memblock能管理的区间翻倍"><span class="nav-number">4.4.</span> <span class="nav-text">memblock_double_array函数：使memblock能管理的区间翻倍</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#memblock-merge-regions函数：将memblock的相邻内存区间合并"><span class="nav-number">4.5.</span> <span class="nav-text">memblock_merge_regions函数：将memblock的相邻内存区间合并</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#memblock删除"><span class="nav-number">5.</span> <span class="nav-text">memblock删除</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#memblock-free函数：从reserved-memblock中移除一个内存区间"><span class="nav-number">5.1.</span> <span class="nav-text">memblock_free函数：从reserved memblock中移除一个内存区间</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#memblock-remove函数：从memory-memblock中移除一个内存空间"><span class="nav-number">5.2.</span> <span class="nav-text">memblock_remove函数：从memory memblock中移除一个内存空间</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#memblock-remove-range函数：从一个memblock中移除指定区间"><span class="nav-number">5.3.</span> <span class="nav-text">memblock_remove_range函数：从一个memblock中移除指定区间</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#memblock-isolate-range函数：-从给定memblock中分离出请求的区间"><span class="nav-number">5.4.</span> <span class="nav-text">memblock_isolate_range函数： 从给定memblock中分离出请求的区间</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#memblock-remove-region函数：从具体memblock中删除指定区间"><span class="nav-number">5.5.</span> <span class="nav-text">memblock_remove_region函数：从具体memblock中删除指定区间</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+<div class="copyright">&copy; <span itemprop="copyrightYear">2021</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Xinlu Wang</span>
+
+  
+
+  
+</div>
+
+<div class="powered-by">
+    <i class="fa fa-user-circle"></i>
+    <span id="busuanzi_container_site_uv">
+        <span id="busuanzi_value_site_uv"></span>
+    </span>
+</div>
+<span class="post-meta-divider">|</span>
+
+<div class="powered-by">
+    <span id="busuanzi_container_site_pv">
+        <span id="busuanzi_value_site_pv"></span>
+    </span>
+    <i class="fa fa-eye"></i>
+</div>
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动 v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Mist</a> v6.4.2</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.2"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  
+  
+  <script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+  
+  <script type="text/javascript">
+    var GUEST = ['nick','mail','link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(function (item) {
+      return GUEST.indexOf(item)>-1;
+    });
+    new Valine({
+        el: '#comments' ,
+        verify: false,
+        notify: false,
+        appId: 'kvMe6P3M8zvX1DeEHbGQnwvq-gzGzoHsz',
+        appKey: 'KlwgMU4eNhTTb3KXiqnvlOGA',
+        placeholder: 'Just go go',
+        avatar:'mp',
+        meta:guest,
+        pageSize:'10' || 10,
+        visitor: true
+    });
+  </script>
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+  
+
+
+  
+  
+  
+  <script src="/lib/needsharebutton/needsharebutton.js"></script>
+
+  <script>
+    
+      pbOptions = {};
+      
+          pbOptions.iconStyle = "box";
+      
+          pbOptions.boxForm = "horizontal";
+      
+          pbOptions.position = "bottomCenter";
+      
+          pbOptions.networks = "Weibo,Wechat,Douban,QQZone";
+      
+      new needShareButton('#needsharebutton-postbottom', pbOptions);
+    
+    
+  </script>
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+  
+  <script src="/lib/bookmark/bookmark.min.js?v=1.0"></script>
+  <script type="text/javascript">
+  
+    bookmark.scrollToMark('auto', "#更多");
+  
+  </script>
+
+
+  
+  <style>
+    .copy-btn {
+      display: inline-block;
+      padding: 6px 12px;
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 20px;
+      color: #333;
+      white-space: nowrap;
+      vertical-align: middle;
+      cursor: pointer;
+      background-color: #eee;
+      background-image: linear-gradient(#fcfcfc, #eee);
+      border: 1px solid #d5d5d5;
+      border-radius: 3px;
+      user-select: none;
+      outline: 0;
+    }
+
+    .highlight-wrap .copy-btn {
+      transition: opacity .3s ease-in-out;
+      opacity: 0;
+      padding: 2px 6px;
+      position: absolute;
+      right: 4px;
+      top: 8px;
+    }
+
+    .highlight-wrap:hover .copy-btn,
+    .highlight-wrap .copy-btn:focus {
+      opacity: 1
+    }
+
+    .highlight-wrap {
+      position: relative;
+    }
+  </style>
+  <script>
+    $('.highlight').each(function (i, e) {
+      var $wrap = $('<div>').addClass('highlight-wrap')
+      $(e).after($wrap)
+      $wrap.append($('<button>').addClass('copy-btn').append('复制').on('click', function (e) {
+        var code = $(this).parent().find('.code').find('.line').map(function (i, e) {
+          return $(e).text()
+        }).toArray().join('\n')
+        var ta = document.createElement('textarea')
+        document.body.appendChild(ta)
+        ta.style.position = 'absolute'
+        ta.style.top = '0px'
+        ta.style.left = '0px'
+        ta.value = code
+        ta.select()
+        ta.focus()
+        var result = document.execCommand('copy')
+        document.body.removeChild(ta)
+        
+          if(result)$(this).text('复制成功')
+          else $(this).text('复制失败')
+        
+        $(this).blur()
+      })).on('mouseleave', function (e) {
+        var $b = $(this).find('.copy-btn')
+        setTimeout(function () {
+          $b.text('复制')
+        }, 300)
+      }).append(e)
+    })
+  </script>
+
+
+</body>
+</html>

@@ -1,0 +1,1652 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+  
+  
+  <link rel="stylesheet" href="/lib/needsharebutton/needsharebutton.css">
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+  <meta name="google-site-verification" content="vuSkRYPVceK1DXhqZWm7wVxYV4YmmnI1Dv_C1M8rJJM" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Monda:300,300italic,400,400italic,700,700italic|Roboto Slab:300,300italic,400,400italic,700,700italic|Lobster Two:300,300italic,400,400italic,700,700italic|PT Mono:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.2" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.2">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.2" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '6.4.2',
+    sidebar: {"position":"right","width":300,"display":"always","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="本文主要讨论中断的延迟处理机制，不仅说明了什么是上半部分「top-half」和下半部分「bottom-half」，还介绍了如何使用下半部分实现中断的延迟处理。">
+<meta name="keywords" content="interrupt,softirq,tasklet,workqueue">
+<meta property="og:type" content="article">
+<meta property="og:title" content="中断延迟处理机制「interrupt delay processing」">
+<meta property="og:url" content="http://chasinglulu.github.io/2019/07/16/中断延迟处理机制「interrupt-delay-processing」/index.html">
+<meta property="og:site_name" content="点滴汇聚">
+<meta property="og:description" content="本文主要讨论中断的延迟处理机制，不仅说明了什么是上半部分「top-half」和下半部分「bottom-half」，还介绍了如何使用下半部分实现中断的延迟处理。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://chasinglulu.github.io/2019/07/16/中断延迟处理机制「interrupt-delay-processing」/interrupt_delay_top_bottom.svg">
+<meta property="og:image" content="http://chasinglulu.github.io/2019/07/16/中断延迟处理机制「interrupt-delay-processing」/softirqs_stat.jpeg">
+<meta property="og:image" content="http://chasinglulu.github.io/2019/07/16/中断延迟处理机制「interrupt-delay-processing」/tasklet_vec_list.svg">
+<meta property="og:image" content="http://chasinglulu.github.io/2019/07/16/中断延迟处理机制「interrupt-delay-processing」/softirq_flow.svg">
+<meta property="og:image" content="http://chasinglulu.github.io/2019/07/16/中断延迟处理机制「interrupt-delay-processing」/workqueu_state_change.svg">
+<meta property="og:image" content="http://chasinglulu.github.io/2019/07/16/中断延迟处理机制「interrupt-delay-processing」/cmwq_structure.svg">
+<meta property="og:image" content="http://chasinglulu.github.io/2019/07/16/中断延迟处理机制「interrupt-delay-processing」/queue_work_call_flow.svg">
+<meta property="og:image" content="http://chasinglulu.github.io/2019/07/16/中断延迟处理机制「interrupt-delay-processing」/queue_work_call_flow_II.svg">
+<meta property="og:updated_time" content="2021-07-06T09:36:32.370Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="中断延迟处理机制「interrupt delay processing」">
+<meta name="twitter:description" content="本文主要讨论中断的延迟处理机制，不仅说明了什么是上半部分「top-half」和下半部分「bottom-half」，还介绍了如何使用下半部分实现中断的延迟处理。">
+<meta name="twitter:image" content="http://chasinglulu.github.io/2019/07/16/中断延迟处理机制「interrupt-delay-processing」/interrupt_delay_top_bottom.svg">
+
+
+
+
+
+
+  <link rel="canonical" href="http://chasinglulu.github.io/2019/07/16/中断延迟处理机制「interrupt-delay-processing」/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>中断延迟处理机制「interrupt delay processing」 | 点滴汇聚</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-right page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">点滴汇聚</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">不积跬步无以至千里，不积小流无以成江海</p>
+      
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首页</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+    <a href="/categories/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-th"></i> <br />分类</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />归档</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+    <a href="/tags/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />标签</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+    <a href="/about/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-user"></i> <br />关于</a>
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://chasinglulu.github.io/2019/07/16/中断延迟处理机制「interrupt-delay-processing」/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Xinlu Wang">
+      <meta itemprop="description" content="不积跬步无以至千里，不积小流无以成江海">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="点滴汇聚">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">中断延迟处理机制「interrupt delay processing」
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-07-16 21:37:11" itemprop="dateCreated datePublished" datetime="2019-07-16T21:37:11+08:00">2019-07-16</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2021-07-06 17:36:32" itemprop="dateModified" datetime="2021-07-06T17:36:32+08:00">2021-07-06</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/interrupt-management/" itemprop="url" rel="index"><span itemprop="name">interrupt management</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <span class="post-meta-item-text">评论数：</span>
+                <a href="/2019/07/16/中断延迟处理机制「interrupt-delay-processing」/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count valine-comment-count" data-xid="/2019/07/16/中断延迟处理机制「interrupt-delay-processing」/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2019/07/16/中断延迟处理机制「interrupt-delay-processing」/" class="leancloud_visitors" data-flag-title="中断延迟处理机制「interrupt delay processing」">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数：</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>本文主要讨论中断的延迟处理机制，不仅说明了什么是上半部分「top-half」和下半部分「bottom-half」，还介绍了如何使用下半部分实现中断的延迟处理。</p>
+<a id="more"></a>
+<hr>
+<ul>
+<li><strong>Target Platform:</strong> <a href="https://www.96boards.org/product/rock960c/" target="_blank" rel="noopener">Rock960c</a></li>
+<li><strong>ARCH:</strong>arm64</li>
+<li><strong>Linux Kernel:</strong>linux-4.19.27</li>
+</ul>
+<hr>
+<h4 id="top-half「上半部分」和bottom-half「下半部分」"><a href="#top-half「上半部分」和bottom-half「下半部分」" class="headerlink" title="top-half「上半部分」和bottom-half「下半部分」"></a>top-half「上半部分」和bottom-half「下半部分」</h4><p>在调用中断处理函数前会禁止中断，如果执行中断处理函数占用的时间越长，那么系统的响应性就越差，也就越有可能丢失更多中断。同时，在禁止中断后调用执行可阻塞函数很可能导致死锁或者增大响应延迟， 比如在中断禁止期间调用sleep函数，系统将会挂死「hang」。为了解决这些问题，一方面确保中断处理函数被隔离在一个安全的执行环境「中断上下文」内运行，另一方面提高中断处理函数的执行速度。</p>
+<p>将中断处理函数要完成的任务一分为二，得出上半部分和下半部分，上半部分在执行中断处理函数期间完成，下半部分则推迟到中断处理函数完成之后才开始处理。上半部分在中断上下文「interrupt context」内越快完成越好，而可中断任务或其他费时任务都尽量推迟在下半部分进行。除此之外，上半部分还主要负责为下一个中断的发生做好准备和设置并调度下半部分执行的任务，而下半部分主要负责在进程上下文「process context」或中断上下文「interrupt context」内处理对时间要求较宽松的任务。比如，假设一个设备为了传输数据而产生了一个中断，上半部分负责从设备拷贝数据到内存，而下半部分负责完成较费时的数据处理任务，当然这样的方式不一定是最好的，但如果设备拥有足够大的硬件缓冲区，那么根据设备这个特性将可能通过其他方法完成数据的处理。尽管可以根据下半部分代码的要求选择临时禁用本地中断，但禁止中断的时间越短越好。</p>
+<div align="center">表1 top-half与bottom-half的对比<br><table style="border-collapse:collapse;border-spacing:0;border-color:#9ABAD9;margin:0px auto" class="tg"><tr><th style="font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#fff;background-color:#409cff;text-align:center">比对内容</th><th style="font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#fff;background-color:#409cff;text-align:center">top-half</th><th style="font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#fff;background-color:#409cff;text-align:center">bottom-half</th></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:center">执行位置</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#D2E4FC;text-align:left">在硬中断处理程序中完成<br></td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:left">在执行完硬件中断处理程序后进行</td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:center;vertical-align:top">执行环境</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#D2E4FC;text-align:left;vertical-align:top">硬中断上下文</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:top">软中断上下文或进程上下文</td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center;vertical-align:top">中断状态</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#D2E4FC;text-align:left;vertical-align:top">在禁止中断的状态下执行</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:top">在容许中断的状态下执行</td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center">主要任务</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#D2E4FC;text-align:left;vertical-align:top">尽量执行最少的任务，越快执行完越好，防止丢失后续发生的中断<br>并利用下半部分的机制延迟处理任务</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:top">处理较费时的或可能阻塞的延迟任务</td></tr></table></div>
+
+<p>在Linux内核中，实现的多个下半部分机制分别是softirq、tasklet、workqueue和kernel thread。注意hardirq和softirq与top-half和bottom-half并不等同，softirq和tasklet都是执行在中断上下文「interrupt context」，而workqueue「工作队列」和kernel thread「内核线程」都是执行在进程上下文「process context」。</p>
+<div align="center"><img src="interrupt_delay_top_bottom.svg" alt="top-half vs bottom-half"><br>图1 上半部分与下半部分</div>
+
+<h5 id="硬中断「hardirq」和软中断「softirq」"><a href="#硬中断「hardirq」和软中断「softirq」" class="headerlink" title="硬中断「hardirq」和软中断「softirq」"></a>硬中断「hardirq」和软中断「softirq」</h5><p>在<a href="https://chasinglulu.github.io/2019/07/07/%E4%B8%AD%E6%96%AD%E3%80%8Cinterrupt%E3%80%8D/">中断「interrupt」</a> 的第一节，从体系架构的角度说明了硬件中断「hardware irq」和软件中断「software irq」。在Linux内核，所有中断也划分为两类：硬件中断和软件中断。接下来看看Linux内核是如何定义硬中断和软中断的，硬中断指的是处理硬件中断和IPIs「Inter Processor Interrupts」的硬中断上下文「hard interrupt context」，其既不可能出现睡眠也不可能被抢占「preemption」，对处理时间的要求比较苛刻，中断处理程序执行的速度越快越好，这样能够提高系统的实时性。软中断指的是处理费时任务的软中断上下文，其既不可能出现睡眠也不可能被软中断上下文执行的其它任务抢占，但可以被硬中断上下文执行的处理任务抢占， 对处理时间的要求较宽松，主要处理比较耗时的和可中断的任务。不过，在硬中断上下文和软中断上下文之间出现共享数据时必须考虑数据同步「synchronization」问题。</p>
+<h4 id="softirq「软中断」"><a href="#softirq「软中断」" class="headerlink" title="softirq「软中断」"></a>softirq「软中断」</h4><p>softirq也是Linux下半部分「bottom-half」机制中的一种延迟处理机制，运行在软中断上下文并能高效地处理延迟任务。</p>
+<div align="center">表2 softirq的优先级和功能<br><table style="border-collapse:collapse;border-spacing:0;border-color:#9ABAD9;margin:0px auto" class="tg"><tr><th style="font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#fff;background-color:#409cff;text-align:center;vertical-align:top">优先级「priority」<br></th><th style="font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#fff;background-color:#409cff;text-align:center;vertical-align:top">名 称</th><th style="font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#fff;background-color:#409cff;text-align:center;vertical-align:top">含义解释</th></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:center;vertical-align:top">0</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#D2E4FC;text-align:center;vertical-align:top">HI_SOFTIRQ<br></td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:top">最高优先级，用于处理TASKLET_HI<br></td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:center;vertical-align:top">1</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#D2E4FC;text-align:center;vertical-align:top">TIMER_SOFTIRQ<br></td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:top">用于处理每个CPU的计时器中断「timer interrupt」<br></td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:center;vertical-align:top">2</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#D2E4FC;text-align:center;vertical-align:top">NET_TX_SOFTIRQ<br></td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:top">用于处理网络设备的报文发送中断<br></td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center;vertical-align:top">3</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#D2E4FC;text-align:center;vertical-align:top">NET_RX_SOFTIRQ</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:top">用于处理网络设备的报文接收中断</td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center;vertical-align:top">4</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#D2E4FC;text-align:center;vertical-align:top">BLOCK_SOFTIRQ</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:top">用于处理块设备「block device」的中断</td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center;vertical-align:top">5</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#D2E4FC;text-align:center;vertical-align:top">IRQ_POLL_SOFTIRQ</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:top">用于执行IOPOLL的回调函数「handler」</td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center;vertical-align:top">6</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#D2E4FC;text-align:center;vertical-align:top">TASKLET_SOFTIRQ</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:top">用于处理tasklet</td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center;vertical-align:top">7</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#D2E4FC;text-align:center;vertical-align:top">SCHED_SOFTIRQ</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:top">用于处理调度「schedule」相关的IPI和执行CFS的负载均衡例程</td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center;vertical-align:top">8</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#D2E4FC;text-align:center;vertical-align:top">HRTIMER_SOFTIRQ</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:top">目前没有使用，还保留也只是为了占用一个数字</td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center;vertical-align:top">9</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#D2E4FC;text-align:center;vertical-align:top">RCU_SOFTIRQ</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:top">用于处理RCU中断，最低优先级，因此每次都在最后处理</td></tr></table></div>
+
+<p>通过查看/proc/softirq能够获得系统各个CPU的softirq统计信息。</p>
+<div align="center"><img src="softirqs_stat.jpeg" alt="softirqs_stat"><br>图2 读取/proc/softirqs时输出内容 </div>
+
+<h5 id="softirq机制初始化"><a href="#softirq机制初始化" class="headerlink" title="softirq机制初始化"></a>softirq机制初始化</h5><p>在start_kernel()中，先完成中断硬件的初始化，然后才进行softirq机制的初始化。由于tasklet是softirq「软中断」的一部分，在softirq初始化中不仅为实现tasklet机制做准备，而且还注册处理tasklet的动作「action」。</p>
+<p><strong>kernel/softirq.c的softirq_init()</strong><br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> __<span class="function">init <span class="title">softirq_init</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="keyword">int</span> cpu;</span><br><span class="line"></span><br><span class="line">	for_each_possible_cpu(cpu) &#123;</span><br><span class="line">		per_cpu(tasklet_vec, cpu).tail =</span><br><span class="line">			&amp;per_cpu(tasklet_vec, cpu).head;</span><br><span class="line">		per_cpu(tasklet_hi_vec, cpu).tail =</span><br><span class="line">			&amp;per_cpu(tasklet_hi_vec, cpu).head;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	open_softirq(TASKLET_SOFTIRQ, tasklet_action);</span><br><span class="line">	open_softirq(HI_SOFTIRQ, tasklet_hi_action);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>通过遍历支持的所有CPU「possible cpu」初始化每个CPU对应的tasklet_vec和tassklet_hi_vec两个链表。这样做的缘由是分别指向两个链表头部的两个tasklet变量都被声明为percpu变量，如下所示：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&lt;kernel/softirq.c&gt;</span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">tasklet_head</span> &#123;</span></span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">tasklet_struct</span> *<span class="title">head</span>;</span></span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">tasklet_struct</span> **<span class="title">tail</span>;</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">static</span> <span class="title">DEFINE_PER_CPU</span><span class="params">(struct tasklet_head, tasklet_vec)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">static</span> <span class="title">DEFINE_PER_CPU</span><span class="params">(struct tasklet_head, tasklet_hi_vec)</span></span>;</span><br></pre></td></tr></table></figure>
+<div align="center"><img src="tasklet_vec_list.svg" alt="tasklet_vec_list"><br>图3 tasklet_vec链表的示意图</div>
+
+<p>为TASKLET_SOFTIRQ和HI_SOFTIRQ分别指定了tasklet_action和tasklet_hi_action处理函数，至于其他的softirq的处理函数也都是在它们各自的初始化函数中通过open_softirq函数指定的。</p>
+<h6 id="softirq与tasklet"><a href="#softirq与tasklet" class="headerlink" title="softirq与tasklet"></a>softirq与tasklet</h6><p>让我们对比一下softirq和tasklet的功能特点。softirq是在编译链接时静态定义的，也就是提前分配的，而tasklet是在运行时动态创建和注册的。一个softirq的处理函数能够并行地运行在多个CPU 上，因此softirq的处理函数对共享资源操作时需要同步。然而同一个tasklet处理函数不能同时运行，因此同步是不必要的。</p>
+<div align="center">表3 softirq与tasklet的对比<br><table style="border-collapse:collapse;border-spacing:0;border-color:#9ABAD9;margin:0px auto" class="tg"><tr><th style="font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#fff;background-color:#409cff;text-align:center;vertical-align:top">比对的特点</th><th style="font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#fff;background-color:#409cff;text-align:center;vertical-align:top">softirq</th><th style="font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#fff;background-color:#409cff;text-align:center;vertical-align:top">tasklet</th></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:center;vertical-align:middle">并行能力<br></td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#D2E4FC;text-align:left;vertical-align:top">同一个softirq处理函数能够同时运行在多个CPU上，因此同步是必要的<br></td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:top">同一个tasklet处理函数不能同时运行在多个CPU上，因此同步是不必要的</td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:center;vertical-align:middle">中断处理函数的注册方法<br></td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#D2E4FC;text-align:left;vertical-align:middle">只能在编译链接时静态注册<br></td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:middle">不仅能静态注册而且还能动态注册</td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:center;vertical-align:middle">优先级<br></td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#D2E4FC;text-align:left;vertical-align:top">每个softirq都具有一个执行优先级 ，如果在同一时刻有多个待处理的softirq，那么最高优先级的softirq会被先处理<br></td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:top">tasklet只有两种优先级：高优先级「high priority」和正常优先级「normal priority」</td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:center;vertical-align:middle">使用场景<br></td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#D2E4FC;text-align:left;vertical-align:middle">仅在执行非常频繁且需要并行处理的场景下才使用<br></td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:top">在softirq不能胜任和需要串行化处理的情况下使用，同时在设备驱动中也是可以使用的</td></tr></table></div>
+
+<h5 id="softirq处理函数注册"><a href="#softirq处理函数注册" class="headerlink" title="softirq处理函数注册"></a>softirq处理函数注册</h5><p>内核为每个softirq指定一个处理函数，正如硬件中断一样也具有处理函数。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;kernel/softirq.c&gt;</span><br><span class="line">void open_softirq(int nr, void (*action)(struct softirq_action *))</span><br><span class="line">&#123;</span><br><span class="line">	softirq_vec[nr].action = action;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>通过softirq对应编号索引softirq_vec数组，为指定的softirq设置处理函数「action」。</p>
+<h5 id="softirq触发"><a href="#softirq触发" class="headerlink" title="softirq触发"></a>softirq触发</h5><p>接下解释内核是如何触发软中断的。不过目前为了触发软中断，多数是调用raise_softirq()函数来触发指定软中断。</p>
+<p><strong>kernel/softirq.c中raise_softirq()和raise_softirq_irqoff</strong><br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">raise_softirq</span><span class="params">(<span class="keyword">unsigned</span> <span class="keyword">int</span> nr)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="keyword">unsigned</span> <span class="keyword">long</span> flags;</span><br><span class="line"></span><br><span class="line">	local_irq_save(flags);</span><br><span class="line">	raise_softirq_irqoff(nr);</span><br><span class="line">	local_irq_restore(flags);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * This function must run with irqs disabled!</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">inline</span> <span class="keyword">void</span> <span class="title">raise_softirq_irqoff</span><span class="params">(<span class="keyword">unsigned</span> <span class="keyword">int</span> nr)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	__raise_softirq_irqoff(nr);</span><br><span class="line"></span><br><span class="line">	<span class="comment">/*</span></span><br><span class="line"><span class="comment">	 * If we're in an interrupt or softirq, we're done</span></span><br><span class="line"><span class="comment">	 * (this also catches softirq-disabled code). We will</span></span><br><span class="line"><span class="comment">	 * actually run the softirq once we return from</span></span><br><span class="line"><span class="comment">	 * the irq or softirq.</span></span><br><span class="line"><span class="comment">	 *</span></span><br><span class="line"><span class="comment">	 * Otherwise we wake up ksoftirqd to make sure we</span></span><br><span class="line"><span class="comment">	 * schedule the softirq soon.</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	<span class="keyword">if</span> (!in_interrupt())</span><br><span class="line">		wakeup_softirqd();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">void</span> __raise_softirq_irqoff(<span class="keyword">unsigned</span> <span class="keyword">int</span> nr)</span><br><span class="line">&#123;</span><br><span class="line">	trace_softirq_raise(nr);</span><br><span class="line">	or_softirq_pending(<span class="number">1U</span>L &lt;&lt; nr);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<ul>
+<li>保存当前的硬件中断状态并禁止当前核心的中断，本质上它就是local_irq_disabled()函数又添加了一个中断状态保存功能。是否需要调用保存中断状态的local_irq_save()取决于具体的需求和场景。</li>
+<li>在中断禁止的状态下调用触发softirq的函数</li>
+<li>进一步调用内部触发softirq的函数</li>
+<li>如果当前没有处在中断上下文，将唤醒ksoftirqd内核线程。内核线程ksoftirqd是在启动阶段预先创建的，而且每个CPU都对应一个该内核线程，其优先级是SCHED_NORMAL。这里所说的中断上下文既可以是硬件中断「hardirq」上下文也可以是软中断「softirq」上下文。</li>
+<li>标记指定的softirq为待处理「pending」状态。本质上，内核用irq_cpustat_t数据结构静态定义了一个percpu irq_stat变量，它包含了一个<code>__softirq_pending</code>字段，该字段中每个bit位都对应一种softirq，一旦当前CPU私有<code>__softirq_pending</code>字段中某一个bit位被置1，那就是表示当前CPU上至少有一个对应的softirq是待处理的。如果在当前CPU所属的<code>__softirq_pending</code>字段中特定softirq对应的bit位未置位，那么该函数就会将其对应bit位置1，以表示至少有一个该softirq是待处理的。</li>
+</ul>
+<h5 id="softirq处理"><a href="#softirq处理" class="headerlink" title="softirq处理"></a>softirq处理</h5><p>下面将分析待处理softirq的处理过程。一旦完成硬件中断的处理过程，如果存在待处理的softirq，那么将进入软中断上下文「不是硬件中断上下文」开始进行未处理softirq的处理过程。因此，在下半部机制中softirq是实时性最好的和处理最及时的。图4给出了el1_irq的执行路径。除此之外，驱动代码或其他函数会先禁用了下半部机制，然后它们在处理完后需再次激活下半部机制，那么此时将可能对待处理softirq进行处理，图4右边的流程正是这种情况的处理路径。最后，内核线程ksoftirqd也可能进行softirq的处理，而且每个CPU都有一个这样的内核线程。如下几种情况会使用内核线程来处理softirq：</p>
+<ul>
+<li>调用raise_softirq()来触发softirq</li>
+<li>在硬件中断处理路径上检测到已经设置了force_irqthreads（在内核命令行添加threadirqs参数）</li>
+<li>已经较长时间在__do_softirq()内处理待处理的softirq或超过了最大重复次数</li>
+</ul>
+<div align="center"><img src="softirq_flow.svg" alt="softirq_execution_path"><br>图4 softirq的处理流程</div>
+
+<h6 id="do-softirq-：核心的softirq处理函数"><a href="#do-softirq-：核心的softirq处理函数" class="headerlink" title="__do_softirq()：核心的softirq处理函数"></a>__do_softirq()：核心的softirq处理函数</h6><p>接下来详细地分析一下softirq是如何在__do_softirq函数中被准确处理的。</p>
+<p><strong>kernel/softirq.c中__do_softirq()</strong><br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br></pre></td><td class="code"><pre><span class="line">asmlinkage __visible <span class="keyword">void</span> __softirq_entry __do_softirq(<span class="keyword">void</span>)</span><br><span class="line">&#123;</span><br><span class="line">	<span class="keyword">unsigned</span> <span class="keyword">long</span> end = jiffies + MAX_SOFTIRQ_TIME;</span><br><span class="line">	<span class="keyword">unsigned</span> <span class="keyword">long</span> old_flags = current-&gt;flags;</span><br><span class="line">	<span class="keyword">int</span> max_restart = MAX_SOFTIRQ_RESTART;</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">softirq_action</span> *<span class="title">h</span>;</span></span><br><span class="line">	<span class="keyword">bool</span> in_hardirq;</span><br><span class="line">	__u32 pending;</span><br><span class="line">	<span class="keyword">int</span> softirq_bit;</span><br><span class="line"></span><br><span class="line">	<span class="comment">/*</span></span><br><span class="line"><span class="comment">	 * Mask out PF_MEMALLOC s current task context is borrowed for the</span></span><br><span class="line"><span class="comment">	 * softirq. A softirq handled such as network RX might set PF_MEMALLOC</span></span><br><span class="line"><span class="comment">	 * again if the socket is related to swap</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	current-&gt;flags &amp;= ~PF_MEMALLOC;</span><br><span class="line"></span><br><span class="line">	pending = local_softirq_pending();</span><br><span class="line">	account_irq_enter_time(current);</span><br><span class="line"></span><br><span class="line">	__local_bh_disable_ip(_RET_IP_, SOFTIRQ_OFFSET);</span><br><span class="line">	in_hardirq = lockdep_softirq_start();</span><br><span class="line"></span><br><span class="line">restart:</span><br><span class="line">	<span class="comment">/* Reset the pending bitmask before enabling irqs */</span></span><br><span class="line">	set_softirq_pending(<span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">	local_irq_enable();</span><br><span class="line"></span><br><span class="line">	h = softirq_vec;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">while</span> ((softirq_bit = ffs(pending))) &#123;</span><br><span class="line">		<span class="keyword">unsigned</span> <span class="keyword">int</span> vec_nr;</span><br><span class="line">		<span class="keyword">int</span> prev_count;</span><br><span class="line"></span><br><span class="line">		h += softirq_bit - <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">		vec_nr = h - softirq_vec;</span><br><span class="line">		prev_count = preempt_count();</span><br><span class="line"></span><br><span class="line">		kstat_incr_softirqs_this_cpu(vec_nr);</span><br><span class="line"></span><br><span class="line">		trace_softirq_entry(vec_nr);</span><br><span class="line">		h-&gt;action(h);</span><br><span class="line">		trace_softirq_exit(vec_nr);</span><br><span class="line">		<span class="keyword">if</span> (unlikely(prev_count != preempt_count())) &#123;</span><br><span class="line">			pr_err(<span class="string">"huh, entered softirq %u %s %p with preempt_count %08x, exited with %08x?\n"</span>,</span><br><span class="line">			       vec_nr, softirq_to_name[vec_nr], h-&gt;action,</span><br><span class="line">			       prev_count, preempt_count());</span><br><span class="line">			preempt_count_set(prev_count);</span><br><span class="line">		&#125;</span><br><span class="line">		h++;</span><br><span class="line">		pending &gt;&gt;= softirq_bit;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	rcu_bh_qs();</span><br><span class="line">	local_irq_disable();</span><br><span class="line"></span><br><span class="line">	pending = local_softirq_pending();</span><br><span class="line">	<span class="keyword">if</span> (pending) &#123;</span><br><span class="line">		<span class="keyword">if</span> (time_before(jiffies, end) &amp;&amp; !need_resched() &amp;&amp;</span><br><span class="line">		    --max_restart)</span><br><span class="line">			<span class="keyword">goto</span> restart;</span><br><span class="line"></span><br><span class="line">		wakeup_softirqd();</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	lockdep_softirq_end(in_hardirq);</span><br><span class="line">	account_irq_exit_time(current);</span><br><span class="line">	__local_bh_enable(SOFTIRQ_OFFSET);</span><br><span class="line">	WARN_ON_ONCE(in_interrupt());</span><br><span class="line">	current_restore_flags(old_flags, PF_MEMALLOC);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h4 id="workqueue「工作队列」"><a href="#workqueue「工作队列」" class="headerlink" title="workqueue「工作队列」"></a>workqueue「工作队列」</h4><div align="center"><img src="workqueu_state_change.svg" alt="workqueu_state_change"><br>图5 wokequeue的状态变化</div>
+
+<h5 id="cmwq「Concurrency-Managed-Workqueues」"><a href="#cmwq「Concurrency-Managed-Workqueues」" class="headerlink" title="cmwq「Concurrency-Managed Workqueues」"></a>cmwq「Concurrency-Managed Workqueues」</h5><div align="center"><img src="cmwq_structure.svg" alt="cmwq_structure"><br>图6 cmwq框架结构</div>
+
+<div align="center"><img src="queue_work_call_flow.svg" alt="__queue_work_call_flow"><br>图7 __queue_work()调用流程 I</div>
+
+<div align="center"><img src="queue_work_call_flow_II.svg" alt="__queue_work_call_flow_II"><br>图7 __queue_work()调用流程 II</div>
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Xinlu Wang</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://chasinglulu.github.io/2019/07/16/中断延迟处理机制「interrupt-delay-processing」/" title="中断延迟处理机制「interrupt delay processing」">http://chasinglulu.github.io/2019/07/16/中断延迟处理机制「interrupt-delay-processing」/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/interrupt/" rel="tag"><i class="fa fa-tag"></i> interrupt</a>
+          
+            <a href="/tags/softirq/" rel="tag"><i class="fa fa-tag"></i> softirq</a>
+          
+            <a href="/tags/tasklet/" rel="tag"><i class="fa fa-tag"></i> tasklet</a>
+          
+            <a href="/tags/workqueue/" rel="tag"><i class="fa fa-tag"></i> workqueue</a>
+          
+        </div>
+      
+
+      
+      
+        <div class="post-widgets">
+        
+
+        
+
+        
+          
+          <div class="social_share">
+            
+            
+               <div id="needsharebutton-postbottom">
+                 <span class="btn">
+                    <i class="fa fa-share-alt" aria-hidden="true"></i>
+                 </span>
+               </div>
+            
+          </div>
+        
+        </div>
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/07/15/时间管理「time-management」/" rel="next" title="时间管理「time management」">
+                <i class="fa fa-chevron-left"></i> 时间管理「time management」
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/07/27/利用Qemu-4-0虚拟ARM64实验平台/" rel="prev" title="利用Qemu-4.0虚拟ARM64实验平台">
+                利用Qemu-4.0虚拟ARM64实验平台 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+    <div class="comments" id="comments">
+    </div>
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Xinlu Wang</p>
+              <p class="site-description motion-element" itemprop="description">不积跬步无以至千里，不积小流无以成江海</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">36</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">9</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">59</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/chasinglulu" target="_blank" title="GitHub"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="mailto:wangkart@aliyun.com" target="_blank" title="E-Mail"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="https://weibo.com/5052275150" target="_blank" title="Weibo"><i class="fa fa-fw fa-weibo"></i>Weibo</a>
+                  
+                </span>
+              
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#top-half「上半部分」和bottom-half「下半部分」"><span class="nav-number">1.</span> <span class="nav-text">top-half「上半部分」和bottom-half「下半部分」</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#硬中断「hardirq」和软中断「softirq」"><span class="nav-number">1.1.</span> <span class="nav-text">硬中断「hardirq」和软中断「softirq」</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#softirq「软中断」"><span class="nav-number">2.</span> <span class="nav-text">softirq「软中断」</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#softirq机制初始化"><span class="nav-number">2.1.</span> <span class="nav-text">softirq机制初始化</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#softirq与tasklet"><span class="nav-number">2.1.1.</span> <span class="nav-text">softirq与tasklet</span></a></li></ol></li><li class="nav-item nav-level-5"><a class="nav-link" href="#softirq处理函数注册"><span class="nav-number">2.2.</span> <span class="nav-text">softirq处理函数注册</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#softirq触发"><span class="nav-number">2.3.</span> <span class="nav-text">softirq触发</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#softirq处理"><span class="nav-number">2.4.</span> <span class="nav-text">softirq处理</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#do-softirq-：核心的softirq处理函数"><span class="nav-number">2.4.1.</span> <span class="nav-text">__do_softirq()：核心的softirq处理函数</span></a></li></ol></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#workqueue「工作队列」"><span class="nav-number">3.</span> <span class="nav-text">workqueue「工作队列」</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#cmwq「Concurrency-Managed-Workqueues」"><span class="nav-number">3.1.</span> <span class="nav-text">cmwq「Concurrency-Managed Workqueues」</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+<div class="copyright">&copy; <span itemprop="copyrightYear">2021</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Xinlu Wang</span>
+
+  
+
+  
+</div>
+
+<div class="powered-by">
+    <i class="fa fa-user-circle"></i>
+    <span id="busuanzi_container_site_uv">
+        <span id="busuanzi_value_site_uv"></span>
+    </span>
+</div>
+<span class="post-meta-divider">|</span>
+
+<div class="powered-by">
+    <span id="busuanzi_container_site_pv">
+        <span id="busuanzi_value_site_pv"></span>
+    </span>
+    <i class="fa fa-eye"></i>
+</div>
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动 v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Mist</a> v6.4.2</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.2"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  
+  
+  <script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+  
+  <script type="text/javascript">
+    var GUEST = ['nick','mail','link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(function (item) {
+      return GUEST.indexOf(item)>-1;
+    });
+    new Valine({
+        el: '#comments' ,
+        verify: false,
+        notify: false,
+        appId: 'kvMe6P3M8zvX1DeEHbGQnwvq-gzGzoHsz',
+        appKey: 'KlwgMU4eNhTTb3KXiqnvlOGA',
+        placeholder: 'Just go go',
+        avatar:'mp',
+        meta:guest,
+        pageSize:'10' || 10,
+        visitor: true
+    });
+  </script>
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+  
+
+
+  
+  
+  
+  <script src="/lib/needsharebutton/needsharebutton.js"></script>
+
+  <script>
+    
+      pbOptions = {};
+      
+          pbOptions.iconStyle = "box";
+      
+          pbOptions.boxForm = "horizontal";
+      
+          pbOptions.position = "bottomCenter";
+      
+          pbOptions.networks = "Weibo,Wechat,Douban,QQZone";
+      
+      new needShareButton('#needsharebutton-postbottom', pbOptions);
+    
+    
+  </script>
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+  
+  <script src="/lib/bookmark/bookmark.min.js?v=1.0"></script>
+  <script type="text/javascript">
+  
+    bookmark.scrollToMark('auto', "#更多");
+  
+  </script>
+
+
+  
+  <style>
+    .copy-btn {
+      display: inline-block;
+      padding: 6px 12px;
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 20px;
+      color: #333;
+      white-space: nowrap;
+      vertical-align: middle;
+      cursor: pointer;
+      background-color: #eee;
+      background-image: linear-gradient(#fcfcfc, #eee);
+      border: 1px solid #d5d5d5;
+      border-radius: 3px;
+      user-select: none;
+      outline: 0;
+    }
+
+    .highlight-wrap .copy-btn {
+      transition: opacity .3s ease-in-out;
+      opacity: 0;
+      padding: 2px 6px;
+      position: absolute;
+      right: 4px;
+      top: 8px;
+    }
+
+    .highlight-wrap:hover .copy-btn,
+    .highlight-wrap .copy-btn:focus {
+      opacity: 1
+    }
+
+    .highlight-wrap {
+      position: relative;
+    }
+  </style>
+  <script>
+    $('.highlight').each(function (i, e) {
+      var $wrap = $('<div>').addClass('highlight-wrap')
+      $(e).after($wrap)
+      $wrap.append($('<button>').addClass('copy-btn').append('复制').on('click', function (e) {
+        var code = $(this).parent().find('.code').find('.line').map(function (i, e) {
+          return $(e).text()
+        }).toArray().join('\n')
+        var ta = document.createElement('textarea')
+        document.body.appendChild(ta)
+        ta.style.position = 'absolute'
+        ta.style.top = '0px'
+        ta.style.left = '0px'
+        ta.value = code
+        ta.select()
+        ta.focus()
+        var result = document.execCommand('copy')
+        document.body.removeChild(ta)
+        
+          if(result)$(this).text('复制成功')
+          else $(this).text('复制失败')
+        
+        $(this).blur()
+      })).on('mouseleave', function (e) {
+        var $b = $(this).find('.copy-btn')
+        setTimeout(function () {
+          $b.text('复制')
+        }, 300)
+      }).append(e)
+    })
+  </script>
+
+
+</body>
+</html>

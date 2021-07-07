@@ -1,0 +1,1640 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+  
+  
+  <link rel="stylesheet" href="/lib/needsharebutton/needsharebutton.css">
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+  <meta name="google-site-verification" content="vuSkRYPVceK1DXhqZWm7wVxYV4YmmnI1Dv_C1M8rJJM" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Monda:300,300italic,400,400italic,700,700italic|Roboto Slab:300,300italic,400,400italic,700,700italic|Lobster Two:300,300italic,400,400italic,700,700italic|PT Mono:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.2" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.2">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.2" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '6.4.2',
+    sidebar: {"position":"right","width":300,"display":"always","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="&amp;ensp;&amp;ensp;&amp;ensp;&amp;ensp;通常所谓的U-Boot升级不过是在芯片原厂提供的BSP基础上增添部分外设适配代码，尽管这样做法能减少移植的难度，但芯片原厂提供的U-Boot版本一般较陈旧，极可能未实现新功能和新需求，比如设备树。通常，启动加载程序的移植是嵌入式Linux系统移植中首要面临的挑战。由于移植过程常涉及源代码的分析和修改，甚至添加新代码，因此需要在移植过程中逐渐提高三种基">
+<meta name="keywords" content="uboot,arm-linux-gnueabihf-gcc">
+<meta property="og:type" content="article">
+<meta property="og:title" content="关于Exynos4412 SoC的启动分析">
+<meta property="og:url" content="http://chasinglulu.github.io/2019/05/28/关于Exynos4412-SoC的启动分析/index.html">
+<meta property="og:site_name" content="点滴汇聚">
+<meta property="og:description" content="&amp;ensp;&amp;ensp;&amp;ensp;&amp;ensp;通常所谓的U-Boot升级不过是在芯片原厂提供的BSP基础上增添部分外设适配代码，尽管这样做法能减少移植的难度，但芯片原厂提供的U-Boot版本一般较陈旧，极可能未实现新功能和新需求，比如设备树。通常，启动加载程序的移植是嵌入式Linux系统移植中首要面临的挑战。由于移植过程常涉及源代码的分析和修改，甚至添加新代码，因此需要在移植过程中逐渐提高三种基">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://chasinglulu.github.io/2019/05/28/关于Exynos4412-SoC的启动分析/exynos_boot_order.svg">
+<meta property="og:image" content="http://chasinglulu.github.io/2019/05/28/关于Exynos4412-SoC的启动分析/memory_map.jpg">
+<meta property="og:image" content="http://chasinglulu.github.io/2019/05/28/关于Exynos4412-SoC的启动分析/exynos_internal_RAM.svg">
+<meta property="og:image" content="http://chasinglulu.github.io/2019/05/28/关于Exynos4412-SoC的启动分析/exynos_sd_layout.svg">
+<meta property="og:image" content="http://chasinglulu.github.io/2019/05/28/关于Exynos4412-SoC的启动分析/exynos_emmc_layout.svg">
+<meta property="og:updated_time" content="2021-07-06T09:36:32.370Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="关于Exynos4412 SoC的启动分析">
+<meta name="twitter:description" content="&amp;ensp;&amp;ensp;&amp;ensp;&amp;ensp;通常所谓的U-Boot升级不过是在芯片原厂提供的BSP基础上增添部分外设适配代码，尽管这样做法能减少移植的难度，但芯片原厂提供的U-Boot版本一般较陈旧，极可能未实现新功能和新需求，比如设备树。通常，启动加载程序的移植是嵌入式Linux系统移植中首要面临的挑战。由于移植过程常涉及源代码的分析和修改，甚至添加新代码，因此需要在移植过程中逐渐提高三种基">
+<meta name="twitter:image" content="http://chasinglulu.github.io/2019/05/28/关于Exynos4412-SoC的启动分析/exynos_boot_order.svg">
+
+
+
+
+
+
+  <link rel="canonical" href="http://chasinglulu.github.io/2019/05/28/关于Exynos4412-SoC的启动分析/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>关于Exynos4412 SoC的启动分析 | 点滴汇聚</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-right page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">点滴汇聚</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">不积跬步无以至千里，不积小流无以成江海</p>
+      
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首页</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+    <a href="/categories/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-th"></i> <br />分类</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />归档</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+    <a href="/tags/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />标签</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+    <a href="/about/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-user"></i> <br />关于</a>
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://chasinglulu.github.io/2019/05/28/关于Exynos4412-SoC的启动分析/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Xinlu Wang">
+      <meta itemprop="description" content="不积跬步无以至千里，不积小流无以成江海">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="点滴汇聚">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">关于Exynos4412 SoC的启动分析
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-05-28 18:01:38" itemprop="dateCreated datePublished" datetime="2019-05-28T18:01:38+08:00">2019-05-28</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2021-07-06 17:36:32" itemprop="dateModified" datetime="2021-07-06T17:36:32+08:00">2021-07-06</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/u-boot/" itemprop="url" rel="index"><span itemprop="name">u-boot</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <span class="post-meta-item-text">评论数：</span>
+                <a href="/2019/05/28/关于Exynos4412-SoC的启动分析/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count valine-comment-count" data-xid="/2019/05/28/关于Exynos4412-SoC的启动分析/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2019/05/28/关于Exynos4412-SoC的启动分析/" class="leancloud_visitors" data-flag-title="关于Exynos4412 SoC的启动分析">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数：</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>&ensp;&ensp;&ensp;&ensp;通常所谓的U-Boot升级不过是在芯片原厂提供的BSP基础上增添部分外设适配代码，尽管这样做法能减少移植的难度，但芯片原厂提供的U-Boot版本一般较陈旧，极可能未实现新功能和新需求，比如设备树。通常，启动加载程序的移植是嵌入式Linux系统移植中首要面临的挑战。由于移植过程常涉及源代码的分析和修改，甚至添加新代码，因此需要在移植过程中逐渐提高三种基本能力：阅读芯片手册的能力、阅读规范文档的能力及阅读源代码的能力。</p>
+<a id="more"></a>
+<h3 id="开发环境"><a href="#开发环境" class="headerlink" title="开发环境"></a>开发环境</h3><ul>
+<li><strong>Host OS:</strong> ubuntu-16.04-desktop</li>
+<li><strong>Target Development Board:</strong> Single Board Computer「SBC」 based on Exynos4412 SoC<ul>
+<li>9tripod X4412「深圳九鼎创展有限公司」</li>
+<li>TOPEET iTOP4412「讯为」</li>
+</ul>
+</li>
+<li><strong>Cross Compiler Toolchain:</strong> arm-linux-gnueabihf-<ul>
+<li>gcc version 6.4.1 20171012 (Linaro GCC 6.4-2017.11)</li>
+</ul>
+</li>
+<li><strong>u-boot:</strong> u-boot-2019.07</li>
+</ul>
+<h3 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h3><p>&ensp;&ensp;&ensp;&ensp;在移植之前，先从官方地址下载特定的U-Boot源代码，如本文使用的u-boot-2019.07。深入理解芯片的启动过程、地址空间映射「memory map」和映像布局对移植来说是至关重要的。本文重点分析了Exynos4412 SoC的启动，为后续的移植做好铺垫。Exynos4412 SoC支持以下启动设备：</p>
+<ul>
+<li>NAND flash</li>
+<li>SD/MMC</li>
+<li>eMMC</li>
+<li>USB</li>
+</ul>
+<h3 id="启动过程"><a href="#启动过程" class="headerlink" title="启动过程"></a>启动过程</h3><p>&ensp;&ensp;&ensp;&ensp;Exynos4412 芯片内部包含一个64KiB ROM和一个256KiB SRAM，并且在ROM中固化了一份bootrom程序，也被称为iROM。内部SRAM用来存储iROM执行时的临时变量、数据及后续加载的fwbl.bin和u-boot-spl.bin代码。Exynos4412芯片的启动过程主要包含BL1、BL2和Kernel三个阶段，其中映像文件的加载执行顺序如图1所示。</p>
+<div align="center"><img src="exynos_boot_order.svg" alt="exynos_boot_order.svg"><br>图1 映像加载执行的顺序</div>
+
+<ol>
+<li>iROM被固化在内部ROM中，其主要完成功能包括：关闭看门狗、禁止中断及关闭MMU和数据缓存、打开指令缓存、刷新TLB和清除L2缓存。除此之外，使其他CPU核心进入idle模式，只保留CPU0继续执行后面的代码。接着获取reset状态、设置系统时钟分频系数和PLLs。最后根据读到的OM引脚配置来决定启动媒介设备「boot media device」，并从此启动设备将固件fwbl.bin加载到内部SRAM并跳转执行。</li>
+<li>固件fwbl.bin初始化IRQ和SVC模式的栈位置，若是从LPA「low power 」状态唤醒，将直接跳转执行u-boot-spl.bin，否则从启动媒介设备中加载u-boot-spl.bin至内部SRAM中。接着判断是不是安全启动，若是就对u-boot-spl.bin映像进行签名校验，若不是就只对u-boot-spl.bin映像进行CRC校验，验证之后跳转执行u-boot-spl.bin代码，<strong>更详细的过程参考[1]</strong>。</li>
+<li>u-boot-spl.bin也要初始化IRQ和SVC模式的栈位置，并且关闭MMU和D-Cache，不过其主要功能是配置系统时钟（clock）和初始化动态内存控制器（dynamic random-access memory controller，DRAMC）。如果需要早期的串口调试功能，那么也是由它实现。若是从LPA或睡眠状态唤醒，将直接执行内存中的u-boot.bin映像，否则从启动设备中加载u-boot.bin映像至内存中并直接跳转执行。由于不同开发板针对不同需求而采用不同的DDR SDRAM芯片，所以芯片的系统时钟和动态内存控制器的配置也要依据开发板或单板的不同做适当的调整，这也正是单独分离出这样一个映像文件的原因。</li>
+<li>u-boot.bin设置MMC、UART、USB、LCD、Network等外设实现各种高级的启动引导功能，比如TFTP升级、启动显示等，然后进入命令菜单等待用户输入命令或执行bootcmd环境变量指定的命令实现自动加载Linux kernel及设备树文件到内存，之后移交控制权给kernel。</li>
+<li>zImage、dtb等文件完成Linux操作系统的启动和设置，为应用程序提供一个执行环境。内核启动流程超出本文的讨论范围，故不做深入探讨。</li>
+</ol>
+<p>&ensp;&ensp;&ensp;&ensp;综上所述，启动引导过程「BoardLoader」分为两个阶段：BL1和BL2，在启动第一阶段涉及fwbl.bin和u-boot-spl.bin两个映像文件，其中fwbl.bin是由三星半导体提供的，而且没有源代码，只能通过文档大致了解它完成了哪些事情。与之相反，u-boot-spl.bin是通过开源U-Boot工程生成的，我们能够掌控代码的执行内容，便于定制化。在启动第二阶段只涉及u-boot.bin映像文件，也是使用U-Boot工程创建的，根据需求能够灵活地修改扩展。</p>
+<h4 id="为什么在启动的第一阶段（BL1）需要单独分离出fwbl-bin和u-boot-spl-bin两个文件？"><a href="#为什么在启动的第一阶段（BL1）需要单独分离出fwbl-bin和u-boot-spl-bin两个文件？" class="headerlink" title="为什么在启动的第一阶段（BL1）需要单独分离出fwbl.bin和u-boot-spl.bin两个文件？"></a>为什么在启动的第一阶段（BL1）需要单独分离出fwbl.bin和u-boot-spl.bin两个文件？</h4><p>&ensp;&ensp;&ensp;&ensp;这样设计的目的其实就是为了使芯片相关的配置过程与平台相关的配置过程完全解耦。无论芯片被使用在什么平台上，芯片配置固件都要具有将平台配置代码加载到内部SRAM并跳转执行的功能，fwbl.bin都由芯片制造商实现，但集成制造商通常都要求能够简单方便地修改平台配置以致于定制出差异化的产品，比如系统时钟的修改、内存芯片的改变等，这些设置都需要能在u-boot-spl.bin中实现。这样做的好处就使集成制造商能够根据具体需求灵活地使用自己定制的启动映像，从而不需要每次硬件选型变更后寻找芯片制造商的协助与授权。</p>
+<h3 id="地址空间映射"><a href="#地址空间映射" class="headerlink" title="地址空间映射"></a>地址空间映射</h3><div align="center"><img src="memory_map.jpg" alt="memory_map.jpg"><br>图2 Exynos4412 SoC的地址空间映射</div><br>&ensp;&ensp;&ensp;&ensp;如图2所示，可看出芯片将物理地址空间划分成多个内存区间「region」，分别有不同的用途。比如该芯片最大只能支持3GiB的内存。<br><br><div align="center"><img src="exynos_internal_RAM.svg" alt="exynos_internal_RAM.svg"><br>图3 关于内部SRAM的内存映射</div>
+
+<p>&ensp;&ensp;&ensp;&ensp;由图 3所示，可看出iROM、fwbl.bin与u-boot-spl.bin各自占用的地址空间。内部SRAM的地址空间是从0x02020000 开始到0x02060000结束。由于内部ROM是只读存储器，因此需要将 0x02020000 ~ 0x02021400的地址空间保留给iROM程序所使用，预留大小为5KiB，用于存放iROM的全局变量（ZI/ZW即全局未初始化变量与全局已初始化变量）、局部变量（stack）等。接下来从0x02021400处开始到0x02025000结束属于fwbl.bin所占用的地址空间，由此可认为fwbl.bin的第一条指令在执行期间是存放在0x02021400地址处，这段地址空间的大小为15KiB。紧接着从0x02025000开始到0x02029000结束的这段空间属于u-boot-spl.bin所占用的地址空间，其大小为16KiB，因此可认为在运行过程中u-boot-spl.bin的第一条指令将存放在0x02025000地址处。<br>&ensp;&ensp;&ensp;&ensp;牵涉位置无关代码（Position-independent code，缩写PIC）的问题是移植U-Boot的难点，即运行地址与加载地址的区别。u-boot-spl.bin的运行地址在编译时是一个很重要的信息，决定得到的u-boot-spl.bin代码能否在芯片上正确运行。运行地址也叫链接地址，是程序指令定位所用的绝对地址，是在编译链接时必须指定的地址。加载地址指的是程序代码放置的位置，大多数情况下运行地址等于加载地址。通常用于生成u-boot-spl.bin的源代码包含非PIC的代码，并且在编译时指定的运行地址与存放映像用的加载地址不一致，当执行到u-boot-spl.bin的位置有关代码时其实际存放地址与依据运行地址计算的地址不吻合，此时u-boot-spl.bin代码将不能顺利执行下去。实际上，u-boot-spl.bin是由fwbl.bin加载到内部SRAM的0x02025000地址处，又由于fwbl.bin是芯片原厂提供的不开源的二进制程序，暂时无法修改fwbl.bin程序的执行行为，因此在编译生成u-boot-spl.bin时必须正确指定u-boot-spl.bin的链接地址为0x02025000，只有这样含有非PIC的u-boot-spl.bin代码才能顺利运行。<br>&ensp;&ensp;&ensp;&ensp;在配置编译生成u-boot映像时，若打开了SPL相关配置选项，则在编译完成后会在映像构建目录build下创建spl子目录，并在此子目录下创建与SPL相关的各种格式的映像文件和符号表，如表1所示。</p>
+<div align="center">表1 编译生成的SPL相关文件<br><table style="border-collapse:collapse;border-spacing:0;border-color:#9ABAD9;margin:0px auto" class="tg"><tr><th style="font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#fff;background-color:#409cff;text-align:center">映像名称</th><th style="font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#fff;background-color:#409cff;text-align:center">含义解释</th></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:center">u-boot-spl.map<br></td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#D2E4FC;text-align:left">映像符号表<br></td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:center">u-boot-spl<br></td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#D2E4FC;text-align:left">ELF格式映像<br></td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:center">u-boot-spl.lds<br></td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#D2E4FC;text-align:left">ld链接脚本<br></td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:center">x4412-spl.bin<br></td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#D2E4FC;text-align:left">特定芯片识别的二进制格式映像<br></td></tr></table></div>
+
+<p>&ensp;&ensp;&ensp;&ensp;按理论说，得到的ELF格式u-boot-spl映像也可以被加载执行，但由于fwbl.bin代码的行为限制，fwbl.bin不能加载执行其他格式的映像，所以一般常用&lt;board_name&gt;-spl.bin，其中&lt;board_name&gt;使用开发板的特定名称代替，例如用x4412代替后即是x4412-spl.bin，<strong>注意：启动第一阶段涉及的u-boot-spl.bin可以指的是这里的x4412-spl.bin</strong>。</p>
+<h3 id="映像布局"><a href="#映像布局" class="headerlink" title="映像布局"></a>映像布局</h3><p>&ensp;&ensp;&ensp;&ensp;在运行时，启动加载程序确切知道各种映像在存储设备SD或eMMC中的放置位置才能正确地从启动设备中获取启动映像并执行，并顺利将控制权转交给Linux内核。</p>
+<div align="center"><img src="exynos_sd_layout.svg" alt="exynos_sd_layout.svg"><br>图4 在SD卡上的映像布局</div>
+
+<p>&ensp;&ensp;&ensp;&ensp;SD卡的扇区大小为512B，编号0扇区为保留扇区，用来存放分区表的数据（MBR）。接下来的15KiB的空间存放fwbl.bin，比如X4412的BSP所提供fwbl.bin是15KiB，但iTOP4412的BSP所提供的fwbl.bin为8KiB。fwbl.bin后面要紧跟着存放u-boot-spl.bin（或x4412-spl.bin），两者之间不能存在空隙，其实u-boot-spl.bin的实际大小只有14KiB，因此u-boot-spl.bin与u-boot.bin之间存在2KiB的间隙，建议将此存储空间置零，后面几个映像文件可以根据实际情况自己安排适当调整位置。如图4所示，显示了X4412开发板所用的映像布局。这些映像文件是直接使用dd命令烧录至裸金属的物理存储空间，并不是存放在SD卡上的基于文件系统的逻辑分区内，但后面的kernel和dtb文件任然需要放入文件系统vfat32格式化的分区内，根文件系统映像存放入ext4格式化的分区内。</p>
+<div align="center"><img src="exynos_emmc_layout.svg" alt="exynos_emmc_layout.svg"><br>图5 在eMMC上的映像布局</div>
+
+<p>&ensp;&ensp;&ensp;&ensp;eMMC存储设备一般拥有多个独立的物理存储空间，每个硬件分区都是独立编址的。通常情况下，Boot Area Patitions存放启动加载程序，User Data Area存储内核映像、设备树和根文件系统等数据。从eMMC启动时，X4412开发板采用的映像布局如图5所示。<strong>更详细的关于eMMC的工作原理及分区，请参考[6]和[7]。</strong><br>&ensp;&ensp;&ensp;&ensp;不管选择从哪个启动设备启动，同样的映像只是在不同启动设备上的存放位置有变化。若设置启动设备为SD卡，则映像需要按照SD卡的存放布局放置。若eMMC被设置为启动设备，则映像就按照eMMC的空间布局存放。尽管图片中显示的内容都是与X4412相关的，但是原理和思想都是相似的，同样适用于iTOP4412开发板。</p>
+<h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><ol>
+<li><a href="/downloads/Android_Exynos4412_iROM_Secure_Booting_Guide_Ver.1.00.00.pdf">Exynos4212 iROM Booting Guide</a></li>
+<li><a href="/downloads/SEC_Exynos4412_Users Manual_Ver.1.00.00.pdf">Exynos 4412 RISC Microprocessor User’s Manual</a></li>
+<li><a href="http://www.techbulo.com/1335.html" target="_blank" rel="noopener">Exynos 4412的启动过程分析</a></li>
+<li><a href="/downloads/ARM_DEN0028B_SMC_Calling_Convention.pdf">SMC CALLING CONVENTION System Software on ARM® Platforms</a></li>
+<li><a href="http://www.cnblogs.com/pengdonglin137/p/5080309.html" target="_blank" rel="noopener">基于tiny4412的u-boot移植（一）</a></li>
+<li><a href="https://www.jedec.org/sites/default/files/docs/JESD84-A44.pdf" target="_blank" rel="noopener">eMMC (Embedded MMC) Standard MMCA 4.4 (JESD84-A44)(March 2009)</a></li>
+<li><a href="https://linux.codingbelief.com/zh/storage/flash_memory/emmc/" target="_blank" rel="noopener">eMMC详解</a></li>
+</ol>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Xinlu Wang</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://chasinglulu.github.io/2019/05/28/关于Exynos4412-SoC的启动分析/" title="关于Exynos4412 SoC的启动分析">http://chasinglulu.github.io/2019/05/28/关于Exynos4412-SoC的启动分析/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/uboot/" rel="tag"><i class="fa fa-tag"></i> uboot</a>
+          
+            <a href="/tags/arm-linux-gnueabihf-gcc/" rel="tag"><i class="fa fa-tag"></i> arm-linux-gnueabihf-gcc</a>
+          
+        </div>
+      
+
+      
+      
+        <div class="post-widgets">
+        
+
+        
+
+        
+          
+          <div class="social_share">
+            
+            
+               <div id="needsharebutton-postbottom">
+                 <span class="btn">
+                    <i class="fa fa-share-alt" aria-hidden="true"></i>
+                 </span>
+               </div>
+            
+          </div>
+        
+        </div>
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/11/05/排序算法学习总结/" rel="next" title="排序算法学习总结">
+                <i class="fa fa-chevron-left"></i> 排序算法学习总结
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/05/28/早期内存分配器-memblock/" rel="prev" title="早期内存分配器：memblock">
+                早期内存分配器：memblock <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+    <div class="comments" id="comments">
+    </div>
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Xinlu Wang</p>
+              <p class="site-description motion-element" itemprop="description">不积跬步无以至千里，不积小流无以成江海</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">36</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">9</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">59</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/chasinglulu" target="_blank" title="GitHub"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="mailto:wangkart@aliyun.com" target="_blank" title="E-Mail"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="https://weibo.com/5052275150" target="_blank" title="Weibo"><i class="fa fa-fw fa-weibo"></i>Weibo</a>
+                  
+                </span>
+              
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#开发环境"><span class="nav-number">1.</span> <span class="nav-text">开发环境</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#概述"><span class="nav-number">2.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#启动过程"><span class="nav-number">3.</span> <span class="nav-text">启动过程</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#为什么在启动的第一阶段（BL1）需要单独分离出fwbl-bin和u-boot-spl-bin两个文件？"><span class="nav-number">3.1.</span> <span class="nav-text">为什么在启动的第一阶段（BL1）需要单独分离出fwbl.bin和u-boot-spl.bin两个文件？</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#地址空间映射"><span class="nav-number">4.</span> <span class="nav-text">地址空间映射</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#映像布局"><span class="nav-number">5.</span> <span class="nav-text">映像布局</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#参考资料"><span class="nav-number">6.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+<div class="copyright">&copy; <span itemprop="copyrightYear">2021</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Xinlu Wang</span>
+
+  
+
+  
+</div>
+
+<div class="powered-by">
+    <i class="fa fa-user-circle"></i>
+    <span id="busuanzi_container_site_uv">
+        <span id="busuanzi_value_site_uv"></span>
+    </span>
+</div>
+<span class="post-meta-divider">|</span>
+
+<div class="powered-by">
+    <span id="busuanzi_container_site_pv">
+        <span id="busuanzi_value_site_pv"></span>
+    </span>
+    <i class="fa fa-eye"></i>
+</div>
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动 v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Mist</a> v6.4.2</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.2"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  
+  
+  <script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+  
+  <script type="text/javascript">
+    var GUEST = ['nick','mail','link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(function (item) {
+      return GUEST.indexOf(item)>-1;
+    });
+    new Valine({
+        el: '#comments' ,
+        verify: false,
+        notify: false,
+        appId: 'kvMe6P3M8zvX1DeEHbGQnwvq-gzGzoHsz',
+        appKey: 'KlwgMU4eNhTTb3KXiqnvlOGA',
+        placeholder: 'Just go go',
+        avatar:'mp',
+        meta:guest,
+        pageSize:'10' || 10,
+        visitor: true
+    });
+  </script>
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+  
+
+
+  
+  
+  
+  <script src="/lib/needsharebutton/needsharebutton.js"></script>
+
+  <script>
+    
+      pbOptions = {};
+      
+          pbOptions.iconStyle = "box";
+      
+          pbOptions.boxForm = "horizontal";
+      
+          pbOptions.position = "bottomCenter";
+      
+          pbOptions.networks = "Weibo,Wechat,Douban,QQZone";
+      
+      new needShareButton('#needsharebutton-postbottom', pbOptions);
+    
+    
+  </script>
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+  
+  <script src="/lib/bookmark/bookmark.min.js?v=1.0"></script>
+  <script type="text/javascript">
+  
+    bookmark.scrollToMark('auto', "#更多");
+  
+  </script>
+
+
+  
+  <style>
+    .copy-btn {
+      display: inline-block;
+      padding: 6px 12px;
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 20px;
+      color: #333;
+      white-space: nowrap;
+      vertical-align: middle;
+      cursor: pointer;
+      background-color: #eee;
+      background-image: linear-gradient(#fcfcfc, #eee);
+      border: 1px solid #d5d5d5;
+      border-radius: 3px;
+      user-select: none;
+      outline: 0;
+    }
+
+    .highlight-wrap .copy-btn {
+      transition: opacity .3s ease-in-out;
+      opacity: 0;
+      padding: 2px 6px;
+      position: absolute;
+      right: 4px;
+      top: 8px;
+    }
+
+    .highlight-wrap:hover .copy-btn,
+    .highlight-wrap .copy-btn:focus {
+      opacity: 1
+    }
+
+    .highlight-wrap {
+      position: relative;
+    }
+  </style>
+  <script>
+    $('.highlight').each(function (i, e) {
+      var $wrap = $('<div>').addClass('highlight-wrap')
+      $(e).after($wrap)
+      $wrap.append($('<button>').addClass('copy-btn').append('复制').on('click', function (e) {
+        var code = $(this).parent().find('.code').find('.line').map(function (i, e) {
+          return $(e).text()
+        }).toArray().join('\n')
+        var ta = document.createElement('textarea')
+        document.body.appendChild(ta)
+        ta.style.position = 'absolute'
+        ta.style.top = '0px'
+        ta.style.left = '0px'
+        ta.value = code
+        ta.select()
+        ta.focus()
+        var result = document.execCommand('copy')
+        document.body.removeChild(ta)
+        
+          if(result)$(this).text('复制成功')
+          else $(this).text('复制失败')
+        
+        $(this).blur()
+      })).on('mouseleave', function (e) {
+        var $b = $(this).find('.copy-btn')
+        setTimeout(function () {
+          $b.text('复制')
+        }, 300)
+      }).append(e)
+    })
+  </script>
+
+
+</body>
+</html>

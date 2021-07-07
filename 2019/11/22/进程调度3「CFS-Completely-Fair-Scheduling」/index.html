@@ -1,0 +1,1614 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+  
+  
+  <link rel="stylesheet" href="/lib/needsharebutton/needsharebutton.css">
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+  <meta name="google-site-verification" content="vuSkRYPVceK1DXhqZWm7wVxYV4YmmnI1Dv_C1M8rJJM" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Monda:300,300italic,400,400italic,700,700italic|Roboto Slab:300,300italic,400,400italic,700,700italic|Lobster Two:300,300italic,400,400italic,700,700italic|PT Mono:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.2" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.2">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.2" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '6.4.2',
+    sidebar: {"position":"right","width":300,"display":"always","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="CFS是内核使用的一种调度器或调度类，它主要负责处理三种调度策略：SCHED_NORMAL、SCHED_BATCH和SCHED_IDLE。从上一篇文章 可知，调度器的核心在挑选下一个运行的进程时有可能会遍历所有的调度类别。实际上系统大多数进程通常都是CFS调度类负责处理的，因此为了优化下一个进程的挑选调度器核心会先判断当前进程是否采用了CFS调度策略，若是，则直接调用CFS代码来挑选下一个进程，若">
+<meta name="keywords" content="task,process,management,schedule">
+<meta property="og:type" content="article">
+<meta property="og:title" content="进程调度3「CFS-Completely Fair Scheduling」">
+<meta property="og:url" content="http://chasinglulu.github.io/2019/11/22/进程调度3「CFS-Completely-Fair-Scheduling」/index.html">
+<meta property="og:site_name" content="点滴汇聚">
+<meta property="og:description" content="CFS是内核使用的一种调度器或调度类，它主要负责处理三种调度策略：SCHED_NORMAL、SCHED_BATCH和SCHED_IDLE。从上一篇文章 可知，调度器的核心在挑选下一个运行的进程时有可能会遍历所有的调度类别。实际上系统大多数进程通常都是CFS调度类负责处理的，因此为了优化下一个进程的挑选调度器核心会先判断当前进程是否采用了CFS调度策略，若是，则直接调用CFS代码来挑选下一个进程，若">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://chasinglulu.github.io/2019/11/22/进程调度3「CFS-Completely-Fair-Scheduling」/enqueue_task_fair_codeflow.svg">
+<meta property="og:image" content="http://chasinglulu.github.io/2019/11/22/进程调度3「CFS-Completely-Fair-Scheduling」/pick_next_task_fair_codeflow.svg">
+<meta property="og:image" content="http://chasinglulu.github.io/2019/11/22/进程调度3「CFS-Completely-Fair-Scheduling」/dequeue_task_fair_codeflow.svg">
+<meta property="og:image" content="http://chasinglulu.github.io/2019/11/22/进程调度3「CFS-Completely-Fair-Scheduling」/update_curr_codeflow.svg">
+<meta property="og:image" content="http://chasinglulu.github.io/2019/11/22/进程调度3「CFS-Completely-Fair-Scheduling」/update_sysctl_codeflow.svg">
+<meta property="og:updated_time" content="2021-07-06T09:36:32.386Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="进程调度3「CFS-Completely Fair Scheduling」">
+<meta name="twitter:description" content="CFS是内核使用的一种调度器或调度类，它主要负责处理三种调度策略：SCHED_NORMAL、SCHED_BATCH和SCHED_IDLE。从上一篇文章 可知，调度器的核心在挑选下一个运行的进程时有可能会遍历所有的调度类别。实际上系统大多数进程通常都是CFS调度类负责处理的，因此为了优化下一个进程的挑选调度器核心会先判断当前进程是否采用了CFS调度策略，若是，则直接调用CFS代码来挑选下一个进程，若">
+<meta name="twitter:image" content="http://chasinglulu.github.io/2019/11/22/进程调度3「CFS-Completely-Fair-Scheduling」/enqueue_task_fair_codeflow.svg">
+
+
+
+
+
+
+  <link rel="canonical" href="http://chasinglulu.github.io/2019/11/22/进程调度3「CFS-Completely-Fair-Scheduling」/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>进程调度3「CFS-Completely Fair Scheduling」 | 点滴汇聚</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-right page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">点滴汇聚</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">不积跬步无以至千里，不积小流无以成江海</p>
+      
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首页</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+    <a href="/categories/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-th"></i> <br />分类</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />归档</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+    <a href="/tags/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />标签</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+    <a href="/about/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-user"></i> <br />关于</a>
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off"
+             placeholder="搜索..." spellcheck="false"
+             type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://chasinglulu.github.io/2019/11/22/进程调度3「CFS-Completely-Fair-Scheduling」/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Xinlu Wang">
+      <meta itemprop="description" content="不积跬步无以至千里，不积小流无以成江海">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="点滴汇聚">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">进程调度3「CFS-Completely Fair Scheduling」
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-11-22 22:56:42" itemprop="dateCreated datePublished" datetime="2019-11-22T22:56:42+08:00">2019-11-22</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2021-07-06 17:36:32" itemprop="dateModified" datetime="2021-07-06T17:36:32+08:00">2021-07-06</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/task-management-and-process-scheduling/" itemprop="url" rel="index"><span itemprop="name">task management and process scheduling</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <span class="post-meta-item-text">评论数：</span>
+                <a href="/2019/11/22/进程调度3「CFS-Completely-Fair-Scheduling」/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count valine-comment-count" data-xid="/2019/11/22/进程调度3「CFS-Completely-Fair-Scheduling」/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2019/11/22/进程调度3「CFS-Completely-Fair-Scheduling」/" class="leancloud_visitors" data-flag-title="进程调度3「CFS-Completely Fair Scheduling」">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数：</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>CFS是内核使用的一种调度器或调度类，它主要负责处理三种调度策略：SCHED_NORMAL、SCHED_BATCH和SCHED_IDLE。从<a href="https://chasinglulu.github.io/2019/11/22/%E8%BF%9B%E7%A8%8B%E8%B0%83%E5%BA%A62%E3%80%8CCore%E3%80%8D/">上一篇文章</a> 可知，调度器的核心在挑选下一个运行的进程时有可能会遍历所有的调度类别。实际上系统大多数进程通常都是CFS调度类负责处理的，因此为了优化下一个进程的挑选调度器核心会先判断当前进程是否采用了CFS调度策略，若是，则直接调用CFS代码来挑选下一个进程，若不是或CFS代码未能挑选到一个合适的进程，则会调用各个调度类的挑选函数来寻找一个合适的进程。若CFS代码寻找到了合适的下一个运行的进程，则直接返回该进程的实例而不会再遍历调度类。本文将主要关注下列的CFS活动和行为：</p>
+<ul>
+<li>将一个任务插入运行队列</li>
+<li>从运行队列中挑选一个合适的任务</li>
+<li>从运行队列中移除一个任务</li>
+<li>处理周期滴答「periodic ticks」</li>
+<li>管理调度实体「scheduling entities」的运行时间</li>
+<li>管理时间片「time slices」</li>
+</ul>
+<a id="more"></a>
+<hr>
+<ul>
+<li><strong>Target Platform:</strong> <a href="https://www.96boards.org/product/rock960c/" target="_blank" rel="noopener">Rock960c</a></li>
+<li><strong>ARCH:</strong>arm64</li>
+<li><strong>Linux Kernel:</strong>linux-4.19.27</li>
+</ul>
+<hr>
+<h3 id="将一个任务插入运行队列"><a href="#将一个任务插入运行队列" class="headerlink" title="将一个任务插入运行队列"></a>将一个任务插入运行队列</h3><div align="center"><img src="enqueue_task_fair_codeflow.svg" alt="enqueue_task_fair_codeflow.svg"><br>图1 enqueue_task_fair函数的调用路径</div>
+
+<h4 id="enqueue-task-fair-：将一个任务插入CFS运行队列"><a href="#enqueue-task-fair-：将一个任务插入CFS运行队列" class="headerlink" title="enqueue_task_fair()：将一个任务插入CFS运行队列"></a>enqueue_task_fair()：将一个任务插入CFS运行队列</h4><h5 id="enqueue-entity-：更新调度实体的vruntime字段并将它插入红黑树"><a href="#enqueue-entity-：更新调度实体的vruntime字段并将它插入红黑树" class="headerlink" title="enqueue_entity()：更新调度实体的vruntime字段并将它插入红黑树"></a>enqueue_entity()：更新调度实体的vruntime字段并将它插入红黑树</h5><h5 id="place-entity-：计算调度实体的vruntime"><a href="#place-entity-：计算调度实体的vruntime" class="headerlink" title="place_entity()：计算调度实体的vruntime"></a>place_entity()：计算调度实体的vruntime</h5><h5 id="enqueue-entity-：将调度实体插入红黑树"><a href="#enqueue-entity-：将调度实体插入红黑树" class="headerlink" title="__enqueue_entity()：将调度实体插入红黑树"></a>__enqueue_entity()：将调度实体插入红黑树</h5><h3 id="从运行队列中挑选一个任务"><a href="#从运行队列中挑选一个任务" class="headerlink" title="从运行队列中挑选一个任务"></a>从运行队列中挑选一个任务</h3><div align="center"><img src="pick_next_task_fair_codeflow.svg" alt="pick_next_task_fair_codeflow.svg"><br>图2 pick_next_task_fair函数的调用路径</div>
+
+<h4 id="pick-next-task-：寻找将要运行的下一个任务"><a href="#pick-next-task-：寻找将要运行的下一个任务" class="headerlink" title="pick_next_task()：寻找将要运行的下一个任务"></a>pick_next_task()：寻找将要运行的下一个任务</h4><h5 id="pick-next-task-fair-：从CFS运行队列中寻找下一个任务"><a href="#pick-next-task-fair-：从CFS运行队列中寻找下一个任务" class="headerlink" title="pick_next_task_fair()：从CFS运行队列中寻找下一个任务"></a>pick_next_task_fair()：从CFS运行队列中寻找下一个任务</h5><h5 id="pick-next-entity-：在红黑树上寻找下一个即将运行的调度实体"><a href="#pick-next-entity-：在红黑树上寻找下一个即将运行的调度实体" class="headerlink" title="pick_next_entity()：在红黑树上寻找下一个即将运行的调度实体"></a>pick_next_entity()：在红黑树上寻找下一个即将运行的调度实体</h5><h5 id="put-prev-entity-：删除当前的调度实体"><a href="#put-prev-entity-：删除当前的调度实体" class="headerlink" title="put_prev_entity()：删除当前的调度实体"></a>put_prev_entity()：删除当前的调度实体</h5><h5 id="set-next-entity-：将以参数形式传入的调度实体设置成当前调度实体"><a href="#set-next-entity-：将以参数形式传入的调度实体设置成当前调度实体" class="headerlink" title="set_next_entity()：将以参数形式传入的调度实体设置成当前调度实体"></a>set_next_entity()：将以参数形式传入的调度实体设置成当前调度实体</h5><h3 id="从运行队列中移除一个任务"><a href="#从运行队列中移除一个任务" class="headerlink" title="从运行队列中移除一个任务"></a>从运行队列中移除一个任务</h3><div align="center"><img src="dequeue_task_fair_codeflow.svg" alt="dequeue_task_fair_codeflow.svg"><br>图3 dequeue_task_fair函数的调用路径</div>
+
+<h4 id="dequeue-task-fair-：从CFS运行队列中移除一个任务"><a href="#dequeue-task-fair-：从CFS运行队列中移除一个任务" class="headerlink" title="dequeue_task_fair()：从CFS运行队列中移除一个任务"></a>dequeue_task_fair()：从CFS运行队列中移除一个任务</h4><h5 id="dequeue-entity-：从红黑树中移除一个调度实体"><a href="#dequeue-entity-：从红黑树中移除一个调度实体" class="headerlink" title="dequeue_entity()：从红黑树中移除一个调度实体"></a>dequeue_entity()：从红黑树中移除一个调度实体</h5><h3 id="周期滴答「periodic-ticks」的处理"><a href="#周期滴答「periodic-ticks」的处理" class="headerlink" title="周期滴答「periodic ticks」的处理"></a>周期滴答「periodic ticks」的处理</h3><h4 id="task-tick-fair-：尝试抢占当前的任务"><a href="#task-tick-fair-：尝试抢占当前的任务" class="headerlink" title="task_tick_fair()：尝试抢占当前的任务"></a>task_tick_fair()：尝试抢占当前的任务</h4><h5 id="entity-tick-：更新CFS运行队列的调度信息以及尝试抢占当前调度实体"><a href="#entity-tick-：更新CFS运行队列的调度信息以及尝试抢占当前调度实体" class="headerlink" title="entity_tick()：更新CFS运行队列的调度信息以及尝试抢占当前调度实体"></a>entity_tick()：更新CFS运行队列的调度信息以及尝试抢占当前调度实体</h5><h5 id="check-preempt-tick-：尝试抢占当前调度实体"><a href="#check-preempt-tick-：尝试抢占当前调度实体" class="headerlink" title="check_preempt_tick()：尝试抢占当前调度实体"></a>check_preempt_tick()：尝试抢占当前调度实体</h5><h3 id="调度实体的runtime管理"><a href="#调度实体的runtime管理" class="headerlink" title="调度实体的runtime管理"></a>调度实体的runtime管理</h3><div align="center"><img src="update_curr_codeflow.svg" alt="update_curr_codeflow.svg"><br>图3 update_curr函数的调用路径</div>
+
+<h4 id="update-curr-：更新CFS运行队列和调度实体的runtime相关字段"><a href="#update-curr-：更新CFS运行队列和调度实体的runtime相关字段" class="headerlink" title="update_curr()：更新CFS运行队列和调度实体的runtime相关字段"></a>update_curr()：更新CFS运行队列和调度实体的runtime相关字段</h4><h5 id="calc-delta-fair-：根据NICE-0-LOAD和se-gt-load加权计算更新delta"><a href="#calc-delta-fair-：根据NICE-0-LOAD和se-gt-load加权计算更新delta" class="headerlink" title="calc_delta_fair()：根据NICE_0_LOAD和se-&gt;load加权计算更新delta"></a>calc_delta_fair()：根据NICE_0_LOAD和se-&gt;load加权计算更新delta</h5><h5 id="calc-delta-：根据load-weight和delta-exec计算权重「weight」"><a href="#calc-delta-：根据load-weight和delta-exec计算权重「weight」" class="headerlink" title="__calc_delta()：根据load_weight和delta_exec计算权重「weight」"></a>__calc_delta()：根据load_weight和delta_exec计算权重「weight」</h5><h3 id="时间片「time-slice」管理"><a href="#时间片「time-slice」管理" class="headerlink" title="时间片「time slice」管理"></a>时间片「time slice」管理</h3><h4 id="sched-slice-：计算调度实体的时间片「time-slice」"><a href="#sched-slice-：计算调度实体的时间片「time-slice」" class="headerlink" title="sched_slice()：计算调度实体的时间片「time slice」"></a>sched_slice()：计算调度实体的时间片「time slice」</h4><h5 id="sched-period-：根据任务数量计算调度延迟「scheduling-latency」"><a href="#sched-period-：根据任务数量计算调度延迟「scheduling-latency」" class="headerlink" title="__sched_period()：根据任务数量计算调度延迟「scheduling latency」"></a>__sched_period()：根据任务数量计算调度延迟「scheduling latency」</h5><h4 id="sched-vslice-：依据调度实体的负载权重计算其虚拟时间片「virtual-time-slice」"><a href="#sched-vslice-：依据调度实体的负载权重计算其虚拟时间片「virtual-time-slice」" class="headerlink" title="sched_vslice()：依据调度实体的负载权重计算其虚拟时间片「virtual time slice」"></a>sched_vslice()：依据调度实体的负载权重计算其虚拟时间片「virtual time slice」</h4><h4 id="update-sysctl-：初始化时间片相关的变量"><a href="#update-sysctl-：初始化时间片相关的变量" class="headerlink" title="update_sysctl()：初始化时间片相关的变量"></a>update_sysctl()：初始化时间片相关的变量</h4><div align="center"><img src="update_sysctl_codeflow.svg" alt="update_sysctl_codeflow.svg"><br>图3 update_sysctl函数的调用路径</div>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Xinlu Wang</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://chasinglulu.github.io/2019/11/22/进程调度3「CFS-Completely-Fair-Scheduling」/" title="进程调度3「CFS-Completely Fair Scheduling」">http://chasinglulu.github.io/2019/11/22/进程调度3「CFS-Completely-Fair-Scheduling」/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/task/" rel="tag"><i class="fa fa-tag"></i> task</a>
+          
+            <a href="/tags/process/" rel="tag"><i class="fa fa-tag"></i> process</a>
+          
+            <a href="/tags/management/" rel="tag"><i class="fa fa-tag"></i> management</a>
+          
+            <a href="/tags/schedule/" rel="tag"><i class="fa fa-tag"></i> schedule</a>
+          
+        </div>
+      
+
+      
+      
+        <div class="post-widgets">
+        
+
+        
+
+        
+          
+          <div class="social_share">
+            
+            
+               <div id="needsharebutton-postbottom">
+                 <span class="btn">
+                    <i class="fa fa-share-alt" aria-hidden="true"></i>
+                 </span>
+               </div>
+            
+          </div>
+        
+        </div>
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/11/22/进程调度2「Core」/" rel="next" title="进程调度2「Core」">
+                <i class="fa fa-chevron-left"></i> 进程调度2「Core」
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/11/23/进程管理1「Data-structures-and-PID」/" rel="prev" title="进程管理1「Data structures and PID」">
+                进程管理1「Data structures and PID」 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+    <div class="comments" id="comments">
+    </div>
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Xinlu Wang</p>
+              <p class="site-description motion-element" itemprop="description">不积跬步无以至千里，不积小流无以成江海</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">36</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">9</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">59</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/chasinglulu" target="_blank" title="GitHub"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="mailto:wangkart@aliyun.com" target="_blank" title="E-Mail"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="https://weibo.com/5052275150" target="_blank" title="Weibo"><i class="fa fa-fw fa-weibo"></i>Weibo</a>
+                  
+                </span>
+              
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#将一个任务插入运行队列"><span class="nav-number">1.</span> <span class="nav-text">将一个任务插入运行队列</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#enqueue-task-fair-：将一个任务插入CFS运行队列"><span class="nav-number">1.1.</span> <span class="nav-text">enqueue_task_fair()：将一个任务插入CFS运行队列</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#enqueue-entity-：更新调度实体的vruntime字段并将它插入红黑树"><span class="nav-number">1.1.1.</span> <span class="nav-text">enqueue_entity()：更新调度实体的vruntime字段并将它插入红黑树</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#place-entity-：计算调度实体的vruntime"><span class="nav-number">1.1.2.</span> <span class="nav-text">place_entity()：计算调度实体的vruntime</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#enqueue-entity-：将调度实体插入红黑树"><span class="nav-number">1.1.3.</span> <span class="nav-text">__enqueue_entity()：将调度实体插入红黑树</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#从运行队列中挑选一个任务"><span class="nav-number">2.</span> <span class="nav-text">从运行队列中挑选一个任务</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#pick-next-task-：寻找将要运行的下一个任务"><span class="nav-number">2.1.</span> <span class="nav-text">pick_next_task()：寻找将要运行的下一个任务</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#pick-next-task-fair-：从CFS运行队列中寻找下一个任务"><span class="nav-number">2.1.1.</span> <span class="nav-text">pick_next_task_fair()：从CFS运行队列中寻找下一个任务</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#pick-next-entity-：在红黑树上寻找下一个即将运行的调度实体"><span class="nav-number">2.1.2.</span> <span class="nav-text">pick_next_entity()：在红黑树上寻找下一个即将运行的调度实体</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#put-prev-entity-：删除当前的调度实体"><span class="nav-number">2.1.3.</span> <span class="nav-text">put_prev_entity()：删除当前的调度实体</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#set-next-entity-：将以参数形式传入的调度实体设置成当前调度实体"><span class="nav-number">2.1.4.</span> <span class="nav-text">set_next_entity()：将以参数形式传入的调度实体设置成当前调度实体</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#从运行队列中移除一个任务"><span class="nav-number">3.</span> <span class="nav-text">从运行队列中移除一个任务</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#dequeue-task-fair-：从CFS运行队列中移除一个任务"><span class="nav-number">3.1.</span> <span class="nav-text">dequeue_task_fair()：从CFS运行队列中移除一个任务</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#dequeue-entity-：从红黑树中移除一个调度实体"><span class="nav-number">3.1.1.</span> <span class="nav-text">dequeue_entity()：从红黑树中移除一个调度实体</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#周期滴答「periodic-ticks」的处理"><span class="nav-number">4.</span> <span class="nav-text">周期滴答「periodic ticks」的处理</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#task-tick-fair-：尝试抢占当前的任务"><span class="nav-number">4.1.</span> <span class="nav-text">task_tick_fair()：尝试抢占当前的任务</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#entity-tick-：更新CFS运行队列的调度信息以及尝试抢占当前调度实体"><span class="nav-number">4.1.1.</span> <span class="nav-text">entity_tick()：更新CFS运行队列的调度信息以及尝试抢占当前调度实体</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#check-preempt-tick-：尝试抢占当前调度实体"><span class="nav-number">4.1.2.</span> <span class="nav-text">check_preempt_tick()：尝试抢占当前调度实体</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#调度实体的runtime管理"><span class="nav-number">5.</span> <span class="nav-text">调度实体的runtime管理</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#update-curr-：更新CFS运行队列和调度实体的runtime相关字段"><span class="nav-number">5.1.</span> <span class="nav-text">update_curr()：更新CFS运行队列和调度实体的runtime相关字段</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#calc-delta-fair-：根据NICE-0-LOAD和se-gt-load加权计算更新delta"><span class="nav-number">5.1.1.</span> <span class="nav-text">calc_delta_fair()：根据NICE_0_LOAD和se-&gt;load加权计算更新delta</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#calc-delta-：根据load-weight和delta-exec计算权重「weight」"><span class="nav-number">5.1.2.</span> <span class="nav-text">__calc_delta()：根据load_weight和delta_exec计算权重「weight」</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#时间片「time-slice」管理"><span class="nav-number">6.</span> <span class="nav-text">时间片「time slice」管理</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#sched-slice-：计算调度实体的时间片「time-slice」"><span class="nav-number">6.1.</span> <span class="nav-text">sched_slice()：计算调度实体的时间片「time slice」</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#sched-period-：根据任务数量计算调度延迟「scheduling-latency」"><span class="nav-number">6.1.1.</span> <span class="nav-text">__sched_period()：根据任务数量计算调度延迟「scheduling latency」</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#sched-vslice-：依据调度实体的负载权重计算其虚拟时间片「virtual-time-slice」"><span class="nav-number">6.2.</span> <span class="nav-text">sched_vslice()：依据调度实体的负载权重计算其虚拟时间片「virtual time slice」</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#update-sysctl-：初始化时间片相关的变量"><span class="nav-number">6.3.</span> <span class="nav-text">update_sysctl()：初始化时间片相关的变量</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+<div class="copyright">&copy; <span itemprop="copyrightYear">2021</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Xinlu Wang</span>
+
+  
+
+  
+</div>
+
+<div class="powered-by">
+    <i class="fa fa-user-circle"></i>
+    <span id="busuanzi_container_site_uv">
+        <span id="busuanzi_value_site_uv"></span>
+    </span>
+</div>
+<span class="post-meta-divider">|</span>
+
+<div class="powered-by">
+    <span id="busuanzi_container_site_pv">
+        <span id="busuanzi_value_site_pv"></span>
+    </span>
+    <i class="fa fa-eye"></i>
+</div>
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动 v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Mist</a> v6.4.2</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.2"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  
+  
+  <script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+  
+  <script type="text/javascript">
+    var GUEST = ['nick','mail','link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(function (item) {
+      return GUEST.indexOf(item)>-1;
+    });
+    new Valine({
+        el: '#comments' ,
+        verify: false,
+        notify: false,
+        appId: 'kvMe6P3M8zvX1DeEHbGQnwvq-gzGzoHsz',
+        appKey: 'KlwgMU4eNhTTb3KXiqnvlOGA',
+        placeholder: 'Just go go',
+        avatar:'mp',
+        meta:guest,
+        pageSize:'10' || 10,
+        visitor: true
+    });
+  </script>
+
+
+
+  
+
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+  
+
+
+  
+  
+  
+  <script src="/lib/needsharebutton/needsharebutton.js"></script>
+
+  <script>
+    
+      pbOptions = {};
+      
+          pbOptions.iconStyle = "box";
+      
+          pbOptions.boxForm = "horizontal";
+      
+          pbOptions.position = "bottomCenter";
+      
+          pbOptions.networks = "Weibo,Wechat,Douban,QQZone";
+      
+      new needShareButton('#needsharebutton-postbottom', pbOptions);
+    
+    
+  </script>
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+  
+  <script src="/lib/bookmark/bookmark.min.js?v=1.0"></script>
+  <script type="text/javascript">
+  
+    bookmark.scrollToMark('auto', "#更多");
+  
+  </script>
+
+
+  
+  <style>
+    .copy-btn {
+      display: inline-block;
+      padding: 6px 12px;
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 20px;
+      color: #333;
+      white-space: nowrap;
+      vertical-align: middle;
+      cursor: pointer;
+      background-color: #eee;
+      background-image: linear-gradient(#fcfcfc, #eee);
+      border: 1px solid #d5d5d5;
+      border-radius: 3px;
+      user-select: none;
+      outline: 0;
+    }
+
+    .highlight-wrap .copy-btn {
+      transition: opacity .3s ease-in-out;
+      opacity: 0;
+      padding: 2px 6px;
+      position: absolute;
+      right: 4px;
+      top: 8px;
+    }
+
+    .highlight-wrap:hover .copy-btn,
+    .highlight-wrap .copy-btn:focus {
+      opacity: 1
+    }
+
+    .highlight-wrap {
+      position: relative;
+    }
+  </style>
+  <script>
+    $('.highlight').each(function (i, e) {
+      var $wrap = $('<div>').addClass('highlight-wrap')
+      $(e).after($wrap)
+      $wrap.append($('<button>').addClass('copy-btn').append('复制').on('click', function (e) {
+        var code = $(this).parent().find('.code').find('.line').map(function (i, e) {
+          return $(e).text()
+        }).toArray().join('\n')
+        var ta = document.createElement('textarea')
+        document.body.appendChild(ta)
+        ta.style.position = 'absolute'
+        ta.style.top = '0px'
+        ta.style.left = '0px'
+        ta.value = code
+        ta.select()
+        ta.focus()
+        var result = document.execCommand('copy')
+        document.body.removeChild(ta)
+        
+          if(result)$(this).text('复制成功')
+          else $(this).text('复制失败')
+        
+        $(this).blur()
+      })).on('mouseleave', function (e) {
+        var $b = $(this).find('.copy-btn')
+        setTimeout(function () {
+          $b.text('复制')
+        }, 300)
+      }).append(e)
+    })
+  </script>
+
+
+</body>
+</html>
