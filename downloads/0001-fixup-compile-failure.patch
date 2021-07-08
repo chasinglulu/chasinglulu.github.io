@@ -1,0 +1,84 @@
+From f8539be842abb1e0d7d973e15b8cfd1dfca67ad2 Mon Sep 17 00:00:00 2001
+From: Xinlu Wang <wangkart@aliyun.com>
+Date: Wed, 7 Jul 2021 13:30:13 +0000
+Subject: [PATCH] fixup compile failure
+
+---
+ CMakeLists.txt         | 4 ++++
+ cmake/FindLibBcc.cmake | 2 +-
+ cmake/FindLibBfd.cmake | 2 +-
+ src/CMakeLists.txt     | 2 ++
+ tests/CMakeLists.txt   | 1 +
+ 5 files changed, 9 insertions(+), 2 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index e4544559..15d8348e 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -118,11 +118,15 @@ else()
+ endif(STATIC_LINKING)
+ get_filename_component(LIBBCC_LIBDIR ${LIBBCC_LIBRARIES} DIRECTORY)
+ set(CMAKE_REQUIRED_LINK_OPTIONS -L${LIBBCC_LIBDIR})
++set(CMAKE_REQUIRED_INCLUDES ${KERNEL_INCLUDE_DIRS})
+ 
+ check_symbol_exists(bcc_prog_load "${LIBBCC_INCLUDE_DIRS}/bcc/libbpf.h" HAVE_BCC_PROG_LOAD)
+ check_symbol_exists(bcc_create_map "${LIBBCC_INCLUDE_DIRS}/bcc/libbpf.h" HAVE_BCC_CREATE_MAP)
+ check_symbol_exists(bcc_elf_foreach_sym "${LIBBCC_INCLUDE_DIRS}/bcc/bcc_elf.h" HAVE_BCC_ELF_FOREACH_SYM)
+ check_symbol_exists(bpf_attach_kfunc "${LIBBCC_INCLUDE_DIRS}/bcc/libbpf.h" HAVE_BCC_KFUNC)
++if(STATIC_LINKING)
++  list(APPEND CMAKE_REQUIRED_LIBRARIES -lstdc++)
++endif()
+ check_symbol_exists(bcc_usdt_addsem_probe "${LIBBCC_INCLUDE_DIRS}/bcc/bcc_usdt.h" HAVE_BCC_USDT_ADDSEM)
+ 
+ # bcc_prog_load_xattr needs struct bpf_load_program_attr,
+diff --git a/cmake/FindLibBcc.cmake b/cmake/FindLibBcc.cmake
+index 92cedab5..9d2c179c 100644
+--- a/cmake/FindLibBcc.cmake
++++ b/cmake/FindLibBcc.cmake
+@@ -87,7 +87,7 @@ else()
+ endif()
+ 
+ INCLUDE(CheckCXXSourceCompiles)
+-SET(CMAKE_REQUIRED_INCLUDES ${LIBBCC_INCLUDE_DIRS})
++SET(CMAKE_REQUIRED_INCLUDES ${LIBBCC_INCLUDE_DIRS} ${KERNEL_INCLUDE_DIRS})
+ CHECK_CXX_SOURCE_COMPILES("
+ #include <bcc/libbpf.h>
+ 
+diff --git a/cmake/FindLibBfd.cmake b/cmake/FindLibBfd.cmake
+index d093881f..2a4bde4e 100644
+--- a/cmake/FindLibBfd.cmake
++++ b/cmake/FindLibBfd.cmake
+@@ -69,7 +69,7 @@ SET(CMAKE_REQUIRED_LIBRARIES ${LIBBFD_LIBRARIES} ${LIBOPCODES_LIBRARIES})
+ # link against if we're not using static libc (which includes such symbols).
+ if(STATIC_LINKING)
+   find_package(LibZ)
+-  list(APPEND CMAKE_REQUIRED_LIBRARIES ${LIBIBERTY_LIBRARIES} ${LIBZ_LIBRARIES})
++  list(APPEND CMAKE_REQUIRED_LIBRARIES ${LIBIBERTY_LIBRARIES} ${LIBZ_LIBRARIES} -ldl)
+   if(NOT STATIC_LIBC)
+     set(CMAKE_REQUIRED_FLAGS
+       "-Wl,--start-group -Wl,-Bdynamic -Wl,-Bdynamic -lpthread -Wl,-Bdynamic -ldl")
+diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
+index 37ee2204..fdbaa245 100644
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -171,6 +171,8 @@ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR ${CMAKE_CXX_COMPILER_VERSION}
+   target_link_libraries(libbpftrace "stdc++fs")
+ endif()
+ 
++target_link_libraries(libbpftrace ${LIBZ_LIBRARIES})
++
+ if (BUILD_ASAN)
+   if(${CMAKE_VERSION} VERSION_LESS "3.13.0")
+     # target_link_options is supported in CMake 3.13 and newer
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index 8d546f9a..dc14cf32 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -198,3 +198,4 @@ if(ENABLE_TEST_VALIDATE_CODEGEN)
+ else()
+   message(STATUS "codegen-validator test disabled")
+ endif()
++target_link_libraries(bpftrace_test ${LIBZ_LIBRARIES})
+-- 
+2.17.1
+

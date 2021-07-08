@@ -161,18 +161,20 @@
 
 
 
-  <meta name="description" content="在嵌入式的环境下经常使用的rootfs都是高度定制的，没有与发行版相似的包管理工具（比如apt-get、yum等），因此我们不能通过一条命令就把eBPF相关的工具安装好，通常我们都要先交叉编译依赖的所有库源代码，然后在交叉编译工具的源代码，整个过程耗时又容易出错。本文说明如何静态编译链接eBPF相关的工具，这样就能方便地集成到定制的rootfs中。">
+  <meta name="description" content="在嵌入式的环境下经常使用的rootfs都是高度定制的，没有与发行版相似的包管理工具（比如apt-get、yum等），因此我们不能通过一条命令就把eBPF相关的工具安装好，通常我们都要先交叉编译依赖的所有库源代码，然后在交叉编译工具的源代码，整个过程耗时又容易出错。本文说明如何在ubuntu-base-aarch64-rootfs上静态编译链接eBPF相关的工具，这样就能方便地把eBPF工具集成到高">
 <meta name="keywords" content="aarch64,bpftrace,bcc,clang,llvm">
 <meta property="og:type" content="article">
 <meta property="og:title" content="在AArch64平台上静态编译链接eBPF相关的工具">
 <meta property="og:url" content="http://chasinglulu.github.io/2021/07/07/在AArch64平台上静态编译链接eBPF相关的工具/index.html">
 <meta property="og:site_name" content="点滴汇聚">
-<meta property="og:description" content="在嵌入式的环境下经常使用的rootfs都是高度定制的，没有与发行版相似的包管理工具（比如apt-get、yum等），因此我们不能通过一条命令就把eBPF相关的工具安装好，通常我们都要先交叉编译依赖的所有库源代码，然后在交叉编译工具的源代码，整个过程耗时又容易出错。本文说明如何静态编译链接eBPF相关的工具，这样就能方便地集成到定制的rootfs中。">
+<meta property="og:description" content="在嵌入式的环境下经常使用的rootfs都是高度定制的，没有与发行版相似的包管理工具（比如apt-get、yum等），因此我们不能通过一条命令就把eBPF相关的工具安装好，通常我们都要先交叉编译依赖的所有库源代码，然后在交叉编译工具的源代码，整个过程耗时又容易出错。本文说明如何在ubuntu-base-aarch64-rootfs上静态编译链接eBPF相关的工具，这样就能方便地把eBPF工具集成到高">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2021-07-07T11:33:58.987Z">
+<meta property="og:image" content="http://chasinglulu.github.io/2021/07/07/在AArch64平台上静态编译链接eBPF相关的工具/bpftrace.png">
+<meta property="og:updated_time" content="2021-07-08T06:42:12.403Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="在AArch64平台上静态编译链接eBPF相关的工具">
-<meta name="twitter:description" content="在嵌入式的环境下经常使用的rootfs都是高度定制的，没有与发行版相似的包管理工具（比如apt-get、yum等），因此我们不能通过一条命令就把eBPF相关的工具安装好，通常我们都要先交叉编译依赖的所有库源代码，然后在交叉编译工具的源代码，整个过程耗时又容易出错。本文说明如何静态编译链接eBPF相关的工具，这样就能方便地集成到定制的rootfs中。">
+<meta name="twitter:description" content="在嵌入式的环境下经常使用的rootfs都是高度定制的，没有与发行版相似的包管理工具（比如apt-get、yum等），因此我们不能通过一条命令就把eBPF相关的工具安装好，通常我们都要先交叉编译依赖的所有库源代码，然后在交叉编译工具的源代码，整个过程耗时又容易出错。本文说明如何在ubuntu-base-aarch64-rootfs上静态编译链接eBPF相关的工具，这样就能方便地把eBPF工具集成到高">
+<meta name="twitter:image" content="http://chasinglulu.github.io/2021/07/07/在AArch64平台上静态编译链接eBPF相关的工具/bpftrace.png">
 
 
 
@@ -435,12 +437,24 @@
                 
               
 
-              <time title="创建时间：2021-07-07 17:37:37 / 修改时间：19:33:58" itemprop="dateCreated datePublished" datetime="2021-07-07T17:37:37+08:00">2021-07-07</time>
+              <time title="创建时间：2021-07-07 17:37:37" itemprop="dateCreated datePublished" datetime="2021-07-07T17:37:37+08:00">2021-07-07</time>
             
 
             
               
 
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2021-07-08 14:42:12" itemprop="dateModified" datetime="2021-07-08T14:42:12+08:00">2021-07-08</time>
               
             
           </span>
@@ -513,7 +527,32 @@
       
 
       
-        <p>在嵌入式的环境下经常使用的rootfs都是高度定制的，没有与发行版相似的包管理工具（比如apt-get、yum等），因此我们不能通过一条命令就把eBPF相关的工具安装好，通常我们都要先交叉编译依赖的所有库源代码，然后在交叉编译工具的源代码，整个过程耗时又容易出错。本文说明如何静态编译链接eBPF相关的工具，这样就能方便地集成到定制的rootfs中。<br><a id="more"></a></p>
+        <p>在嵌入式的环境下经常使用的rootfs都是高度定制的，没有与发行版相似的包管理工具（比如apt-get、yum等），因此我们不能通过一条命令就把eBPF相关的工具安装好，通常我们都要先交叉编译依赖的所有库源代码，然后在交叉编译工具的源代码，整个过程耗时又容易出错。本文说明如何在ubuntu-base-aarch64-rootfs上静态编译链接eBPF相关的工具，这样就能方便地把eBPF工具集成到高度定制的嵌入式rootfs中。<br><a id="more"></a></p>
+<hr>
+<ul>
+<li><strong>Target Platform:</strong> <a href="https://www.96boards.org/product/rock960c/" target="_blank" rel="noopener">Rock960c</a></li>
+<li><strong>ARCH:</strong>arm64</li>
+<li><strong>rootfs:</strong>Ubuntu-base-18.04.5-rootfs-aarch64</li>
+</ul>
+<hr>
+<h3 id="前提条件"><a href="#前提条件" class="headerlink" title="前提条件"></a>前提条件</h3><ul>
+<li>参考<a href="https://chasinglulu.github.io/2019/07/27/%E5%88%A9%E7%94%A8Qemu-4-0%E8%99%9A%E6%8B%9FARM64%E5%AE%9E%E9%AA%8C%E5%B9%B3%E5%8F%B0/">利用Qemu-4.0虚拟ARM64实验平台</a>的第5节【定制rootfs】</li>
+<li>Rock960C SBC更换成定制好的ubuntu-base–18.04.5-rootfs-aarch64，并重启引导login</li>
+</ul>
+<h3 id="clang的下载与编译"><a href="#clang的下载与编译" class="headerlink" title="clang的下载与编译"></a>clang的下载与编译</h3><p>参考<a href="https://github.com/iovisor/bpftrace/blob/master/INSTALL.md#ubuntu" target="_blank" rel="noopener">Building bpftrace in Ubuntu</a>的说明，通过apt-get命令安装了部分依赖库，但是安装的libclang-7-dev并没有包含libclang.a，其是静态编译链接bpftrace的重要库文件。下面命令给出了llvm和clang的静态编译命令：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">wget https://releases.llvm.org/8.0.0/llvm-8.0.0.src.tar.xz</span><br><span class="line">wget https://releases.llvm.org/8.0.0/cfe-8.0.0.src.tar.xz</span><br><span class="line"></span><br><span class="line">mkdir -p <span class="variable">$HOME</span>/install/llvm</span><br><span class="line">sudo apt-get install zlib1g-dev libncurses5-dev bison cmake flex make libxml2-dev libelf-dev -y</span><br><span class="line"></span><br><span class="line">tar -xJf llvm-8.0.0.src.tar.xz</span><br><span class="line">tar -xJf cfe-8.0.0.src.tar.xz</span><br><span class="line">mv cfe-8.0.0.src llvm-8.0.0.src/tools/clang</span><br><span class="line"><span class="built_in">cd</span> llvm-8.0.0.src</span><br><span class="line">mkdir build</span><br><span class="line"><span class="built_in">cd</span> build</span><br><span class="line">cmake .. -DBUILD_SHARED_LIBS=OFF -DLLVM_BUILD_LLVM_DYLIB=ON -DLIBCLANG_BUILD_STATIC=ON -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=<span class="variable">$HOME</span>/install/llvm -DCLANG_BUILD_EXAMPLES=OFF -DCLANG_INCLUDE_DOCS=OFF -DCLANG_INCLUDE_TESTS=OFF -DLLVM_APPEND_VC_REV=OFF -DLLVM_BUILD_DOCS=OFF -DLLVM_BUILD_EXAMPLES=OFF -DLLVM_BUILD_TESTS=OFF -DLLVM_BUILD_TOOLS=ON -DLLVM_ENABLE_ASSERTIONS=OFF -DLLVM_ENABLE_CXX1Y=ON -DLLVM_ENABLE_EH=ON -DLLVM_ENABLE_LIBCXX=OFF -DLLVM_ENABLE_PIC=ON -DLLVM_ENABLE_RTTI=ON -DLLVM_ENABLE_SPHINX=OFF -DLLVM_ENABLE_TERMINFO=OFF -DLLVM_INCLUDE_DOCS=OFF -DLLVM_INCLUDE_EXAMPLES=OFF -DLLVM_INCLUDE_GO_TESTS=OFF -DLLVM_INCLUDE_TESTS=OFF -DLLVM_INCLUDE_TOOLS=ON -DLLVM_INCLUDE_UTILS=OFF -DLLVM_PARALLEL_LINK_JOBS=1 -DLLVM_TARGETS_TO_BUILD=<span class="string">"host;BPF"</span></span><br><span class="line">make -j4</span><br><span class="line">make install</span><br><span class="line"></span><br><span class="line">find . -name <span class="string">'libclang.a'</span> | xargs cp -t <span class="variable">$HOME</span>/install/llvm/lib/</span><br></pre></td></tr></table></figure>
+<h3 id="BCC的下载与编译"><a href="#BCC的下载与编译" class="headerlink" title="BCC的下载与编译"></a>BCC的下载与编译</h3><p>BCC(BPF Compiler Collection)是一个工具包，用于构建高效的内核追踪（tracing）和操控程序，同时它还包含多个比较有用的工具和用例。BCC利用了扩展的BPF（Berkeley Packet Filters）技术，也就是eBPF，它是在Linux-3.15合并窗口期间才被首次添加到内核中的一个新功能，要想使用BCC的更多功能需要内核版本至少是Linux-4.1以上。<br>Ingo Molnár如下解释了eBPF：</p>
+<blockquote>
+<p>One of the more interesting features in this cycle is the ability to attach eBPF programs (user-defined, sandboxed bytecode executed by the kernel) to kprobes. This allows user-defined instrumentation on a live kernel image that can never crash, hang or interfere with the kernel negatively.</p>
+</blockquote>
+<p>BCC使BPF程序更容于编写，使用C语言进行内核检测（包含一个基于LLVM的C封装），同时还具有针对Python和lua两种封装。它适用于许多任务，包括性能分析和网络流量控制。由于bpftrace依赖BCC相关的库，因此我们需要先静态编译链接BCC：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">wget https://github.com/iovisor/bcc/releases/download/v0.20.0/bcc-src-with-submodule.tar.gz</span><br><span class="line"></span><br><span class="line">tar -xzf bcc-src-with-submodule.tar.gz</span><br><span class="line">mkdir -p <span class="variable">$HOME</span>/install/bcc</span><br><span class="line"></span><br><span class="line"><span class="built_in">cd</span> bcc</span><br><span class="line">mkdir build</span><br><span class="line"><span class="built_in">cd</span> build</span><br><span class="line">cmake .. -DCMAKE_INSTALL_PREFIX=<span class="variable">$HOME</span>/install/bcc -DCMAKE_USE_LIBBPF_PACKAGE=OFF -DCMAKE_PREFIX_PATH=<span class="variable">$HOME</span>/install/llvm</span><br><span class="line">make install</span><br></pre></td></tr></table></figure>
+<h3 id="libbpf的编译"><a href="#libbpf的编译" class="headerlink" title="libbpf的编译"></a>libbpf的编译</h3><p>从bcc-v0.10.0开始，开始单独分离出一个libbpf仓库，用于提供关于bpf系统调用的封装函数，以及 bpf.h/btf.h等uapi头文件。要注意的是，如果编译构建bcc时，没有包含libbpf的源代码，其将导致构建失败问题。然而我们下载的bcc-src-with-submodule.tar.gz已经包含了libbpf的源代码，下面给出了libbpf的编译命令：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> bcc/src/cc/libbpf/src</span><br><span class="line">mkdir -p <span class="variable">$HOME</span>/install/libbpf</span><br><span class="line"></span><br><span class="line">OBJDIR=build DESTDIR=<span class="variable">$HOME</span>/install/libbpf/ make install</span><br></pre></td></tr></table></figure>
+<h3 id="bpftrace的下载与编译"><a href="#bpftrace的下载与编译" class="headerlink" title="bpftrace的下载与编译"></a>bpftrace的下载与编译</h3><p>bpftrace是一个高级的追踪（tracing）语言，使最近的内核（从4.x开始）中eBPF技术更容易使用。bpftrace利用LLVM作为后端解释器先将脚本编译成BPF字节码（bytecode），然后利用BCC调用Linux BPF接口完成交互，同时其还能使用Linux现存的tracing技术：内核动态追踪（kprobes）、用户动态追踪（uprobes）以及静态tracepoint。bpftrace语言的设计理念借鉴了awk和C语言，同时还参考了以前的DTrace和System Tap等追踪器（tracers）。bpftrace 是由 Alastair Robertson发起创建的。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">curl https://codeload.github.com/iovisor/bpftrace/tar.gz/refs/tags/v0.12.1 -o bpftrace-0.12.1.tar.gz</span><br><span class="line">mkdir -p <span class="variable">$HOME</span>/install/bpftrace</span><br><span class="line">sudo apt-get install libltdl-dev libpthread-stubs0-dev libiberty-dev</span><br><span class="line"></span><br><span class="line"><span class="built_in">export</span> LIBRARY_PATH=<span class="variable">$HOME</span>/install/libpbf/usr/lib:<span class="variable">$LIBRARY_PATH</span></span><br><span class="line"><span class="built_in">export</span> LD_LIBRARY_PATH=<span class="variable">$HOME</span>/install/libpbf/usr/lib:<span class="variable">$LD_LIBRARY_PATH</span></span><br><span class="line"><span class="built_in">export</span> CPATH=<span class="variable">$HOME</span>/install/libpbf/usr/include:<span class="variable">$CPATH</span></span><br><span class="line"><span class="built_in">export</span> C_INCLUDE_PATH=<span class="variable">$HOME</span>/install/libpbf/usr/include:<span class="variable">$C_INCLUDE_PATH</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">export</span> LIBRARY_PATH=<span class="variable">$HOME</span>/install/llvm/lib:<span class="variable">$LIBRARY_PATH</span></span><br><span class="line"><span class="built_in">export</span> LD_LIBRARY_PATH=<span class="variable">$HOME</span>/install/llvm/lib:<span class="variable">$LD_LIBRARY_PATH</span></span><br><span class="line"><span class="built_in">export</span> CPATH=<span class="variable">$HOME</span>/install/llvm/include:<span class="variable">$CPATH</span></span><br><span class="line"><span class="built_in">export</span> C_INCLUDE_PATH=<span class="variable">$HOME</span>/install/llvm/include:<span class="variable">$C_INCLUDE_PATH</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">export</span> LIBRARY_PATH=<span class="variable">$HOME</span>/install/bcc/lib:<span class="variable">$LIBRARY_PATH</span></span><br><span class="line"><span class="built_in">export</span> LD_LIBRARY_PATH=<span class="variable">$HOME</span>/install/bcc/lib:<span class="variable">$LD_LIBRARY_PATH</span></span><br><span class="line"><span class="built_in">export</span> CPATH=<span class="variable">$HOME</span>/install/bcc/include:<span class="variable">$CPATH</span></span><br><span class="line"><span class="built_in">export</span> C_INCLUDE_PATH=<span class="variable">$HOME</span>/install/bcc/include:<span class="variable">$C_INCLUDE_PATH</span></span><br><span class="line"></span><br><span class="line">tar -xzf bpftrace-0.12.1.tar.gz</span><br><span class="line"><span class="built_in">cd</span> bpftrace-0.12.1</span><br><span class="line">mkdir build</span><br><span class="line"><span class="built_in">cd</span> build</span><br><span class="line">cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS:BOOL=OFF -DSTATIC_LIBC=ON -DSTATIC_LINKING=1 -DCMAKE_PREFIX_PATH=<span class="variable">$HOME</span>/install/llvm -DCMAKE_INSTALL_PREFIX=<span class="variable">$HOME</span>/install/bpftrace -DKERNEL_INCLUDE_DIRS=<span class="variable">$HOME</span>/install/bcc/include/bcc/compat</span><br><span class="line">make install</span><br></pre></td></tr></table></figure>
+<p><strong>注意：</strong>由于bpftrace-0.12.1在Ubuntu-18.04.5下编译会报错，需要打上<a href="/downloads/0001-fixup-compile-failure.patch">0001-fixup-compile-failure.patch</a>才可以解决编译问题。</p>
+<p><img src="bpftrace.png" alt="bpftrace"></p>
 
       
     </div>
@@ -645,8 +684,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -823,8 +871,6 @@
                     
                       
                     
-                      
-                    
                     <span class="site-state-item-count">59</span>
                     <span class="site-state-item-name">标签</span>
                   </a>
@@ -870,6 +916,22 @@
         </div>
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#前提条件"><span class="nav-number">1.</span> <span class="nav-text">前提条件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#clang的下载与编译"><span class="nav-number">2.</span> <span class="nav-text">clang的下载与编译</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#BCC的下载与编译"><span class="nav-number">3.</span> <span class="nav-text">BCC的下载与编译</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#libbpf的编译"><span class="nav-number">4.</span> <span class="nav-text">libbpf的编译</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#bpftrace的下载与编译"><span class="nav-number">5.</span> <span class="nav-text">bpftrace的下载与编译</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       

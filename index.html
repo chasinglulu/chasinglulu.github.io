@@ -438,12 +438,24 @@
                 
               
 
-              <time title="创建时间：2021-07-07 17:37:37 / 修改时间：19:33:58" itemprop="dateCreated datePublished" datetime="2021-07-07T17:37:37+08:00">2021-07-07</time>
+              <time title="创建时间：2021-07-07 17:37:37" itemprop="dateCreated datePublished" datetime="2021-07-07T17:37:37+08:00">2021-07-07</time>
             
 
             
               
 
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2021-07-08 14:42:12" itemprop="dateModified" datetime="2021-07-08T14:42:12+08:00">2021-07-08</time>
               
             
           </span>
@@ -517,7 +529,7 @@
 
       
         
-          <p>在嵌入式的环境下经常使用的rootfs都是高度定制的，没有与发行版相似的包管理工具（比如apt-get、yum等），因此我们不能通过一条命令就把eBPF相关的工具安装好，通常我们都要先交叉编译依赖的所有库源代码，然后在交叉编译工具的源代码，整个过程耗时又容易出错。本文说明如何静态编译链接eBPF相关的工具，这样就能方便地集成到定制的rootfs中。<br>
+          <p>在嵌入式的环境下经常使用的rootfs都是高度定制的，没有与发行版相似的包管理工具（比如apt-get、yum等），因此我们不能通过一条命令就把eBPF相关的工具安装好，通常我们都要先交叉编译依赖的所有库源代码，然后在交叉编译工具的源代码，整个过程耗时又容易出错。本文说明如何在ubuntu-base-aarch64-rootfs上静态编译链接eBPF相关的工具，这样就能方便地把eBPF工具集成到高度定制的嵌入式rootfs中。<br>
           <!--noindex-->
           <div class="post-button text-center">
             <a class="btn" href="/2021/07/07/在AArch64平台上静态编译链接eBPF相关的工具/#more" rel="contents">
@@ -2418,8 +2430,6 @@
                 <div class="site-state-item site-state-tags">
                   <a href="/tags/index.html">
                     
-                    
-                      
                     
                       
                     
