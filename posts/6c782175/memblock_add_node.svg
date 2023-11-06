@@ -1,0 +1,418 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- 由 Microsoft Visio, SVG Export 生成 memblock_add_node.svg 页-1 -->
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:ev="http://www.w3.org/2001/xml-events"
+		width="5.6626in" height="7.90871in" viewBox="0 0 407.707 569.427" xml:space="preserve" color-interpolation-filters="sRGB"
+		class="st33">
+	<style type="text/css">
+	<![CDATA[
+		.st1 {marker-end:url(#mrkr5-7);stroke:#000000;stroke-linecap:round;stroke-linejoin:round;stroke-width:0.5}
+		.st2 {fill:#000000;fill-opacity:1;stroke:#000000;stroke-opacity:1;stroke-width:0.16556291390728}
+		.st3 {visibility:visible}
+		.st4 {fill:#5b9bd5;fill-opacity:0.22;filter:url(#filter_2);marker-end:url(#mrkr5-12);stroke:#5b9bd5;stroke-opacity:0.22}
+		.st5 {fill:#5b9bd5;fill-opacity:0.22;stroke:#5b9bd5;stroke-opacity:0.22;stroke-width:0.22935779816514}
+		.st6 {fill:url(#grad0-18);marker-end:url(#mrkr5-16);stroke:#7f7f7f;stroke-width:0.75}
+		.st7 {fill:#7f7f7f;fill-opacity:1;stroke:#7f7f7f;stroke-opacity:1;stroke-width:0.22935779816514}
+		.st8 {fill:#48d9fd;font-family:宋体;font-size:0.666664em}
+		.st9 {font-family:Times New Roman;font-size:1em}
+		.st10 {font-size:1em}
+		.st11 {fill:#48d9fd;font-family:宋体;font-size:0.75em}
+		.st12 {fill:url(#grad0-43);marker-end:url(#mrkr5-16);stroke:#7f7f7f;stroke-width:0.75}
+		.st13 {fill:#000000;font-family:Times New Roman;font-size:0.916672em}
+		.st14 {fill:#5b9bd5;fill-opacity:0.22;filter:url(#filter_2);stroke:#5b9bd5;stroke-opacity:0.22}
+		.st15 {fill:#a5a5a5;stroke:#7f7f7f;stroke-width:0.75}
+		.st16 {fill:#5b9bd5;fill-opacity:0.25;filter:url(#filter_2);stroke:#5b9bd5;stroke-opacity:0.25}
+		.st17 {fill:#5b9bd5;fill-opacity:0.25;stroke:#5b9bd5;stroke-opacity:0.25;stroke-width:0.16556291390728}
+		.st18 {fill:#ffffff;stroke:#7f7f7f;stroke-width:0.5}
+		.st19 {fill:#7f7f7f;fill-opacity:1;stroke:#7f7f7f;stroke-opacity:1;stroke-width:0.16556291390728}
+		.st20 {fill:#5b9bd5;fill-opacity:0.22;stroke:#5b9bd5;stroke-opacity:0.22;stroke-width:0.28409090909091}
+		.st21 {fill:#a5a5a5;stroke:#48d9fd;stroke-width:1}
+		.st22 {fill:#48d9fd;fill-opacity:1;stroke:#48d9fd;stroke-opacity:1;stroke-width:0.28409090909091}
+		.st23 {stroke:#000000;stroke-linecap:round;stroke-linejoin:round;stroke-width:0.5}
+		.st24 {fill:#ffffff;marker-end:url(#mrkr5-16);stroke:#7f7f7f;stroke-width:0.75}
+		.st25 {fill:#ffffff;stroke:none;stroke-linecap:butt;stroke-width:7.2}
+		.st26 {fill:#000000;font-family:宋体;font-size:0.666664em}
+		.st27 {fill:none;filter:url(#filter_2);stroke:none}
+		.st28 {fill:#5b9bd5;filter:url(#filter_2);font-family:宋体;font-size:0.833336em;opacity:0.219608}
+		.st29 {fill:none;stroke:none;stroke-width:0.25}
+		.st30 {fill:#000000;font-family:宋体;font-size:0.833336em}
+		.st31 {fill:#000000;font-family:Times New Roman;font-size:0.666664em}
+		.st32 {fill:#000000;font-family:Times New Roman;font-size:0.666664em;font-weight:bold}
+		.st33 {fill:none;fill-rule:evenodd;font-size:12px;overflow:visible;stroke-linecap:square;stroke-miterlimit:3}
+	]]>
+	</style>
+
+	<defs id="Patterns_And_Gradients">
+		<linearGradient id="grad0-18" x1="0" y1="0" x2="1" y2="0" gradientTransform="rotate(90 0.5 0.5)">
+			<stop offset="0" stop-color="#d8d8d8" stop-opacity="1"/>
+			<stop offset="0.64" stop-color="#f2f2f2" stop-opacity="1"/>
+			<stop offset="0.88" stop-color="#ffffff" stop-opacity="1"/>
+			<stop offset="1" stop-color="#ffffff" stop-opacity="1"/>
+		</linearGradient>
+		<linearGradient id="grad0-43" x1="0" y1="0" x2="1" y2="0" gradientTransform="rotate(90 0.5 0.5)">
+			<stop offset="0" stop-color="#ffffff" stop-opacity="1"/>
+			<stop offset="0.33" stop-color="#f2f2f2" stop-opacity="1"/>
+			<stop offset="0.76" stop-color="#f2f2f2" stop-opacity="1"/>
+			<stop offset="1" stop-color="#f2f2f2" stop-opacity="1"/>
+		</linearGradient>
+	</defs>
+	<defs id="Markers">
+		<g id="lend5">
+			<path d="M 2 1 L 0 0 L 1.98117 -0.993387 C 1.67173 -0.364514 1.67301 0.372642 1.98465 1.00043 " style="stroke:none"/>
+		</g>
+		<marker id="mrkr5-7" class="st2" refX="-10.57" orient="auto" markerUnits="strokeWidth" overflow="visible">
+			<use xlink:href="#lend5" transform="scale(-6.04,-6.04) "/>
+		</marker>
+		<marker id="mrkr5-12" class="st5" refX="-7.63" orient="auto" markerUnits="strokeWidth" overflow="visible">
+			<use xlink:href="#lend5" transform="scale(-4.36,-4.36) "/>
+		</marker>
+		<marker id="mrkr5-16" class="st7" refX="-7.63" orient="auto" markerUnits="strokeWidth" overflow="visible">
+			<use xlink:href="#lend5" transform="scale(-4.36,-4.36) "/>
+		</marker>
+		<marker id="mrkr5-57" class="st17" refX="-10.57" orient="auto" markerUnits="strokeWidth" overflow="visible">
+			<use xlink:href="#lend5" transform="scale(-6.04,-6.04) "/>
+		</marker>
+		<marker id="mrkr5-61" class="st19" refX="-10.57" orient="auto" markerUnits="strokeWidth" overflow="visible">
+			<use xlink:href="#lend5" transform="scale(-6.04,-6.04) "/>
+		</marker>
+		<marker id="mrkr5-104" class="st20" refX="-6.16" orient="auto" markerUnits="strokeWidth" overflow="visible">
+			<use xlink:href="#lend5" transform="scale(-3.52,-3.52) "/>
+		</marker>
+		<marker id="mrkr5-108" class="st22" refX="-6.16" orient="auto" markerUnits="strokeWidth" overflow="visible">
+			<use xlink:href="#lend5" transform="scale(-3.52,-3.52) "/>
+		</marker>
+	</defs>
+	<defs id="Filters">
+		<filter id="filter_2">
+			<feGaussianBlur stdDeviation="2"/>
+		</filter>
+	</defs>
+	<g>
+		<title>页-1</title>
+		<g id="group74-1" transform="translate(7.31187,-17.3039)">
+			<title>工作表.74</title>
+			<g id="shape43-2" transform="translate(-417.288,498.561) rotate(-90) scale(-1,1)">
+				<title>直线连接线.43</title>
+				<path d="M0 569.43 L16.51 569.43" class="st1"/>
+			</g>
+			<g id="shape50-8" transform="translate(44.7053,0)">
+				<title>矩形.50</title>
+				<desc>循环条件已有区间个数 + 即将添加区间个数 &#62; 数组能容纳的最大区间个数</desc>
+				<g id="shadow50-9" transform="matrix(1,0,0,1,0.345598,1.97279)" class="st3">
+					<rect x="0" y="520.361" width="214.866" height="49.0663" class="st4"/>
+				</g>
+				<rect x="0" y="520.361" width="214.866" height="49.0663" class="st6"/>
+				<text x="6.92" y="532.26" class="st8">循环条件：已有区间个数<tspan class="st9"> </tspan><tspan class="st9">+ </tspan>即将添加区间个数<tspan
+							class="st9"> </tspan><tspan class="st9">&#62; </tspan>数组能容<tspan x="75.43" dy="1.316em" class="st10">纳的最大区间个数</tspan></text>			</g>
+			<g id="shape42-25" transform="translate(49.5242,-238.11)">
+				<title>矩形</title>
+				<desc>循环最多循环次数等于memory memblock中区间个数</desc>
+				<g id="shadow42-26" transform="matrix(1,0,0,1,0.345598,1.97279)" class="st3">
+					<rect x="0" y="339.537" width="329.386" height="229.89" class="st4"/>
+				</g>
+				<rect x="0" y="339.537" width="329.386" height="229.89" class="st6"/>
+				<text x="4" y="352.42" class="st11">循环：最多循环次数等于<tspan class="st9">memory memblock</tspan>中区间个数</text>			</g>
+			<g id="shape1-35" transform="translate(240.012,-257.953)">
+				<title>流程</title>
+				<desc>memblock_insert_region</desc>
+				<g id="shadow1-36" transform="matrix(1,0,0,1,0.345598,1.97279)" class="st3">
+					<rect x="0" y="552.419" width="127.559" height="17.0079" class="st4"/>
+				</g>
+				<rect x="0" y="552.419" width="127.559" height="17.0079" class="st12"/>
+				<text x="8.79" y="564.22" class="st13">memblock_insert_region</text>			</g>
+			<g id="shape7-45" transform="translate(95.4455,-493.228)">
+				<title>圆角的矩形</title>
+				<desc>memblock_add_range</desc>
+				<g id="shadow7-46" transform="matrix(1,0,0,1,0.345598,1.97279)" class="st3">
+					<path d="M8.5 569.43 L104.88 569.43 A8.5038 8.5038 -180 0 0 113.39 560.92 A8.5038 8.5038 -180 0 0 104.88 552.42
+								 L8.5 552.42 A8.5038 8.5038 -180 0 0 -0 560.92 A8.5038 8.5038 -180 0 0 8.5 569.43 Z" class="st14"/>
+				</g>
+				<path d="M8.5 569.43 L104.88 569.43 A8.5038 8.5038 -180 0 0 113.39 560.92 A8.5038 8.5038 -180 0 0 104.88 552.42 L8.5
+							 552.42 A8.5038 8.5038 -180 0 0 -0 560.92 A8.5038 8.5038 -180 0 0 8.5 569.43 Z" class="st15"/>
+				<text x="7.82" y="564.22" class="st13">memblock_add_range</text>			</g>
+			<g id="shape8-53" transform="translate(95.4455,-399.685)">
+				<title>判定</title>
+				<desc>rbase &#62;= end</desc>
+				<g id="shadow8-54" transform="matrix(1,0,0,1,0.345598,1.97279)" class="st3">
+					<path d="M0 552.42 L56.69 535.41 L113.39 552.42 L56.69 569.43 L0 552.42 Z" class="st16"/>
+				</g>
+				<path d="M0 552.42 L56.69 535.41 L113.39 552.42 L56.69 569.43 L0 552.42 Z" class="st18"/>
+				<text x="28.19" y="555.72" class="st13">rbase &#62;= end</text>			</g>
+			<g id="shape9-63" transform="translate(95.4455,-354.331)">
+				<title>判定.9</title>
+				<desc>rend &#60;= base</desc>
+				<g id="shadow9-64" transform="matrix(1,0,0,1,0.345598,1.97279)" class="st3">
+					<path d="M0 552.42 L56.69 535.41 L113.39 552.42 L56.69 569.43 L0 552.42 Z" class="st16"/>
+				</g>
+				<path d="M0 552.42 L56.69 535.41 L113.39 552.42 L56.69 569.43 L0 552.42 Z" class="st18"/>
+				<text x="28.19" y="555.72" class="st13">rend &#60;= base</text>			</g>
+			<g id="shape10-71" transform="translate(95.4455,-306.142)">
+				<title>判定.10</title>
+				<desc>rbase &#62; base</desc>
+				<g id="shadow10-72" transform="matrix(1,0,0,1,0.345598,1.97279)" class="st3">
+					<path d="M0 552.42 L56.69 535.41 L113.39 552.42 L56.69 569.43 L0 552.42 Z" class="st16"/>
+				</g>
+				<path d="M0 552.42 L56.69 535.41 L113.39 552.42 L56.69 569.43 L0 552.42 Z" class="st18"/>
+				<text x="29.46" y="555.72" class="st13">rbase &#62; base</text>			</g>
+			<g id="shape11-79" transform="translate(95.4455,-181.417)">
+				<title>判定.11</title>
+				<desc>base &#60; end</desc>
+				<g id="shadow11-80" transform="matrix(1,0,0,1,0.345598,1.97279)" class="st3">
+					<path d="M0 552.42 L56.69 535.41 L113.39 552.42 L56.69 569.43 L0 552.42 Z" class="st16"/>
+				</g>
+				<path d="M0 552.42 L56.69 535.41 L113.39 552.42 L56.69 569.43 L0 552.42 Z" class="st18"/>
+				<text x="33.13" y="555.72" class="st13">base &#60; end</text>			</g>
+			<g id="shape12-87" transform="translate(169.146,-277.795)">
+				<title>判定.12</title>
+				<desc>second round?</desc>
+				<g id="shadow12-88" transform="matrix(1,0,0,1,0.345598,1.97279)" class="st3">
+					<path d="M0 552.42 L56.69 535.41 L113.39 552.42 L56.69 569.43 L0 552.42 Z" class="st16"/>
+				</g>
+				<path d="M0 552.42 L56.69 535.41 L113.39 552.42 L56.69 569.43 L0 552.42 Z" class="st18"/>
+				<text x="24.77" y="555.72" class="st13">second round?</text>			</g>
+			<g id="shape15-95" transform="translate(-417.288,33.6788) rotate(-90) scale(-1,1)">
+				<title>直线连接线</title>
+				<path d="M0 569.43 L20.23 569.43" class="st1"/>
+			</g>
+			<g id="shape2-100" transform="translate(34.5006,-527.244)">
+				<title>开始/结束</title>
+				<desc>memblock_add</desc>
+				<g id="shadow2-101" transform="matrix(1,0,0,1,0.345598,1.97279)" class="st3">
+					<path d="M8.5 569.43 L85.04 569.43 A8.50394 8.50394 -180 0 0 85.04 552.42 L8.5 552.42 A8.50394 8.50394 -180 1
+								 0 8.5 569.43 Z" class="st14"/>
+				</g>
+				<path d="M8.5 569.43 L85.04 569.43 A8.50394 8.50394 -180 0 0 85.04 552.42 L8.5 552.42 A8.50394 8.50394 -180 1 0 8.5
+							 569.43 Z" class="st21"/>
+				<text x="12.86" y="564.22" class="st13">memblock_add</text>			</g>
+			<g id="shape4-110" transform="translate(177.247,-527.244)">
+				<title>开始/结束.4</title>
+				<desc>memblock_add_node</desc>
+				<g id="shadow4-111" transform="matrix(1,0,0,1,0.345598,1.97279)" class="st3">
+					<path d="M8.5 569.43 L104.88 569.43 A8.50394 8.50394 -180 0 0 104.88 552.42 L8.5 552.42 A8.50394 8.50394 -180
+								 1 0 8.5 569.43 Z" class="st14"/>
+				</g>
+				<path d="M8.5 569.43 L104.88 569.43 A8.50394 8.50394 -180 0 0 104.88 552.42 L8.5 552.42 A8.50394 8.50394 -180 1 0
+							 8.5 569.43 Z" class="st21"/>
+				<text x="9.34" y="564.22" class="st13">memblock_add_node</text>			</g>
+			<g id="shape14-118" transform="translate(177.247,603.106) rotate(180)">
+				<title>工作表.14</title>
+				<path d="M0 569.43 L49.2 569.43" class="st23"/>
+			</g>
+			<g id="shape17-121" transform="translate(-417.288,76.1985) rotate(-90) scale(-1,1)">
+				<title>直线连接线.17</title>
+				<path d="M0 569.43 L54.24 569.43" class="st1"/>
+			</g>
+			<g id="shape18-126" transform="translate(-417.288,169.742) rotate(-90) scale(-1,1)">
+				<title>直线连接线.18</title>
+				<path d="M0 569.43 L6.05 569.43" class="st1"/>
+			</g>
+			<g id="shape19-131" transform="translate(-417.288,215.096) rotate(-90) scale(-1,1)">
+				<title>直线连接线.19</title>
+				<path d="M0 569.43 L8.89 569.43" class="st1"/>
+			</g>
+			<g id="shape20-136" transform="translate(208.831,815.704) scale(1,-1)">
+				<title>侧边到顶部/底部</title>
+				<path d="M0 569.43 L17.01 569.43 L17.01 563.37" class="st1"/>
+			</g>
+			<g id="shape21-141" transform="translate(282.532,844.051) scale(1,-1)">
+				<title>侧边到顶部/底部.21</title>
+				<path d="M0 569.43 L21.26 569.43 L21.26 554.87" class="st1"/>
+			</g>
+			<g id="shape22-146" transform="translate(-417.288,263.285) rotate(-90) scale(-1,1)">
+				<title>直线连接线.22</title>
+				<path d="M0 569.43 L85.42 569.43" class="st1"/>
+			</g>
+			<g id="shape23-151" transform="translate(152.138,-371.339)">
+				<title>侧面</title>
+				<path d="M56.69 569.43 L73.7 569.43 L73.7 492.32 L5.29 492.32" class="st1"/>
+			</g>
+			<g id="shape24-156" transform="translate(-343.588,291.632) rotate(-90) scale(-1,1)">
+				<title>直线连接线.24</title>
+				<path d="M0 569.43 L23.41 569.43" class="st1"/>
+			</g>
+			<g id="shape26-161" transform="translate(95.4455,722.161) scale(1,-1)">
+				<title>侧面.26</title>
+				<path d="M0 569.43 L-16.72 569.43 L-16.72 383.78 L50.13 383.78" class="st1"/>
+			</g>
+			<g id="shape27-166" transform="translate(95.4455,-70.8661)">
+				<title>判定.27</title>
+				<desc>second round?</desc>
+				<g id="shadow27-167" transform="matrix(1,0,0,1,0.345598,1.97279)" class="st3">
+					<path d="M0 552.42 L56.69 535.41 L113.39 552.42 L56.69 569.43 L0 552.42 Z" class="st16"/>
+				</g>
+				<path d="M0 552.42 L56.69 535.41 L113.39 552.42 L56.69 569.43 L0 552.42 Z" class="st18"/>
+				<text x="24.77" y="555.72" class="st13">second round?</text>			</g>
+			<g id="shape28-174" transform="translate(-417.288,388.01) rotate(-90) scale(-1,1)">
+				<title>直线连接线.28</title>
+				<path d="M0 569.43 L71.25 569.43" class="st1"/>
+			</g>
+			<g id="shape29-179" transform="translate(249.934,-130.394)">
+				<title>流程.29</title>
+				<desc>memblock_insert_region</desc>
+				<g id="shadow29-180" transform="matrix(1,0,0,1,0.345598,1.97279)" class="st3">
+					<rect x="0" y="552.419" width="127.559" height="17.0079" class="st4"/>
+				</g>
+				<rect x="0" y="552.419" width="127.559" height="17.0079" class="st12"/>
+				<text x="8.79" y="564.22" class="st13">memblock_insert_region</text>			</g>
+			<g id="shape30-188" transform="translate(176.233,-150.945)">
+				<title>判定.30</title>
+				<desc>second round?</desc>
+				<g id="shadow30-189" transform="matrix(1,0,0,1,0.345598,1.97279)" class="st3">
+					<path d="M0 552.42 L56.69 535.41 L113.39 552.42 L56.69 569.43 L0 552.42 Z" class="st16"/>
+				</g>
+				<path d="M0 552.42 L56.69 535.41 L113.39 552.42 L56.69 569.43 L0 552.42 Z" class="st18"/>
+				<text x="24.77" y="555.72" class="st13">second round?</text>			</g>
+			<g id="shape31-196" transform="translate(208.831,940.429) scale(1,-1)">
+				<title>侧边到顶部/底部.31</title>
+				<path d="M0 569.43 L24.09 569.43 L24.09 561.25" class="st1"/>
+			</g>
+			<g id="shape32-201" transform="translate(289.619,970.901) scale(1,-1)">
+				<title>侧边到顶部/底部.32</title>
+				<path d="M0 569.43 L24.09 569.43 L24.09 554.16" class="st1"/>
+			</g>
+			<g id="shape34-206" transform="translate(313.713,1008.46) rotate(180)">
+				<title>顶部/底部到侧边</title>
+				<path d="M0 569.43 L0 560.92 L156.29 560.92" class="st1"/>
+			</g>
+			<g id="shape35-211" transform="translate(-336.501,418.482) rotate(-90) scale(-1,1)">
+				<title>直线连接线.35</title>
+				<path d="M0 569.43 L24.08 569.43" class="st1"/>
+			</g>
+			<g id="shape36-216" transform="translate(88.3589,-4.25197)">
+				<title>流程.36</title>
+				<desc>memblock_double_array</desc>
+				<g id="shadow36-217" transform="matrix(1,0,0,1,0.345598,1.97279)" class="st3">
+					<rect x="0" y="552.419" width="127.559" height="17.0079" class="st4"/>
+				</g>
+				<rect x="0" y="552.419" width="127.559" height="17.0079" class="st24"/>
+				<text x="8.8" y="564.22" class="st13">memblock_double_array</text>			</g>
+			<g id="shape37-224" transform="translate(265.524,-41.1024)">
+				<title>流程.37</title>
+				<desc>memblock_merge_regions</desc>
+				<g id="shadow37-225" transform="matrix(1,0,0,1,0.345598,1.97279)" class="st3">
+					<rect x="0" y="552.419" width="127.559" height="17.0079" class="st4"/>
+				</g>
+				<rect x="0" y="552.419" width="127.559" height="17.0079" class="st12"/>
+				<text x="5.13" y="564.22" class="st13">memblock_merge_regions</text>			</g>
+			<g id="shape38-233" transform="translate(208.831,1050.98) scale(1,-1)">
+				<title>侧边到顶部/底部.38</title>
+				<desc>相邻内存区间合并</desc>
+				<path d="M0 569.43 L120.47 569.43 L120.47 544.95" class="st1"/>
+				<rect x="88.4725" y="549.745" width="63.9998" height="9.59985" class="st25"/>
+				<text x="88.47" y="-552.14" transform="scale(1,-1)" class="st26">相邻内存区间合并</text>			</g>
+			<g id="shape39-240" transform="translate(307.559,0)">
+				<title>圆角的矩形.39</title>
+				<desc>return</desc>
+				<g id="shadow39-241" transform="matrix(1,0,0,1,0.345598,1.97279)" class="st3">
+					<path d="M4.35 569.43 L39.14 569.43 A4.34887 4.34887 -180 0 0 43.49 565.08 L43.49 556.77 A4.34887 4.34887 -180
+								 0 0 39.14 552.42 L4.35 552.42 A4.34887 4.34887 -180 0 0 0 556.77 L0 565.08 A4.34887 4.34887 -180
+								 0 0 4.35 569.43 Z" class="st14"/>
+				</g>
+				<path d="M4.35 569.43 L39.14 569.43 A4.34887 4.34887 -180 0 0 43.49 565.08 L43.49 556.77 A4.34887 4.34887 -180 0
+							 0 39.14 552.42 L4.35 552.42 A4.34887 4.34887 -180 0 0 0 556.77 L0 565.08 A4.34887 4.34887 -180 0 0 4.35
+							 569.43 Z" class="st15"/>
+				<text x="8.61" y="564.22" class="st13">return</text>			</g>
+			<g id="shape41-248" transform="translate(-240.123,528.325) rotate(-90) scale(-1,1)">
+				<title>直线连接线.41</title>
+				<path d="M0 569.43 L18.81 569.43" class="st1"/>
+			</g>
+			<g id="shape47-253" transform="translate(152.138,0)">
+				<title>通用连接线</title>
+				<path d="M0 569.43 L0 577.93 L-65.2 577.93 L-130.39 577.93 L-130.39 101.33" class="st1"/>
+			</g>
+			<g id="shape48-258" transform="translate(0,-473.386)">
+				<title>圆角的矩形.48</title>
+				<desc>repeat:</desc>
+				<g id="shadow48-259" transform="matrix(1,0,0,1,0.345598,1.97279)" class="st3">
+					<path d="M4.35 569.43 L39.14 569.43 A4.34887 4.34887 -180 0 0 43.49 565.08 L43.49 556.77 A4.34887 4.34887 -180
+								 0 0 39.14 552.42 L4.35 552.42 A4.34887 4.34887 -180 0 0 0 556.77 L0 565.08 A4.34887 4.34887 -180
+								 0 0 4.35 569.43 Z" class="st14"/>
+				</g>
+				<path d="M4.35 569.43 L39.14 569.43 A4.34887 4.34887 -180 0 0 43.49 565.08 L43.49 556.77 A4.34887 4.34887 -180 0
+							 0 39.14 552.42 L4.35 552.42 A4.34887 4.34887 -180 0 0 0 556.77 L0 565.08 A4.34887 4.34887 -180 0 0 4.35
+							 569.43 Z" class="st15"/>
+				<text x="6.78" y="564.22" class="st13">repeat:</text>			</g>
+			<g id="shape49-266" transform="translate(43.4894,-481.89)">
+				<title>直线连接线.49</title>
+				<path d="M0 569.43 L103.1 569.43" class="st1"/>
+			</g>
+			<g id="shape51-271" transform="translate(38.7526,-48.189)">
+				<title>工作表.51</title>
+				<desc>试图使数组容量翻倍</desc>
+				<g id="shadow51-272" transform="matrix(1,0,0,1,0.345598,1.97279)" class="st3">
+					<rect x="0" y="552.419" width="106.299" height="17.0079" class="st27"/>
+					<text x="4" y="566.29" class="st28">试图使数组容量翻倍</text>				</g>
+				<rect x="0" y="552.419" width="106.299" height="17.0079" class="st29"/>
+				<text x="4" y="566.29" class="st30">试图使数组容量翻倍</text>			</g>
+			<g id="shape53-279" transform="translate(210.957,-470.551)">
+				<title>工作表.53</title>
+				<desc>下面流程会重复执行两轮在第二轮才真正插入内存区间并且只插入非重叠区间</desc>
+				<g id="shadow53-280" transform="matrix(1,0,0,1,0.345598,1.97279)" class="st3">
+					<rect x="0" y="529.742" width="167.953" height="39.685" class="st27"/>
+					<text x="4" y="542.74" class="st28">下面流程会重复执行两轮，在第二<tspan x="4" dy="1.2em" class="st10">轮才真正插入内存区间</tspan>，并且只插<tspan
+								x="4" dy="1.287em" class="st10">入非重叠区间</tspan></text>				</g>
+				<rect x="0" y="529.742" width="167.953" height="39.685" class="st29"/>
+				<text x="4" y="542.74" class="st30">下面流程会重复执行两轮，在第二<tspan x="4" dy="1.2em" class="st10">轮才真正插入内存区间</tspan>，并且只插<tspan
+							x="4" dy="1.287em" class="st10">入非重叠区间</tspan></text>			</g>
+			<g id="shape54-291" transform="translate(303.792,880.901) rotate(180)">
+				<title>顶部/底部到侧边.54</title>
+				<path d="M0 569.43 L0 560.92 L146.37 560.92" class="st1"/>
+			</g>
+			<g id="shape55-296" transform="translate(77.7356,-416.693)">
+				<title>工作表.55</title>
+				<desc>yes</desc>
+				<rect x="0" y="558.19" width="21.2466" height="11.2368" class="st29"/>
+				<text x="5.29" y="566.21" class="st31">yes</text>			</g>
+			<g id="shape57-299" transform="translate(205.295,-371.44)">
+				<title>工作表.57</title>
+				<desc>yes</desc>
+				<rect x="0" y="558.19" width="21.2466" height="11.2368" class="st29"/>
+				<text x="5.29" y="566.21" class="st31">yes</text>			</g>
+			<g id="shape65-302" transform="translate(208.831,-323.2)">
+				<title>工作表.65</title>
+				<desc>yes</desc>
+				<rect x="0" y="558.19" width="21.2466" height="11.2368" class="st29"/>
+				<text x="5.29" y="566.21" class="st31">yes</text>			</g>
+			<g id="shape66-305" transform="translate(283.247,-294.905)">
+				<title>工作表.66</title>
+				<desc>yes</desc>
+				<rect x="0" y="558.19" width="21.2466" height="11.2368" class="st29"/>
+				<text x="5.29" y="566.21" class="st31">yes</text>			</g>
+			<g id="shape67-308" transform="translate(208.831,-198.425)">
+				<title>工作表.67</title>
+				<desc>yes</desc>
+				<rect x="0" y="558.19" width="21.2466" height="11.2368" class="st29"/>
+				<text x="5.29" y="566.21" class="st31">yes</text>			</g>
+			<g id="shape68-311" transform="translate(291.751,-168.661)">
+				<title>工作表.68</title>
+				<desc>yes</desc>
+				<rect x="0" y="558.19" width="21.2466" height="11.2368" class="st29"/>
+				<text x="5.29" y="566.21" class="st31">yes</text>			</g>
+			<g id="shape69-314" transform="translate(212.381,-87.358)">
+				<title>工作表.69</title>
+				<desc>yes</desc>
+				<rect x="0" y="558.19" width="21.2466" height="11.2368" class="st29"/>
+				<text x="5.29" y="566.21" class="st31">yes</text>			</g>
+			<g id="shape70-317" transform="translate(169.862,-428.133)">
+				<title>工作表.70</title>
+				<desc>(A)</desc>
+				<rect x="0" y="558.19" width="21.2466" height="11.2368" class="st29"/>
+				<text x="5.07" y="566.21" class="st32">(A)</text>			</g>
+			<g id="shape71-320" transform="translate(170.577,-384.196)">
+				<title>工作表.71</title>
+				<desc>(B)</desc>
+				<rect x="0" y="558.19" width="21.2466" height="11.2368" class="st29"/>
+				<text x="5.29" y="566.21" class="st32">(B)</text>			</g>
+			<g id="shape72-323" transform="translate(171.981,-334.488)">
+				<title>工作表.72</title>
+				<desc>(C)</desc>
+				<rect x="0" y="558.19" width="21.2466" height="11.2368" class="st29"/>
+				<text x="5.07" y="566.21" class="st32">(C)</text>			</g>
+			<g id="shape73-326" transform="translate(169.862,-209.866)">
+				<title>工作表.73</title>
+				<desc>(D)</desc>
+				<rect x="0" y="558.19" width="21.2466" height="11.2368" class="st29"/>
+				<text x="5.07" y="566.21" class="st32">(D)</text>			</g>
+		</g>
+	</g>
+</svg>

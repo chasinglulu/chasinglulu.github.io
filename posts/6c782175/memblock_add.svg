@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- 由 Microsoft Visio, SVG Export 生成 memblock_add.svg 页-1 -->
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:ev="http://www.w3.org/2001/xml-events"
+		width="8.55831in" height="6.66284in" viewBox="0 0 616.199 479.724" xml:space="preserve" color-interpolation-filters="sRGB"
+		class="st21">
+	<style type="text/css">
+	<![CDATA[
+		.st1 {visibility:visible}
+		.st2 {fill:#5b9bd5;fill-opacity:0.22;filter:url(#filter_2);stroke:#5b9bd5;stroke-opacity:0.22}
+		.st3 {fill:url(#grad0-8);stroke:#000000;stroke-width:0.25}
+		.st4 {fill:#000000;font-family:Times New Roman;font-size:1.00001em}
+		.st5 {fill:url(#grad0-16);stroke:#000000;stroke-width:0.25}
+		.st6 {marker-end:url(#mrkr5-44);stroke:#000000;stroke-linecap:round;stroke-linejoin:round;stroke-width:1}
+		.st7 {fill:#000000;fill-opacity:1;stroke:#000000;stroke-opacity:1;stroke-width:0.35714285714286}
+		.st8 {fill:#ffffff;stroke:none;stroke-linecap:butt;stroke-width:7.2}
+		.st9 {fill:#00fefe;font-family:Times New Roman;font-size:1.00001em}
+		.st10 {fill:none;filter:url(#filter_2);stroke:#5b9bd5;stroke-dasharray:1.75,1.25;stroke-opacity:0.22}
+		.st11 {fill:#5b9bd5;filter:url(#filter_2);font-family:Times New Roman;font-size:1.00001em;opacity:0.219608}
+		.st12 {font-size:1em}
+		.st13 {font-family:黑体;font-size:1em}
+		.st14 {fill:none;stroke:#000000;stroke-dasharray:1.75,1.25;stroke-width:0.25}
+		.st15 {fill:#5b9bd5;fill-opacity:0.25;filter:url(#filter_2);stroke:#5b9bd5;stroke-opacity:0.25}
+		.st16 {fill:#bfbfbf;stroke:#7f7f7f;stroke-width:1.5}
+		.st17 {marker-end:url(#mrkr5-138);stroke:#000000;stroke-linecap:round;stroke-linejoin:round;stroke-width:1}
+		.st18 {fill:#000000;fill-opacity:1;stroke:#000000;stroke-opacity:1;stroke-width:0.28409090909091}
+		.st19 {fill:none;stroke:none;stroke-width:0.25}
+		.st20 {fill:#00fefe;font-family:宋体;font-size:1.00001em}
+		.st21 {fill:none;fill-rule:evenodd;font-size:12px;overflow:visible;stroke-linecap:square;stroke-miterlimit:3}
+	]]>
+	</style>
+
+	<defs id="Patterns_And_Gradients">
+		<linearGradient id="grad0-8" x1="0" y1="0" x2="1" y2="0" gradientTransform="rotate(90 0.5 0.5)">
+			<stop offset="0" stop-color="#3f3f3f" stop-opacity="1"/>
+			<stop offset="0.4" stop-color="#a5a5a5" stop-opacity="1"/>
+			<stop offset="0.72" stop-color="#bfbfbf" stop-opacity="1"/>
+			<stop offset="1" stop-color="#d8d8d8" stop-opacity="1"/>
+		</linearGradient>
+		<linearGradient id="grad0-16" x1="0" y1="0" x2="1" y2="0" gradientTransform="rotate(90 0.5 0.5)">
+			<stop offset="0" stop-color="#d8d8d8" stop-opacity="1"/>
+			<stop offset="0.4" stop-color="#d8d8d8" stop-opacity="1"/>
+			<stop offset="0.72" stop-color="#f2f2f2" stop-opacity="1"/>
+			<stop offset="1" stop-color="#f2f2f2" stop-opacity="1"/>
+		</linearGradient>
+	</defs>
+	<defs id="Markers">
+		<g id="lend5">
+			<path d="M 2 1 L 0 0 L 1.98117 -0.993387 C 1.67173 -0.364514 1.67301 0.372642 1.98465 1.00043 " style="stroke:none"/>
+		</g>
+		<marker id="mrkr5-44" class="st7" refX="-4.54" orient="auto" markerUnits="strokeWidth" overflow="visible">
+			<use xlink:href="#lend5" transform="scale(-2.8,-2.8) "/>
+		</marker>
+		<marker id="mrkr5-138" class="st18" refX="-6.16" orient="auto" markerUnits="strokeWidth" overflow="visible">
+			<use xlink:href="#lend5" transform="scale(-3.52,-3.52) "/>
+		</marker>
+	</defs>
+	<defs id="Filters">
+		<filter id="filter_2">
+			<feGaussianBlur stdDeviation="2"/>
+		</filter>
+	</defs>
+	<g>
+		<title>页-1</title>
+		<g id="group38-1" transform="translate(3.02923,-5.3478)">
+			<title>工作表.38</title>
+			<g id="shape2-2" transform="translate(-3.19744E-014,-445.359)">
+				<title>圆角矩形</title>
+				<desc>start_kernel</desc>
+				<g id="shadow2-3" transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+					<path d="M9.92 479.72 L89.29 479.72 A9.9211 9.9211 -180 0 0 99.21 469.8 L99.21 462.03 A9.9211 9.9211 -180 0 0
+								 89.29 452.11 L9.92 452.11 A9.9211 9.9211 -180 0 0 0 462.03 L0 469.8 A9.9211 9.9211 -180 0 0 9.92
+								 479.72 Z" class="st2"/>
+				</g>
+				<path d="M9.92 479.72 L89.29 479.72 A9.9211 9.9211 -180 0 0 99.21 469.8 L99.21 462.03 A9.9211 9.9211 -180 0 0 89.29
+							 452.11 L9.92 452.11 A9.9211 9.9211 -180 0 0 0 462.03 L0 469.8 A9.9211 9.9211 -180 0 0 9.92 479.72 Z"
+						class="st3"/>
+				<text x="21.28" y="469.56" class="st4">start_kernel</text>			</g>
+			<g id="shape4-10" transform="translate(70.8661,-396.485)">
+				<title>圆角矩形.4</title>
+				<desc>setup_arch</desc>
+				<g id="shadow4-11" transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+					<path d="M9.92 479.72 L89.29 479.72 A9.9211 9.9211 -180 0 0 99.21 469.8 L99.21 462.03 A9.9211 9.9211 -180 0 0
+								 89.29 452.11 L9.92 452.11 A9.9211 9.9211 -180 0 0 0 462.03 L0 469.8 A9.9211 9.9211 -180 0 0 9.92
+								 479.72 Z" class="st2"/>
+				</g>
+				<path d="M9.92 479.72 L89.29 479.72 A9.9211 9.9211 -180 0 0 99.21 469.8 L99.21 462.03 A9.9211 9.9211 -180 0 0 89.29
+							 452.11 L9.92 452.11 A9.9211 9.9211 -180 0 0 0 462.03 L0 469.8 A9.9211 9.9211 -180 0 0 9.92 479.72 Z"
+						class="st5"/>
+				<text x="23.62" y="469.56" class="st4">setup_arch</text>			</g>
+			<g id="shape5-18" transform="translate(120.472,-347.61)">
+				<title>圆角矩形.5</title>
+				<desc>setup_machine_fdt</desc>
+				<g id="shadow5-19" transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+					<path d="M13.32 479.72 L119.91 479.72 A13.3226 13.3226 -180 0 0 133.23 466.4 L133.23 465.43 A13.3226 13.3226
+								 -180 0 0 119.91 452.11 L13.32 452.11 A13.3226 13.3226 -180 0 0 -0 465.43 L0 466.4 A13.3226 13.3226
+								 -180 0 0 13.32 479.72 Z" class="st2"/>
+				</g>
+				<path d="M13.32 479.72 L119.91 479.72 A13.3226 13.3226 -180 0 0 133.23 466.4 L133.23 465.43 A13.3226 13.3226 -180
+							 0 0 119.91 452.11 L13.32 452.11 A13.3226 13.3226 -180 0 0 -0 465.43 L0 466.4 A13.3226 13.3226 -180 0
+							 0 13.32 479.72 Z" class="st5"/>
+				<text x="20.96" y="469.56" class="st4">setup_machine_fdt</text>			</g>
+			<g id="shape9-25" transform="translate(221.102,-297.638)">
+				<title>圆角矩形.9</title>
+				<desc>early_init_dt_scan</desc>
+				<g id="shadow9-26" transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+					<path d="M13.32 479.72 L119.91 479.72 A13.3226 13.3226 -180 0 0 133.23 466.4 L133.23 465.43 A13.3226 13.3226
+								 -180 0 0 119.91 452.11 L13.32 452.11 A13.3226 13.3226 -180 0 0 -0 465.43 L0 466.4 A13.3226 13.3226
+								 -180 0 0 13.32 479.72 Z" class="st2"/>
+				</g>
+				<path d="M13.32 479.72 L119.91 479.72 A13.3226 13.3226 -180 0 0 133.23 466.4 L133.23 465.43 A13.3226 13.3226 -180
+							 0 0 119.91 452.11 L13.32 452.11 A13.3226 13.3226 -180 0 0 -0 465.43 L0 466.4 A13.3226 13.3226 -180 0
+							 0 13.32 479.72 Z" class="st5"/>
+				<text x="22.29" y="469.56" class="st4">early_init_dt_scan</text>			</g>
+			<g id="shape19-32" transform="translate(297.638,0)">
+				<title>圆角矩形.19</title>
+				<desc>memblock_add</desc>
+				<g id="shadow19-33" transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+					<path d="M9.92 479.72 L89.29 479.72 A9.9211 9.9211 -180 0 0 99.21 469.8 L99.21 462.03 A9.9211 9.9211 -180 0 0
+								 89.29 452.11 L9.92 452.11 A9.9211 9.9211 -180 0 0 0 462.03 L0 469.8 A9.9211 9.9211 -180 0 0 9.92
+								 479.72 Z" class="st2"/>
+				</g>
+				<path d="M9.92 479.72 L89.29 479.72 A9.9211 9.9211 -180 0 0 99.21 469.8 L99.21 462.03 A9.9211 9.9211 -180 0 0 89.29
+							 452.11 L9.92 452.11 A9.9211 9.9211 -180 0 0 0 462.03 L0 469.8 A9.9211 9.9211 -180 0 0 9.92 479.72 Z"
+						class="st3"/>
+				<text x="14.12" y="469.56" class="st4">memblock_add</text>			</g>
+			<g id="shape22-39" transform="translate(509.436,-228.144) rotate(58.7733)">
+				<title>曲线连接 3</title>
+				<path d="M-0 479.72 A38.741 38.741 0 0 1 36.7 477.4 L37.01 477.57" class="st6"/>
+			</g>
+			<g id="shape23-45" transform="translate(601.715,-139.914) rotate(64.1263)">
+				<title>曲线连接 3.23</title>
+				<path d="M0 479.72 A40.2131 40.2131 0 0 1 34.55 477.62 L34.88 477.77" class="st6"/>
+			</g>
+			<g id="shape25-50" transform="translate(603.14,-210.369) rotate(46.7538)">
+				<title>曲线连接 3.25</title>
+				<desc>arm64</desc>
+				<path d="M0 479.72 A39.9438 39.9438 0 0 1 45.63 476.92 L45.93 477.13" class="st6"/>
+				<rect x="-341.458" y="333.632" width="30.6565" height="14.4001" transform="rotate(-46.7538)" class="st8"/>
+				<text x="-341.46" y="344.43" transform="rotate(-46.7538)" class="st9">arm64</text>			</g>
+			<g id="shape26-57" transform="translate(632.086,-47.0818) rotate(68.0659)">
+				<title>曲线连接 3.26</title>
+				<desc>arm</desc>
+				<path d="M0 479.72 A188.743 188.743 -180 0 0 103.43 481.07 L103.77 480.97" class="st6"/>
+				<rect x="-441.468" y="225.106" width="18.6562" height="14.4001" transform="rotate(-68.0659)" class="st8"/>
+				<text x="-441.47" y="235.91" transform="rotate(-68.0659)" class="st9">arm</text>			</g>
+			<g id="shape27-64" transform="translate(-80.1399,-135.686) rotate(-39.8846)">
+				<title>曲线连接 3.27</title>
+				<desc>arm64</desc>
+				<path d="M78.5 479.72 A263.369 263.369 -180 0 0 4.85 479.04 L4.5 479.09" class="st6"/>
+				<rect x="320.524" y="333.485" width="30.6565" height="14.4001" transform="rotate(39.8846)" class="st8"/>
+				<text x="320.52" y="344.28" transform="rotate(39.8846)" class="st9">arm64</text>			</g>
+			<g id="shape31-71" transform="translate(726.25,151.247) rotate(59.0929)">
+				<title>曲线连接 3.31</title>
+				<path d="M0 479.72 A62.5263 62.5263 0 0 1 59.15 477.4 L59.47 477.58" class="st6"/>
+			</g>
+			<g id="shape32-76" transform="translate(375.591,-140.305)">
+				<title>矩形.32</title>
+				<desc>memory { device_type = &#34; memory&#34; ; reg = &#60;0x40000000 0x400000...</desc>
+				<g id="shadow32-77" transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+					<path d="M0 479.72 L233.86 479.72 L233.86 407.47 L0 407.47 L0 479.72 Z" class="st10"/>
+					<text x="4" y="424.9" class="st11">memory {  <tspan x="46.52" dy="1.287em" class="st12">device</tspan>_type = <tspan
+								class="st13">&#34;</tspan> memory<tspan class="st13">&#34;</tspan> ;  <tspan x="46.52" dy="1.229em"
+								class="st12">reg </tspan>= &#60;0x40000000 0x40000000&#62;; <tspan x="4" dy="1.2em" class="st12">};</tspan></text>				</g>
+				<path d="M0 479.72 L233.86 479.72 L233.86 407.47 L0 407.47 L0 479.72 Z" class="st14"/>
+				<text x="4" y="424.9" class="st4">memory {  <tspan x="46.52" dy="1.287em" class="st12">device</tspan>_type = <tspan
+							class="st13">&#34;</tspan> memory<tspan class="st13">&#34;</tspan> ;  <tspan x="46.52" dy="1.229em"
+							class="st12">reg </tspan>= &#60;0x40000000 0x40000000&#62;; <tspan x="4" dy="1.2em" class="st12">};</tspan></text>			</g>
+			<g id="shape33-94" transform="translate(338.031,-176.434)">
+				<title>普通箭头</title>
+				<g id="shadow33-95" transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+					<path d="M0 479.72 L11.34 468.39 L11.34 474.06 L30.47 474.06 L30.47 479.72 L30.47 485.39 L11.34 485.39 L11.34
+								 491.06 L0 479.72 Z" class="st15"/>
+				</g>
+				<path d="M0 479.72 L11.34 468.39 L11.34 474.06 L30.47 474.06 L30.47 479.72 L30.47 485.39 L11.34 485.39 L11.34 491.06
+							 L0 479.72 Z" class="st16"/>
+			</g>
+			<g id="group34-99" transform="translate(121.181,-48.8748)">
+				<title>工作表.34</title>
+				<g id="shape7-100" transform="translate(19.1339,-170.81)">
+					<title>圆角矩形.7</title>
+					<desc>early_init_dt_scan_nodes</desc>
+					<g id="shadow7-101" transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+						<path d="M13.81 479.72 L160.52 479.72 A13.8072 13.8072 -180 0 0 174.33 465.92 A13.8072 13.8072 -180 0 0 160.52
+									 452.11 L13.81 452.11 A13.8072 13.8072 -180 0 0 0 465.92 A13.8072 13.8072 -180 0 0 13.81 479.72
+									 Z" class="st2"/>
+					</g>
+					<path d="M13.81 479.72 L160.52 479.72 A13.8072 13.8072 -180 0 0 174.33 465.92 A13.8072 13.8072 -180 0 0 160.52
+								 452.11 L13.81 452.11 A13.8072 13.8072 -180 0 0 0 465.92 A13.8072 13.8072 -180 0 0 13.81 479.72 Z"
+							class="st5"/>
+					<text x="25.85" y="469.56" class="st4">early_init_dt_scan_nodes</text>				</g>
+				<g id="shape10-107" transform="translate(19.1339,-120.335)">
+					<title>圆角矩形.10</title>
+					<desc>of_scan_flat_dt</desc>
+					<g id="shadow10-108" transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+						<path d="M13.81 479.72 L160.52 479.72 A13.8072 13.8072 -180 0 0 174.33 465.92 A13.8072 13.8072 -180 0 0 160.52
+									 452.11 L13.81 452.11 A13.8072 13.8072 -180 0 0 0 465.92 A13.8072 13.8072 -180 0 0 13.81 479.72
+									 Z" class="st2"/>
+					</g>
+					<path d="M13.81 479.72 L160.52 479.72 A13.8072 13.8072 -180 0 0 174.33 465.92 A13.8072 13.8072 -180 0 0 160.52
+								 452.11 L13.81 452.11 A13.8072 13.8072 -180 0 0 0 465.92 A13.8072 13.8072 -180 0 0 13.81 479.72 Z"
+							class="st5"/>
+					<text x="51.34" y="469.56" class="st4">of_scan_flat_dt</text>				</g>
+				<g id="shape13-114" transform="translate(19.1339,-69.8603)">
+					<title>圆角矩形.13</title>
+					<desc>early_init_dt_scan_memory</desc>
+					<g id="shadow13-115" transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+						<path d="M13.81 479.72 L160.52 479.72 A13.8072 13.8072 -180 0 0 174.33 465.92 A13.8072 13.8072 -180 0 0 160.52
+									 452.11 L13.81 452.11 A13.8072 13.8072 -180 0 0 0 465.92 A13.8072 13.8072 -180 0 0 13.81 479.72
+									 Z" class="st2"/>
+					</g>
+					<path d="M13.81 479.72 L160.52 479.72 A13.8072 13.8072 -180 0 0 174.33 465.92 A13.8072 13.8072 -180 0 0 160.52
+								 452.11 L13.81 452.11 A13.8072 13.8072 -180 0 0 0 465.92 A13.8072 13.8072 -180 0 0 13.81 479.72 Z"
+							class="st5"/>
+					<text x="19.85" y="469.56" class="st4">early_init_dt_scan_memory</text>				</g>
+				<g id="shape15-121" transform="translate(19.1339,-19.3853)">
+					<title>圆角矩形.15</title>
+					<desc>early_init_dt_add_memory_arch</desc>
+					<g id="shadow15-122" transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+						<path d="M13.81 479.72 L160.52 479.72 A13.8072 13.8072 -180 0 0 174.33 465.92 A13.8072 13.8072 -180 0 0 160.52
+									 452.11 L13.81 452.11 A13.8072 13.8072 -180 0 0 0 465.92 A13.8072 13.8072 -180 0 0 13.81 479.72
+									 Z" class="st2"/>
+					</g>
+					<path d="M13.81 479.72 L160.52 479.72 A13.8072 13.8072 -180 0 0 174.33 465.92 A13.8072 13.8072 -180 0 0 160.52
+								 452.11 L13.81 452.11 A13.8072 13.8072 -180 0 0 0 465.92 A13.8072 13.8072 -180 0 0 13.81 479.72 Z"
+							class="st5"/>
+					<text x="8.52" y="469.56" class="st4">early_init_dt_add_memory_arch</text>				</g>
+				<g id="shape24-128">
+					<title>矩形</title>
+					<g id="shadow24-129" transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+						<path d="M0 479.72 L211.18 479.72 L211.18 267.13 L0 267.13 L0 479.72 Z" class="st10"/>
+					</g>
+					<path d="M0 479.72 L211.18 479.72 L211.18 267.13 L0 267.13 L0 479.72 Z" class="st14"/>
+				</g>
+				<g id="shape28-133" transform="translate(586.024,308.914) rotate(90)">
+					<title>工作表.28</title>
+					<path d="M0 479.72 L16.7 479.72" class="st17"/>
+				</g>
+				<g id="shape29-139" transform="translate(586.024,359.389) rotate(90)">
+					<title>工作表.29</title>
+					<path d="M0 479.72 L16.7 479.72" class="st17"/>
+				</g>
+				<g id="shape30-144" transform="translate(586.024,409.864) rotate(90)">
+					<title>工作表.30</title>
+					<path d="M0 479.72 L16.7 479.72" class="st17"/>
+				</g>
+			</g>
+			<g id="shape37-149" transform="translate(340.157,-241.473)">
+				<title>工作表.37</title>
+				<desc>搜索并解析设备树</desc>
+				<rect x="0" y="459.724" width="111.969" height="20" class="st19"/>
+				<text x="7.98" y="473.32" class="st20">搜索并解析设备树</text>			</g>
+		</g>
+	</g>
+</svg>

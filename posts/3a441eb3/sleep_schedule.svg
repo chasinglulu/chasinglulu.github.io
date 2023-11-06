@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- 由 Microsoft Visio, SVG Export 生成 sleep_schedule.svg 页-1 -->
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:ev="http://www.w3.org/2001/xml-events"
+		xmlns:v="http://schemas.microsoft.com/visio/2003/SVGExtensions/" width="8.97753in" height="1.30036in"
+		viewBox="0 0 646.382 93.626" xml:space="preserve" color-interpolation-filters="sRGB" class="st6">
+	<v:documentProperties v:langID="2052" v:metric="true" v:viewMarkup="false"/>
+
+	<style type="text/css">
+	<![CDATA[
+		.st1 {fill:#ffc000;stroke:#ffc000;stroke-width:0.75}
+		.st2 {fill:#000000;font-family:Times New Roman;font-size:0.916672em}
+		.st3 {fill:#00b0f0;stroke:#00b0f0;stroke-width:0.75}
+		.st4 {marker-end:url(#mrkr3-13);stroke:#000000;stroke-linecap:round;stroke-linejoin:round;stroke-width:0.75}
+		.st5 {fill:#000000;fill-opacity:1;stroke:#000000;stroke-opacity:1;stroke-width:0.22935779816514}
+		.st6 {fill:none;fill-rule:evenodd;font-size:12px;overflow:visible;stroke-linecap:square;stroke-miterlimit:3}
+	]]>
+	</style>
+
+	<defs id="Markers">
+		<g id="lend3">
+			<path d="M 2 1 L 0 0 L 2 -1 " style="stroke-linecap:round;stroke-linejoin:round;fill:none"/>
+		</g>
+		<marker id="mrkr3-13" class="st5" v:arrowType="3" v:arrowSize="2" orient="auto" markerUnits="strokeWidth"
+				overflow="visible">
+			<use xlink:href="#lend3" transform="scale(-4.36,-4.36) "/>
+		</marker>
+	</defs>
+	<g v:mID="0" v:index="1" v:groupContext="foregroundPage">
+		<title>页-1</title>
+		<v:pageProperties v:drawingScale="0.0393701" v:pageScale="0.0393701" v:drawingUnits="24" v:shadowOffsetX="8.50394"
+				v:shadowOffsetY="-8.50394"/>
+		<v:layer v:name="连接线" v:index="0"/>
+		<g id="group63-1" transform="translate(0.75,-0.75)" v:mID="63" v:groupContext="group">
+			<title>工作表.63</title>
+			<g id="shape2-2" v:mID="2" v:groupContext="shape" transform="translate(1.59872E-14,-56.6929)">
+				<title>矩形</title>
+				<desc>User-space sleep API</desc>
+				<v:userDefs>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="60.2362" cy="75.9094" width="120.48" height="35.4331"/>
+				<rect x="0" y="58.1929" width="120.472" height="35.4331" rx="2.83465" ry="2.83465" class="st1"/>
+				<text x="12.89" y="79.21" class="st2" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>User-space sleep API</text>			</g>
+			<g id="shape3-5" v:mID="3" v:groupContext="shape" transform="translate(545.669,0)">
+				<title>矩形.2</title>
+				<desc>schedule()</desc>
+				<v:userDefs>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="46.063" cy="75.9094" width="92.13" height="35.4331"/>
+				<rect x="0" y="58.1929" width="92.126" height="35.4331" rx="2.83465" ry="2.83465" class="st3"/>
+				<text x="23.16" y="79.21" class="st2" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>schedule()</text>			</g>
+			<g id="shape10-8" v:mID="10" v:groupContext="shape" v:layerMember="0" transform="translate(120.472,-74.4094)">
+				<title>直线连接线</title>
+				<v:userDefs>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<path d="M0 93.63 L28.35 93.63" class="st4"/>
+			</g>
+			<g id="shape55-14" v:mID="55" v:groupContext="shape" transform="translate(148.819,-56.6929)">
+				<title>矩形.55</title>
+				<desc>nanosleep systemcall</desc>
+				<v:userDefs>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="60.2362" cy="75.9094" width="120.48" height="35.4331"/>
+				<rect x="0" y="58.1929" width="120.472" height="35.4331" rx="2.83465" ry="2.83465" class="st3"/>
+				<text x="13.65" y="79.21" class="st2" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>nanosleep systemcall</text>			</g>
+			<g id="shape56-17" v:mID="56" v:groupContext="shape" transform="translate(297.638,-56.6929)">
+				<title>矩形.56</title>
+				<desc>hrtimer_nanosleep()</desc>
+				<v:userDefs>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="53.1496" cy="75.9094" width="106.3" height="35.4331"/>
+				<rect x="0" y="58.1929" width="106.299" height="35.4331" rx="2.83465" ry="2.83465" class="st3"/>
+				<text x="8.56" y="79.21" class="st2" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>hrtimer_nanosleep()</text>			</g>
+			<g id="shape57-20" v:mID="57" v:groupContext="shape" transform="translate(432.283,-56.6929)">
+				<title>矩形.57</title>
+				<desc>do_nanosleep()</desc>
+				<v:userDefs>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="38.9764" cy="75.9094" width="77.96" height="35.4331"/>
+				<rect x="0" y="58.1929" width="77.9528" height="35.4331" rx="2.83465" ry="2.83465" class="st3"/>
+				<text x="5.07" y="79.21" class="st2" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>do_nanosleep()</text>			</g>
+			<g id="shape58-23" v:mID="58" v:groupContext="shape" transform="translate(538.583,-56.6929)">
+				<title>矩形.58</title>
+				<desc>freezable_schedule()</desc>
+				<v:userDefs>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="53.1496" cy="75.9094" width="106.3" height="35.4331"/>
+				<rect x="0" y="58.1929" width="106.299" height="35.4331" rx="2.83465" ry="2.83465" class="st3"/>
+				<text x="7.35" y="79.21" class="st2" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>freezable_schedule()</text>			</g>
+			<g id="shape59-26" v:mID="59" v:groupContext="shape" v:layerMember="0" transform="translate(269.291,-74.4094)">
+				<title>直线连接线.59</title>
+				<v:userDefs>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<path d="M0 93.63 L28.35 93.63" class="st4"/>
+			</g>
+			<g id="shape60-31" v:mID="60" v:groupContext="shape" v:layerMember="0" transform="translate(403.937,-74.4094)">
+				<title>直线连接线.60</title>
+				<v:userDefs>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<path d="M0 93.63 L28.35 93.63" class="st4"/>
+			</g>
+			<g id="shape61-36" v:mID="61" v:groupContext="shape" v:layerMember="0" transform="translate(510.236,-74.4094)">
+				<title>直线连接线.61</title>
+				<v:userDefs>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<path d="M0 93.63 L28.35 93.63" class="st4"/>
+			</g>
+			<g id="shape62-41" v:mID="62" v:groupContext="shape" v:layerMember="0"
+					transform="translate(498.106,36.9331) rotate(-90) scale(-1,1)">
+				<title>直线连接线.62</title>
+				<v:userDefs>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<path d="M0 93.63 L21.26 93.63" class="st4"/>
+			</g>
+		</g>
+	</g>
+</svg>

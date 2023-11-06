@@ -1,0 +1,524 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- 由 Microsoft Visio, SVG Export 生成 dequeue_task_fair_codeflow.svg 页-1 -->
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:ev="http://www.w3.org/2001/xml-events"
+		xmlns:v="http://schemas.microsoft.com/visio/2003/SVGExtensions/" width="9.94654in" height="6.83955in"
+		viewBox="0 0 716.151 492.447" xml:space="preserve" color-interpolation-filters="sRGB" class="st12">
+	<v:documentProperties v:langID="2052" v:metric="true" v:viewMarkup="false"/>
+
+	<style type="text/css">
+	<![CDATA[
+		.st1 {visibility:visible}
+		.st2 {fill:#5b9bd5;fill-opacity:0.22;filter:url(#filter_2);stroke:#5b9bd5;stroke-opacity:0.22}
+		.st3 {fill:#00b0f0;stroke:#00b0f0;stroke-width:0.75}
+		.st4 {fill:#000000;font-family:Times New Roman;font-size:1.00001em}
+		.st5 {fill:#ffc000;stroke:#ffc000;stroke-width:0.75}
+		.st6 {marker-end:url(#mrkr3-43);stroke:#000000;stroke-linecap:round;stroke-linejoin:round;stroke-width:0.75}
+		.st7 {fill:#000000;fill-opacity:1;stroke:#000000;stroke-opacity:1;stroke-width:0.22935779816514}
+		.st8 {font-size:1em}
+		.st9 {marker-end:url(#mrkr3-43);stroke:#000000;stroke-dasharray:5.25,3.75;stroke-linecap:round;stroke-linejoin:round;stroke-width:0.75}
+		.st10 {fill:none;stroke:none;stroke-width:0.25}
+		.st11 {fill:#000000;font-family:宋体;font-size:0.916672em}
+		.st12 {fill:none;fill-rule:evenodd;font-size:12px;overflow:visible;stroke-linecap:square;stroke-miterlimit:3}
+	]]>
+	</style>
+
+	<defs id="Markers">
+		<g id="lend3">
+			<path d="M 2 1 L 0 0 L 2 -1 " style="stroke-linecap:round;stroke-linejoin:round;fill:none"/>
+		</g>
+		<marker id="mrkr3-43" class="st7" v:arrowType="3" v:arrowSize="2" orient="auto" markerUnits="strokeWidth"
+				overflow="visible">
+			<use xlink:href="#lend3" transform="scale(-4.36,-4.36) "/>
+		</marker>
+	</defs>
+	<defs id="Filters">
+		<filter id="filter_2">
+			<feGaussianBlur stdDeviation="2"/>
+		</filter>
+	</defs>
+	<g v:mID="0" v:index="1" v:groupContext="foregroundPage">
+		<title>页-1</title>
+		<v:pageProperties v:drawingScale="0.0393701" v:pageScale="0.0393701" v:drawingUnits="24" v:shadowOffsetX="8.50394"
+				v:shadowOffsetY="-8.50394"/>
+		<v:layer v:name="连接线" v:index="0"/>
+		<g id="group45-1" transform="translate(7.31194,-5.3478)" v:mID="45" v:groupContext="group">
+			<title>工作表.45</title>
+			<g id="shape28-2" v:mID="28" v:groupContext="shape" transform="translate(545.669,-226.772)">
+				<title>矩形.28</title>
+				<desc>dequeue_task()</desc>
+				<v:userDefs>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="53.1496" cy="481.817" width="106.3" height="21.2598"/>
+				<g id="shadow28-3" v:groupContext="shadow" v:shadowOffsetX="0.345598" v:shadowOffsetY="-1.97279" v:shadowType="1"
+						transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+					<rect x="0" y="471.187" width="106.299" height="21.2598" rx="2.83465" ry="2.83465" class="st2"/>
+				</g>
+				<rect x="0" y="471.187" width="106.299" height="21.2598" rx="2.83465" ry="2.83465" class="st3"/>
+				<text x="16.5" y="485.42" class="st4" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>dequeue_task()</text>			</g>
+			<g id="shape1-8" v:mID="1" v:groupContext="shape" transform="translate(-3.19744E-14,-148.819)">
+				<title>矩形.2</title>
+				<desc>migration_cpu_stop()</desc>
+				<v:userDefs>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="63.7795" cy="481.817" width="127.56" height="21.2598"/>
+				<g id="shadow1-9" v:groupContext="shadow" v:shadowOffsetX="0.345598" v:shadowOffsetY="-1.97279" v:shadowType="1"
+						transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+					<rect x="0" y="471.187" width="127.559" height="21.2598" rx="2.83465" ry="2.83465" class="st2"/>
+				</g>
+				<rect x="0" y="471.187" width="127.559" height="21.2598" rx="2.83465" ry="2.83465" class="st5"/>
+				<text x="11.79" y="485.42" class="st4" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>migration_cpu_stop()</text>			</g>
+			<g id="shape2-14" v:mID="2" v:groupContext="shape" transform="translate(-3.19744E-14,-92.126)">
+				<title>矩形.2</title>
+				<desc>migrate_tasks()</desc>
+				<v:userDefs>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="63.7795" cy="481.817" width="127.56" height="21.2598"/>
+				<g id="shadow2-15" v:groupContext="shadow" v:shadowOffsetX="0.345598" v:shadowOffsetY="-1.97279" v:shadowType="1"
+						transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+					<rect x="0" y="471.187" width="127.559" height="21.2598" rx="2.83465" ry="2.83465" class="st2"/>
+				</g>
+				<rect x="0" y="471.187" width="127.559" height="21.2598" rx="2.83465" ry="2.83465" class="st5"/>
+				<text x="26.46" y="485.42" class="st4" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>migrate_tasks()</text>			</g>
+			<g id="shape3-20" v:mID="3" v:groupContext="shape" transform="translate(-3.19744E-14,-56.6929)">
+				<title>Rectangle.2</title>
+				<desc>set_cpus_allowed_ptr()</desc>
+				<v:userDefs>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="63.7795" cy="481.817" width="127.56" height="21.2598"/>
+				<g id="shadow3-21" v:groupContext="shadow" v:shadowOffsetX="0.345598" v:shadowOffsetY="-1.97279" v:shadowType="1"
+						transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+					<rect x="0" y="471.187" width="127.559" height="21.2598" rx="2.83465" ry="2.83465" class="st2"/>
+				</g>
+				<rect x="0" y="471.187" width="127.559" height="21.2598" rx="2.83465" ry="2.83465" class="st5"/>
+				<text x="7.46" y="485.42" class="st4" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>set_cpus_allowed_ptr()</text>			</g>
+			<g id="shape4-26" v:mID="4" v:groupContext="shape">
+				<title>Rectangle.4</title>
+				<desc>sched_setaffinity()</desc>
+				<v:userDefs>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="63.7795" cy="481.817" width="127.56" height="21.2598"/>
+				<g id="shadow4-27" v:groupContext="shadow" v:shadowOffsetX="0.345598" v:shadowOffsetY="-1.97279" v:shadowType="1"
+						transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+					<rect x="0" y="471.187" width="127.559" height="21.2598" rx="2.83465" ry="2.83465" class="st2"/>
+				</g>
+				<rect x="0" y="471.187" width="127.559" height="21.2598" rx="2.83465" ry="2.83465" class="st5"/>
+				<text x="18.8" y="485.42" class="st4" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>sched_setaffinity()</text>			</g>
+			<g id="shape5-32" v:mID="5" v:groupContext="shape" transform="translate(155.906,-120.472)">
+				<title>矩形.5</title>
+				<desc>__migrate_task()</desc>
+				<v:userDefs>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="81.4961" cy="481.817" width="163" height="21.2598"/>
+				<g id="shadow5-33" v:groupContext="shadow" v:shadowOffsetX="0.345598" v:shadowOffsetY="-1.97279" v:shadowType="1"
+						transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+					<rect x="0" y="471.187" width="162.992" height="21.2598" rx="2.83465" ry="2.83465" class="st2"/>
+				</g>
+				<rect x="0" y="471.187" width="162.992" height="21.2598" rx="2.83465" ry="2.83465" class="st3"/>
+				<text x="40.51" y="485.42" class="st4" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>__migrate_task()</text>			</g>
+			<g id="shape6-38" v:mID="6" v:groupContext="shape" v:layerMember="0"
+					transform="translate(459.504,-30.7558) rotate(42.3821)">
+				<title>波浪连接线 1.6</title>
+				<v:userDefs>
+					<v:ud v:nameU="Scale" v:val="VT0(1):26"/>
+					<v:ud v:nameU="AntiScale" v:val="VT0(1):26"/>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<path d="M0 492.45 C17.39 487.1 19.51 494.61 37.3 492.45" class="st6"/>
+			</g>
+			<g id="shape7-44" v:mID="7" v:groupContext="shape" v:layerMember="0"
+					transform="translate(439.287,770.913) rotate(-39.2732) scale(1,-1)">
+				<title>波浪连接线 1.7</title>
+				<v:userDefs>
+					<v:ud v:nameU="Scale" v:val="VT0(1):26"/>
+					<v:ud v:nameU="AntiScale" v:val="VT0(1):26"/>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<path d="M0 492.45 C16.39 487.1 18.38 494.61 35.15 492.45" class="st6"/>
+			</g>
+			<g id="shape8-49" v:mID="8" v:groupContext="shape" transform="translate(155.906,-28.3465)">
+				<title>矩形.8</title>
+				<desc>__set_cpus_allowed_ptr()</desc>
+				<v:userDefs>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="81.4961" cy="481.817" width="163" height="21.2598"/>
+				<g id="shadow8-50" v:groupContext="shadow" v:shadowOffsetX="0.345598" v:shadowOffsetY="-1.97279" v:shadowType="1"
+						transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+					<rect x="0" y="471.187" width="162.992" height="21.2598" rx="2.83465" ry="2.83465" class="st2"/>
+				</g>
+				<rect x="0" y="471.187" width="162.992" height="21.2598" rx="2.83465" ry="2.83465" class="st3"/>
+				<text x="19.18" y="485.42" class="st4" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>__set_cpus_allowed_ptr()</text>			</g>
+			<g id="shape9-55" v:mID="9" v:groupContext="shape" v:layerMember="0"
+					transform="translate(457.199,59.2808) rotate(42.0202)">
+				<title>波浪连接线 1.9</title>
+				<v:userDefs>
+					<v:ud v:nameU="Scale" v:val="VT0(1):26"/>
+					<v:ud v:nameU="AntiScale" v:val="VT0(1):26"/>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<path d="M0 492.45 C14.26 488.27 24.79 492.28 36.63 492.45" class="st6"/>
+			</g>
+			<g id="shape10-60" v:mID="10" v:groupContext="shape" v:layerMember="0"
+					transform="translate(450.45,853.631) rotate(-40.9717) scale(1,-1)">
+				<title>波浪连接线 1.10</title>
+				<v:userDefs>
+					<v:ud v:nameU="Scale" v:val="VT0(1):26"/>
+					<v:ud v:nameU="AntiScale" v:val="VT0(1):26"/>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<path d="M0 492.45 C13.89 488.27 24.14 492.28 35.67 492.45" class="st6"/>
+			</g>
+			<g id="shape11-65" v:mID="11" v:groupContext="shape" transform="translate(155.906,-177.165)">
+				<title>矩形.11</title>
+				<desc>detach_task()</desc>
+				<v:userDefs>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="81.4961" cy="481.817" width="163" height="21.2598"/>
+				<g id="shadow11-66" v:groupContext="shadow" v:shadowOffsetX="0.345598" v:shadowOffsetY="-1.97279" v:shadowType="1"
+						transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+					<rect x="0" y="471.187" width="162.992" height="21.2598" rx="2.83465" ry="2.83465" class="st2"/>
+				</g>
+				<rect x="0" y="471.187" width="162.992" height="21.2598" rx="2.83465" ry="2.83465" class="st3"/>
+				<text x="49.18" y="485.42" class="st4" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>detach_task()</text>			</g>
+			<g id="shape12-71" v:mID="12" v:groupContext="shape" transform="translate(155.906,-233.858)">
+				<title>矩形.12</title>
+				<desc>__schedule()</desc>
+				<v:userDefs>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="81.4961" cy="481.817" width="163" height="21.2598"/>
+				<g id="shadow12-72" v:groupContext="shadow" v:shadowOffsetX="0.345598" v:shadowOffsetY="-1.97279" v:shadowType="1"
+						transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+					<rect x="0" y="471.187" width="162.992" height="21.2598" rx="2.83465" ry="2.83465" class="st2"/>
+				</g>
+				<rect x="0" y="471.187" width="162.992" height="21.2598" rx="2.83465" ry="2.83465" class="st3"/>
+				<text x="50.51" y="485.42" class="st4" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>__schedule()</text>			</g>
+			<g id="shape13-77" v:mID="13" v:groupContext="shape" transform="translate(354.331,-205.512)">
+				<title>矩形.13</title>
+				<desc>deactivate_task()</desc>
+				<v:userDefs>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="70.8661" cy="481.817" width="141.74" height="21.2598"/>
+				<g id="shadow13-78" v:groupContext="shadow" v:shadowOffsetX="0.345598" v:shadowOffsetY="-1.97279" v:shadowType="1"
+						transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+					<rect x="0" y="471.187" width="141.732" height="21.2598" rx="2.83465" ry="2.83465" class="st2"/>
+				</g>
+				<rect x="0" y="471.187" width="141.732" height="21.2598" rx="2.83465" ry="2.83465" class="st3"/>
+				<text x="29.89" y="485.42" class="st4" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>deactivate_task()</text>			</g>
+			<g id="shape14-83" v:mID="14" v:groupContext="shape" transform="translate(354.331,-74.4094)">
+				<title>矩形.14</title>
+				<desc>move_queued_task()</desc>
+				<v:userDefs>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="70.8661" cy="481.817" width="141.74" height="21.2598"/>
+				<g id="shadow14-84" v:groupContext="shadow" v:shadowOffsetX="0.345598" v:shadowOffsetY="-1.97279" v:shadowType="1"
+						transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+					<rect x="0" y="471.187" width="141.732" height="21.2598" rx="2.83465" ry="2.83465" class="st2"/>
+				</g>
+				<rect x="0" y="471.187" width="141.732" height="21.2598" rx="2.83465" ry="2.83465" class="st3"/>
+				<text x="20.55" y="485.42" class="st4" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>move_queued_task()</text>			</g>
+			<g id="shape15-89" v:mID="15" v:groupContext="shape" v:layerMember="0"
+					transform="translate(699.333,48.6581) rotate(50.5826)">
+				<title>波浪连接线 1.15</title>
+				<v:userDefs>
+					<v:ud v:nameU="Scale" v:val="VT0(1):26"/>
+					<v:ud v:nameU="AntiScale" v:val="VT0(1):26"/>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<path d="M0 492.45 C28.24 478.14 24.23 492.36 53.57 492.45" class="st6"/>
+			</g>
+			<g id="shape16-94" v:mID="16" v:groupContext="shape" v:layerMember="0"
+					transform="translate(695.576,770.674) rotate(-49.8991) scale(1,-1)">
+				<title>波浪连接线 1.16</title>
+				<v:userDefs>
+					<v:ud v:nameU="Scale" v:val="VT0(1):26"/>
+					<v:ud v:nameU="AntiScale" v:val="VT0(1):26"/>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<path d="M0 492.45 C20.69 472.79 30.84 499.93 52.81 492.45" class="st6"/>
+			</g>
+			<g id="shape17-99" v:mID="17" v:groupContext="shape" transform="translate(155.906,-276.378)">
+				<title>矩形.17</title>
+				<desc>sched_setscheduler systemcall sched_setattr systemcall</desc>
+				<v:userDefs>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="81.4961" cy="474.731" width="163" height="35.4331"/>
+				<g id="shadow17-100" v:groupContext="shadow" v:shadowOffsetX="0.345598" v:shadowOffsetY="-1.97279" v:shadowType="1"
+						transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+					<rect x="0" y="457.014" width="162.992" height="35.4331" rx="2.83465" ry="2.83465" class="st2"/>
+				</g>
+				<rect x="0" y="457.014" width="162.992" height="35.4331" rx="2.83465" ry="2.83465" class="st3"/>
+				<text x="8.35" y="471.13" class="st4" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>sched_setscheduler systemcall<v:newlineChar/><tspan
+							x="23.35" dy="1.2em" class="st8">sched</tspan>_setattr systemcall</text>			</g>
+			<g id="shape18-106" v:mID="18" v:groupContext="shape" v:layerMember="0"
+					transform="translate(582.95,-167.71) rotate(32.4256)">
+				<title>波浪连接线 1.18</title>
+				<v:userDefs>
+					<v:ud v:nameU="Scale" v:val="VT0(1):26"/>
+					<v:ud v:nameU="AntiScale" v:val="VT0(1):26"/>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<path d="M0 492.45 C16.19 484.54 15.83 499.74 40.97 492.45" class="st6"/>
+			</g>
+			<g id="shape19-111" v:mID="19" v:groupContext="shape" v:layerMember="0"
+					transform="translate(605.283,705.261) rotate(-35.5601) scale(1,-1)">
+				<title>波浪连接线 1.19</title>
+				<v:userDefs>
+					<v:ud v:nameU="Scale" v:val="VT0(1):26"/>
+					<v:ud v:nameU="AntiScale" v:val="VT0(1):26"/>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<path d="M0 492.45 C15.66 487.38 19.86 496.26 42.16 492.45" class="st6"/>
+			</g>
+			<g id="shape20-116" v:mID="20" v:groupContext="shape" transform="translate(354.331,-354.331)">
+				<title>矩形.20</title>
+				<desc>do_set_cpus_allowed()</desc>
+				<v:userDefs>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="70.8661" cy="481.817" width="141.74" height="21.2598"/>
+				<g id="shadow20-117" v:groupContext="shadow" v:shadowOffsetX="0.345598" v:shadowOffsetY="-1.97279" v:shadowType="1"
+						transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+					<rect x="0" y="471.187" width="141.732" height="21.2598" rx="2.83465" ry="2.83465" class="st2"/>
+				</g>
+				<rect x="0" y="471.187" width="141.732" height="21.2598" rx="2.83465" ry="2.83465" class="st3"/>
+				<text x="15.21" y="485.42" class="st4" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>do_set_cpus_allowed()</text>			</g>
+			<g id="shape21-122" v:mID="21" v:groupContext="shape" transform="translate(155.906,-325.984)">
+				<title>矩形.21</title>
+				<desc>sched_setsaffinity systemcall</desc>
+				<v:userDefs>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="81.4961" cy="481.817" width="163" height="21.2598"/>
+				<g id="shadow21-123" v:groupContext="shadow" v:shadowOffsetX="0.345598" v:shadowOffsetY="-1.97279" v:shadowType="1"
+						transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+					<rect x="0" y="471.187" width="162.992" height="21.2598" rx="2.83465" ry="2.83465" class="st2"/>
+				</g>
+				<rect x="0" y="471.187" width="162.992" height="21.2598" rx="2.83465" ry="2.83465" class="st3"/>
+				<text x="11.35" y="485.42" class="st4" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>sched_setsaffinity systemcall</text>			</g>
+			<g id="shape22-128" v:mID="22" v:groupContext="shape" transform="translate(155.906,-382.677)">
+				<title>矩形.22</title>
+				<desc>set_cpus_allowed_ptr()</desc>
+				<v:userDefs>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="81.4961" cy="481.817" width="163" height="21.2598"/>
+				<g id="shadow22-129" v:groupContext="shadow" v:shadowOffsetX="0.345598" v:shadowOffsetY="-1.97279" v:shadowType="1"
+						transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+					<rect x="0" y="471.187" width="162.992" height="21.2598" rx="2.83465" ry="2.83465" class="st2"/>
+				</g>
+				<rect x="0" y="471.187" width="162.992" height="21.2598" rx="2.83465" ry="2.83465" class="st3"/>
+				<text x="25.18" y="485.42" class="st4" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>set_cpus_allowed_ptr()</text>			</g>
+			<g id="shape23-134" v:mID="23" v:groupContext="shape" transform="translate(354.331,-283.465)">
+				<title>矩形.23</title>
+				<desc>__sched_setscheduler()</desc>
+				<v:userDefs>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="70.8661" cy="481.817" width="141.74" height="21.2598"/>
+				<g id="shadow23-135" v:groupContext="shadow" v:shadowOffsetX="0.345598" v:shadowOffsetY="-1.97279" v:shadowType="1"
+						transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+					<rect x="0" y="471.187" width="141.732" height="21.2598" rx="2.83465" ry="2.83465" class="st2"/>
+				</g>
+				<rect x="0" y="471.187" width="141.732" height="21.2598" rx="2.83465" ry="2.83465" class="st3"/>
+				<text x="14.55" y="485.42" class="st4" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>__sched_setscheduler()</text>			</g>
+			<g id="shape24-140" v:mID="24" v:groupContext="shape" v:layerMember="0"
+					transform="translate(594.003,564.271) rotate(-33.9624) scale(1,-1)">
+				<title>波浪连接线 1.24</title>
+				<v:userDefs>
+					<v:ud v:nameU="Scale" v:val="VT0(1):26"/>
+					<v:ud v:nameU="AntiScale" v:val="VT0(1):26"/>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<path d="M0 492.45 C9.75 487.22 19.93 498.62 41.35 492.45" class="st9"/>
+			</g>
+			<g id="shape25-145" v:mID="25" v:groupContext="shape" v:layerMember="0"
+					transform="translate(587.751,-313.44) rotate(33.0898)">
+				<title>波浪连接线 1.25</title>
+				<v:userDefs>
+					<v:ud v:nameU="Scale" v:val="VT0(1):26"/>
+					<v:ud v:nameU="AntiScale" v:val="VT0(1):26"/>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<path d="M0 492.45 C9.73 487.22 19.9 498.62 41.28 492.45" class="st9"/>
+			</g>
+			<g id="shape26-150" v:mID="26" v:groupContext="shape" transform="translate(354.331,-418.11)">
+				<title>矩形.26</title>
+				<desc>sched_move_task()</desc>
+				<v:userDefs>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="70.8661" cy="481.817" width="141.74" height="21.2598"/>
+				<g id="shadow26-151" v:groupContext="shadow" v:shadowOffsetX="0.345598" v:shadowOffsetY="-1.97279" v:shadowType="1"
+						transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+					<rect x="0" y="471.187" width="141.732" height="21.2598" rx="2.83465" ry="2.83465" class="st2"/>
+				</g>
+				<rect x="0" y="471.187" width="141.732" height="21.2598" rx="2.83465" ry="2.83465" class="st3"/>
+				<text x="24.21" y="485.42" class="st4" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>sched_move_task()</text>			</g>
+			<g id="shape27-156" v:mID="27" v:groupContext="shape" transform="translate(354.331,-453.543)">
+				<title>矩形.27</title>
+				<desc>set_user_nice()</desc>
+				<v:userDefs>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="70.8661" cy="481.817" width="141.74" height="21.2598"/>
+				<g id="shadow27-157" v:groupContext="shadow" v:shadowOffsetX="0.345598" v:shadowOffsetY="-1.97279" v:shadowType="1"
+						transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+					<rect x="0" y="471.187" width="141.732" height="21.2598" rx="2.83465" ry="2.83465" class="st2"/>
+				</g>
+				<rect x="0" y="471.187" width="141.732" height="21.2598" rx="2.83465" ry="2.83465" class="st3"/>
+				<text x="34.22" y="485.42" class="st4" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>set_user_nice()</text>			</g>
+			<g id="shape30-162" v:mID="30" v:groupContext="shape" transform="translate(598.819,-184.252)">
+				<title>矩形.30</title>
+				<desc>dequeue_task_fair()</desc>
+				<v:userDefs>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="53.1496" cy="481.817" width="106.3" height="21.2598"/>
+				<g id="shadow30-163" v:groupContext="shadow" v:shadowOffsetX="0.345598" v:shadowOffsetY="-1.97279" v:shadowType="1"
+						transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+					<rect x="0" y="471.187" width="106.299" height="21.2598" rx="2.83465" ry="2.83465" class="st2"/>
+				</g>
+				<rect x="0" y="471.187" width="106.299" height="21.2598" rx="2.83465" ry="2.83465" class="st3"/>
+				<text x="5.17" y="485.42" class="st4" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>dequeue_task_fair()</text>			</g>
+			<g id="shape31-168" v:mID="31" v:groupContext="shape" v:layerMember="0"
+					transform="translate(971.81,-98.8841) rotate(75.0357)">
+				<title>波浪连接线 1</title>
+				<v:userDefs>
+					<v:ud v:nameU="Scale" v:val="VT0(1):26"/>
+					<v:ud v:nameU="AntiScale" v:val="VT0(1):26"/>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<path d="M0 492.45 C63.55 454.37 137.15 490.72 222.85 492.45" class="st6"/>
+			</g>
+			<g id="shape32-173" v:mID="32" v:groupContext="shape" v:layerMember="0"
+					transform="translate(971.423,-64.8892) rotate(74.8625)">
+				<title>波浪连接线 1.32</title>
+				<v:userDefs>
+					<v:ud v:nameU="Scale" v:val="VT0(1):26"/>
+					<v:ud v:nameU="AntiScale" v:val="VT0(1):26"/>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<path d="M0 492.45 C65.79 460.28 101.3 496.11 187.79 492.45" class="st6"/>
+			</g>
+			<g id="shape33-178" v:mID="33" v:groupContext="shape" v:layerMember="0"
+					transform="translate(957.431,-44.6885) rotate(69.5352)">
+				<title>波浪连接线 1.33</title>
+				<v:userDefs>
+					<v:ud v:nameU="Scale" v:val="VT0(1):26"/>
+					<v:ud v:nameU="AntiScale" v:val="VT0(1):26"/>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<path d="M0 492.45 C46.46 483.41 78.29 503.86 135.4 492.45" class="st6"/>
+			</g>
+			<g id="shape34-183" v:mID="34" v:groupContext="shape" v:layerMember="0"
+					transform="translate(885.257,-103.362) rotate(52.2161)">
+				<title>波浪连接线 1.34</title>
+				<v:userDefs>
+					<v:ud v:nameU="Scale" v:val="VT0(1):26"/>
+					<v:ud v:nameU="AntiScale" v:val="VT0(1):26"/>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<path d="M0 492.45 C34.46 486.89 40.3 517.62 78.19 492.45" class="st6"/>
+			</g>
+			<g id="shape35-188" v:mID="35" v:groupContext="shape" v:layerMember="0"
+					transform="translate(607.7,755.932) rotate(-13.1028) scale(1,-1)">
+				<title>波浪连接线 1.35</title>
+				<v:userDefs>
+					<v:ud v:nameU="Scale" v:val="VT0(1):26"/>
+					<v:ud v:nameU="AntiScale" v:val="VT0(1):26"/>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<path d="M0 492.45 C15.77 487.68 22.86 490.62 50.64 492.45" class="st6"/>
+			</g>
+			<g id="shape36-193" v:mID="36" v:groupContext="shape" v:layerMember="0"
+					transform="translate(955.806,583.875) rotate(-69.0013) scale(1,-1)">
+				<title>波浪连接线 1.36</title>
+				<v:userDefs>
+					<v:ud v:nameU="Scale" v:val="VT0(1):26"/>
+					<v:ud v:nameU="AntiScale" v:val="VT0(1):26"/>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<path d="M0 492.45 C20.85 465.54 106.78 503.55 150.3 492.45" class="st6"/>
+			</g>
+			<g id="shape37-198" v:mID="37" v:groupContext="shape" v:layerMember="0"
+					transform="translate(781.709,-191.55) rotate(21.8014)">
+				<title>波浪连接线 1.37</title>
+				<v:userDefs>
+					<v:ud v:nameU="Scale" v:val="VT0(1):26"/>
+					<v:ud v:nameU="AntiScale" v:val="VT0(1):26"/>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<path d="M0 492.45 C21.02 505.87 28.14 484.55 57.24 492.45" class="st6"/>
+			</g>
+			<g id="group42-203" transform="translate(0,-439.37)" v:mID="42" v:groupContext="group">
+				<title>工作表.42</title>
+				<g id="shape38-204" v:mID="38" v:groupContext="shape" v:layerMember="0" transform="translate(0,-27.8869)">
+					<title>有向线 1.44</title>
+					<v:userDefs>
+						<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+					</v:userDefs>
+					<path d="M0 492.45 L113.39 492.45" class="st9"/>
+				</g>
+				<g id="shape39-209" v:mID="39" v:groupContext="shape" v:layerMember="0" transform="translate(0,-6.62702)">
+					<title>有向线 1.45</title>
+					<v:userDefs>
+						<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+					</v:userDefs>
+					<path d="M0 492.45 L113.39 492.45" class="st6"/>
+				</g>
+				<g id="shape40-214" v:mID="40" v:groupContext="shape" transform="translate(113.386,-21.2598)">
+					<title>工作表.40</title>
+					<desc>有省略的调用路径</desc>
+					<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+					<v:textRect cx="49.6063" cy="485.59" width="99.22" height="13.7136"/>
+					<rect x="0" y="478.734" width="99.2126" height="13.7136" class="st10"/>
+					<text x="4" y="488.89" class="st11" v:langID="2052"><v:paragraph/><v:tabList/>有省略的调用路径</text>				</g>
+				<g id="shape41-217" v:mID="41" v:groupContext="shape" transform="translate(113.386,0)">
+					<title>工作表.41</title>
+					<desc>完整的调用路径</desc>
+					<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+					<v:textRect cx="45.0709" cy="485.59" width="90.15" height="13.7136"/>
+					<rect x="0" y="478.734" width="90.1417" height="13.7136" class="st10"/>
+					<text x="4" y="488.89" class="st11" v:langID="2052"><v:paragraph/><v:tabList/>完整的调用路径</text>				</g>
+			</g>
+			<g id="shape44-220" v:mID="44" v:groupContext="shape" v:layerMember="0" transform="translate(318.898,-294.094)">
+				<title>直线连接线</title>
+				<v:userDefs>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<path d="M0 492.45 L35.43 492.45" class="st6"/>
+			</g>
+		</g>
+	</g>
+</svg>

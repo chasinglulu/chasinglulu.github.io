@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- 由 Microsoft Visio, SVG Export 生成 memblock_struct.svg 页-1 -->
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:ev="http://www.w3.org/2001/xml-events"
+		width="6.06765in" height="2.7349in" viewBox="0 0 436.871 196.913" xml:space="preserve" color-interpolation-filters="sRGB"
+		class="st14">
+	<style type="text/css">
+	<![CDATA[
+		.st1 {visibility:visible}
+		.st2 {fill:#5b9bd5;fill-opacity:0.22;filter:url(#filter_2);stroke:#5b9bd5;stroke-opacity:0.22}
+		.st3 {fill:#7f7f7f;stroke:#000000;stroke-width:0.25}
+		.st4 {fill:#000000;font-family:Times New Roman;font-size:1.00001em}
+		.st5 {fill:none;filter:url(#filter_2);stroke:#5b9bd5;stroke-opacity:0.22}
+		.st6 {fill:#5b9bd5;filter:url(#filter_2);font-family:Times New Roman;font-size:1.00001em;opacity:0.219608}
+		.st7 {fill:none;stroke:#000000;stroke-width:0.25}
+		.st8 {fill:#d8d8d8;stroke:#000000;stroke-width:0.25}
+		.st9 {fill:none;stroke:none;stroke-width:0.25}
+		.st10 {fill:#5b9bd5;font-family:Times New Roman;font-size:1.00001em}
+		.st11 {font-size:1em}
+		.st12 {marker-start:url(#mrkr5-67);stroke:#000000;stroke-linecap:round;stroke-linejoin:round;stroke-width:1}
+		.st13 {fill:#000000;fill-opacity:1;stroke:#000000;stroke-opacity:1;stroke-width:0.28409090909091}
+		.st14 {fill:none;fill-rule:evenodd;font-size:12px;overflow:visible;stroke-linecap:square;stroke-miterlimit:3}
+	]]>
+	</style>
+
+	<defs id="Markers">
+		<g id="lend5">
+			<path d="M 2 1 L 0 0 L 1.98117 -0.993387 C 1.67173 -0.364514 1.67301 0.372642 1.98465 1.00043 " style="stroke:none"/>
+		</g>
+		<marker id="mrkr5-67" class="st13" refX="5.8" orient="auto" markerUnits="strokeWidth" overflow="visible">
+			<use xlink:href="#lend5" transform="scale(3.52) "/>
+		</marker>
+	</defs>
+	<defs id="Filters">
+		<filter id="filter_2">
+			<feGaussianBlur stdDeviation="2"/>
+		</filter>
+	</defs>
+	<g>
+		<title>页-1</title>
+		<g id="group21-1" transform="translate(0.25,-5.34781)">
+			<title>工作表.21</title>
+			<g id="shape1-2" transform="translate(103.3,-136.063)">
+				<title>矩形</title>
+				<desc>memblock</desc>
+				<g id="shadow1-3" transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+					<rect x="0" y="174.236" width="77.9528" height="22.6772" class="st2"/>
+				</g>
+				<rect x="0" y="174.236" width="77.9528" height="22.6772" class="st3"/>
+				<text x="13.65" y="189.17" class="st4">memblock</text>			</g>
+			<g id="shape2-8" transform="translate(142.276,-113.386)">
+				<title>矩形.2</title>
+				<desc>.memory</desc>
+				<g id="shadow2-9" transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+					<rect x="0" y="174.236" width="77.9528" height="22.6772" class="st5"/>
+					<text x="17.48" y="189.17" class="st6">.memory</text>				</g>
+				<rect x="0" y="174.236" width="77.9528" height="22.6772" class="st7"/>
+				<text x="17.48" y="189.17" class="st4">.memory</text>			</g>
+			<g id="shape3-16" transform="translate(181.252,-90.7087)">
+				<title>矩形.3</title>
+				<desc>.regions[128]</desc>
+				<g id="shadow3-17" transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+					<rect x="0" y="174.236" width="77.9528" height="22.6772" class="st2"/>
+				</g>
+				<rect x="0" y="174.236" width="77.9528" height="22.6772" class="st8"/>
+				<text x="6.82" y="189.17" class="st4">.regions[128]</text>			</g>
+			<g id="shape4-22" transform="translate(142.276,-68.0315)">
+				<title>矩形.4</title>
+				<desc>.reserved</desc>
+				<g id="shadow4-23" transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+					<rect x="0" y="174.236" width="77.9528" height="22.6772" class="st5"/>
+					<text x="17.16" y="189.17" class="st6">.reserved</text>				</g>
+				<rect x="0" y="174.236" width="77.9528" height="22.6772" class="st7"/>
+				<text x="17.16" y="189.17" class="st4">.reserved</text>			</g>
+			<g id="shape5-30" transform="translate(142.276,-22.6772)">
+				<title>矩形.5</title>
+				<desc>.physmem</desc>
+				<g id="shadow5-31" transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+					<rect x="0" y="174.236" width="77.9528" height="22.6772" class="st5"/>
+					<text x="14.14" y="189.17" class="st6">.physmem</text>				</g>
+				<rect x="0" y="174.236" width="77.9528" height="22.6772" class="st7"/>
+				<text x="14.14" y="189.17" class="st4">.physmem</text>			</g>
+			<g id="shape6-38" transform="translate(181.252,-45.3543)">
+				<title>矩形.6</title>
+				<desc>.regions[128]</desc>
+				<g id="shadow6-39" transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+					<rect x="0" y="174.236" width="77.9528" height="22.6772" class="st2"/>
+				</g>
+				<rect x="0" y="174.236" width="77.9528" height="22.6772" class="st8"/>
+				<text x="6.82" y="189.17" class="st4">.regions[128]</text>			</g>
+			<g id="shape7-44" transform="translate(181.252,-2.84217E-014)">
+				<title>矩形.7</title>
+				<desc>.regions[4]</desc>
+				<g id="shadow7-45" transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+					<rect x="0" y="174.236" width="77.9528" height="22.6772" class="st2"/>
+				</g>
+				<rect x="0" y="174.236" width="77.9528" height="22.6772" class="st8"/>
+				<text x="12.82" y="189.17" class="st4">.regions[4]</text>			</g>
+			<g id="shape8-50" transform="translate(103.3,-165.827)">
+				<title>工作表.8</title>
+				<desc>struct memblock</desc>
+				<rect x="0" y="174.236" width="62.7412" height="22.6772" class="st9"/>
+				<text x="4" y="181.97" class="st10">struct  <tspan x="4" dy="1.2em" class="st11">memblock</tspan></text>			</g>
+			<g id="shape10-54" transform="translate(7.99361E-015,-68.0315)">
+				<title>工作表.10</title>
+				<desc>struct memblock_type</desc>
+				<rect x="0" y="174.236" width="87.5443" height="22.6772" class="st9"/>
+				<text x="4" y="181.97" class="st10">struct  <tspan x="4" dy="1.2em" class="st11">memblock</tspan>_type</text>			</g>
+			<g id="shape11-58" transform="translate(334.653,-45.3543)">
+				<title>工作表.11</title>
+				<desc>struct memblock_region</desc>
+				<rect x="0" y="174.236" width="101.718" height="22.6772" class="st9"/>
+				<text x="4" y="181.97" class="st10">struct  <tspan x="4" dy="1.2em" class="st11">memblock</tspan>_region</text>			</g>
+			<g id="shape14-62" transform="translate(267.919,223.809) rotate(140.353)">
+				<title>工作表.14</title>
+				<path d="M5.8 196.91 L6.16 196.91 L71.08 196.91" class="st12"/>
+			</g>
+			<g id="shape15-68" transform="translate(142.276,314.456) rotate(180)">
+				<title>工作表.15</title>
+				<path d="M5.8 196.91 L6.16 196.91 L54.73 196.91" class="st12"/>
+			</g>
+			<g id="shape16-73" transform="translate(16.6336,314.518) rotate(-140.353)">
+				<title>工作表.16</title>
+				<path d="M5.8 196.91 L6.16 196.91 L71.08 196.91" class="st12"/>
+			</g>
+			<g id="shape17-78" transform="translate(360.657,-73.9012) rotate(31.0116)">
+				<title>工作表.17</title>
+				<path d="M5.8 196.91 L6.16 196.91 L88.03 196.91" class="st12"/>
+			</g>
+			<g id="shape18-83" transform="translate(259.205,-56.6929)">
+				<title>工作表.18</title>
+				<path d="M5.8 196.91 L6.16 196.91 L75.45 196.91" class="st12"/>
+			</g>
+			<g id="shape19-88" transform="translate(157.708,16.835) rotate(-31.0271)">
+				<title>工作表.19</title>
+				<path d="M5.8 196.91 L6.16 196.91 L87.99 196.91" class="st12"/>
+			</g>
+		</g>
+	</g>
+</svg>
