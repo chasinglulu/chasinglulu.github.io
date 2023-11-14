@@ -28,12 +28,14 @@
 <meta property="og:site_name" content="点滴汇聚">
 <meta property="og:description" content="现在越来越多的公司开始关注和使用RISC-V，或者已经有一些公司开始把RISC-V集成到自己的芯片中，但是市面上还是缺乏一款优秀的RISC-V开发板，既能满足软件开发验证使用，又能提供丰富的学习例程。 在无RISC-V开发板的情况下，为了能够学习验证RISC-V相关的代码，通过Qemu模拟器搭建RISC-V运行环境，这样也能完全达到实验学习的目的。">
 <meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://chasinglulu.github.io/images/26/version.jpg">
 <meta property="article:published_time" content="2023-11-03T11:12:07.000Z">
-<meta property="article:modified_time" content="2023-11-06T12:37:42.984Z">
+<meta property="article:modified_time" content="2023-11-14T07:13:06.473Z">
 <meta property="article:author" content="Xinlu Wang">
 <meta property="article:tag" content="qemu">
 <meta property="article:tag" content="risc-v">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://chasinglulu.github.io/images/26/version.jpg">
 
 
 <link rel="canonical" href="http://chasinglulu.github.io/posts/d4e29484/">
@@ -169,7 +171,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%8B%E8%BD%BD%E7%BC%96%E8%AF%91%E5%B7%A5%E5%85%B7"><span class="nav-number">1.</span> <span class="nav-text">下载编译工具</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Qemu%E6%9E%84%E5%BB%BA"><span class="nav-number">2.</span> <span class="nav-text">Qemu构建</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#OpenSBI%E6%9E%84%E5%BB%BA"><span class="nav-number">3.</span> <span class="nav-text">OpenSBI构建</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#U-Boot%E6%9E%84%E5%BB%BA"><span class="nav-number">4.</span> <span class="nav-text">U-Boot构建</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Kernel%E6%9E%84%E5%BB%BA"><span class="nav-number">5.</span> <span class="nav-text">Kernel构建</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%90%E8%A1%8C%E9%AA%8C%E8%AF%81"><span class="nav-number">6.</span> <span class="nav-text">运行验证</span></a></li></ol></div>
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%8B%E8%BD%BD%E7%BC%96%E8%AF%91%E5%B7%A5%E5%85%B7"><span class="nav-number">1.</span> <span class="nav-text">下载编译工具</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Qemu%E6%9E%84%E5%BB%BA"><span class="nav-number">2.</span> <span class="nav-text">Qemu构建</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#OpenSBI%E6%9E%84%E5%BB%BA"><span class="nav-number">3.</span> <span class="nav-text">OpenSBI构建</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#U-Boot%E6%9E%84%E5%BB%BA"><span class="nav-number">4.</span> <span class="nav-text">U-Boot构建</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%90%E8%A1%8C%E9%AA%8C%E8%AF%81"><span class="nav-number">5.</span> <span class="nav-text">运行验证</span></a></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -284,7 +286,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2023-11-06 20:37:42" itemprop="dateModified" datetime="2023-11-06T20:37:42+08:00">2023-11-06</time>
+      <time title="修改时间：2023-11-14 15:13:06" itemprop="dateModified" datetime="2023-11-14T15:13:06+08:00">2023-11-14</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -324,7 +326,7 @@
         <i class="far fa-file-word"></i>
       </span>
       <span class="post-meta-item-text">本文字数：</span>
-      <span>162</span>
+      <span>352</span>
     </span>
     <span class="post-meta-item" title="阅读时长">
       <span class="post-meta-item-icon">
@@ -345,7 +347,16 @@
 <p>在无RISC-V开发板的情况下，为了能够学习验证RISC-V相关的代码，通过Qemu模拟器搭建RISC-V运行环境，这样也能完全达到实验学习的目的。</p>
 <span id="more"></span>
 
-<h3 id="下载编译工具"><a href="#下载编译工具" class="headerlink" title="下载编译工具"></a>下载编译工具</h3><h3 id="Qemu构建"><a href="#Qemu构建" class="headerlink" title="Qemu构建"></a>Qemu构建</h3><h3 id="OpenSBI构建"><a href="#OpenSBI构建" class="headerlink" title="OpenSBI构建"></a>OpenSBI构建</h3><h3 id="U-Boot构建"><a href="#U-Boot构建" class="headerlink" title="U-Boot构建"></a>U-Boot构建</h3><h3 id="Kernel构建"><a href="#Kernel构建" class="headerlink" title="Kernel构建"></a>Kernel构建</h3><h3 id="运行验证"><a href="#运行验证" class="headerlink" title="运行验证"></a>运行验证</h3>
+<h3 id="下载编译工具"><a href="#下载编译工具" class="headerlink" title="下载编译工具"></a>下载编译工具</h3><h3 id="Qemu构建"><a href="#Qemu构建" class="headerlink" title="Qemu构建"></a>Qemu构建</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">git <span class="built_in">clone</span> -b qemu-v7.2.0 https://github.com/chasinglulu/qemu.git</span><br><span class="line"><span class="built_in">cd</span> qemu</span><br><span class="line">./configure --target-list=aarch64-softmmu,riscv64-softmmu,riscv32-softmmu --enable-fdt --disable-kvm --disable-xen --enable-gcrypt</span><br><span class="line">make -j64</span><br><span class="line"></span><br><span class="line"><span class="built_in">cd</span> build</span><br><span class="line">./qemu-system-riscv32 --version</span><br></pre></td></tr></table></figure>
+<p><img data-src="/images/26/version.jpg" alt="qemu-system-riscv32-version"></p>
+<center>图1 检查qemu-system-riscv32的版本</center>
+
+<h3 id="OpenSBI构建"><a href="#OpenSBI构建" class="headerlink" title="OpenSBI构建"></a>OpenSBI构建</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">git <span class="built_in">clone</span> https://github.com/riscv-software-src/opensbi.git</span><br><span class="line"></span><br><span class="line"><span class="built_in">export</span> CROSS_COMPILE=riscv32-unknown-linux-gnu-</span><br><span class="line">make PLATFORM=generic</span><br></pre></td></tr></table></figure>
+<p>更多关于OpenSBI的构建说明，参考<a target="_blank" rel="noopener" href="https://github.com/riscv-software-src/opensbi">OpenSBI README</a></p>
+<h3 id="U-Boot构建"><a href="#U-Boot构建" class="headerlink" title="U-Boot构建"></a>U-Boot构建</h3><p>首先要将<code>/path/to/opensbi/build/platform/generic/firmware</code>目录下<code>fw_dynamic.bin</code>文件复制到u-boot源代码目录下，在编译时binman会使用这个bin文件打包出一个u-boot.itb。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">git <span class="built_in">clone</span> -b lambert-uboot https://github.com/chasinglulu/u-boot.git</span><br><span class="line"><span class="built_in">cd</span> u-boot</span><br><span class="line">make ARCH=riscv CROSS_COMPILE=riscv32-unknown-linux-gnu- qemu-riscv32_spl_defconfig</span><br><span class="line">make -j4</span><br></pre></td></tr></table></figure>
+
+<h3 id="运行验证"><a href="#运行验证" class="headerlink" title="运行验证"></a>运行验证</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">qemu-system-riscv32 -M virt -smp 4 -m 2G -display none -serial stdio -bios /path/to/u-boot/spl/u-boot-spl.bin -device loader,file=/path/to/u-boot/u-boot.itb,addr=0x80200000</span><br></pre></td></tr></table></figure>
     </div>
 
     

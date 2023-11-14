@@ -1478,7 +1478,16 @@
 <p>在无RISC-V开发板的情况下，为了能够学习验证RISC-V相关的代码，通过Qemu模拟器搭建RISC-V运行环境，这样也能完全达到实验学习的目的。</p>
 <span id="more"></span>
 
-<h3 id="下载编译工具"><a href="#下载编译工具" class="headerlink" title="下载编译工具"></a>下载编译工具</h3><h3 id="Qemu构建"><a href="#Qemu构建" class="headerlink" title="Qemu构建"></a>Qemu构建</h3><h3 id="OpenSBI构建"><a href="#OpenSBI构建" class="headerlink" title="OpenSBI构建"></a>OpenSBI构建</h3><h3 id="U-Boot构建"><a href="#U-Boot构建" class="headerlink" title="U-Boot构建"></a>U-Boot构建</h3><h3 id="Kernel构建"><a href="#Kernel构建" class="headerlink" title="Kernel构建"></a>Kernel构建</h3><h3 id="运行验证"><a href="#运行验证" class="headerlink" title="运行验证"></a>运行验证</h3>]]></content>
+<h3 id="下载编译工具"><a href="#下载编译工具" class="headerlink" title="下载编译工具"></a>下载编译工具</h3><h3 id="Qemu构建"><a href="#Qemu构建" class="headerlink" title="Qemu构建"></a>Qemu构建</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git <span class="built_in">clone</span> -b qemu-v7.2.0 https://github.com/chasinglulu/qemu.git</span><br><span class="line"><span class="built_in">cd</span> qemu</span><br><span class="line">./configure --target-list=aarch64-softmmu,riscv64-softmmu,riscv32-softmmu --enable-fdt --disable-kvm --disable-xen --enable-gcrypt</span><br><span class="line">make -j64</span><br><span class="line"></span><br><span class="line"><span class="built_in">cd</span> build</span><br><span class="line">./qemu-system-riscv32 --version</span><br></pre></td></tr></table></figure>
+<p><img data-src="/images/26/version.jpg" alt="qemu-system-riscv32-version"></p>
+<center>图1 检查qemu-system-riscv32的版本</center>
+
+<h3 id="OpenSBI构建"><a href="#OpenSBI构建" class="headerlink" title="OpenSBI构建"></a>OpenSBI构建</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git <span class="built_in">clone</span> https://github.com/riscv-software-src/opensbi.git</span><br><span class="line"></span><br><span class="line"><span class="built_in">export</span> CROSS_COMPILE=riscv32-unknown-linux-gnu-</span><br><span class="line">make PLATFORM=generic</span><br></pre></td></tr></table></figure>
+<p>更多关于OpenSBI的构建说明，参考<a href="https://github.com/riscv-software-src/opensbi">OpenSBI README</a></p>
+<h3 id="U-Boot构建"><a href="#U-Boot构建" class="headerlink" title="U-Boot构建"></a>U-Boot构建</h3><p>首先要将<code>/path/to/opensbi/build/platform/generic/firmware</code>目录下<code>fw_dynamic.bin</code>文件复制到u-boot源代码目录下，在编译时binman会使用这个bin文件打包出一个u-boot.itb。</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git <span class="built_in">clone</span> -b lambert-uboot https://github.com/chasinglulu/u-boot.git</span><br><span class="line"><span class="built_in">cd</span> u-boot</span><br><span class="line">make ARCH=riscv CROSS_COMPILE=riscv32-unknown-linux-gnu- qemu-riscv32_spl_defconfig</span><br><span class="line">make -j4</span><br></pre></td></tr></table></figure>
+
+<h3 id="运行验证"><a href="#运行验证" class="headerlink" title="运行验证"></a>运行验证</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">qemu-system-riscv32 -M virt -smp 4 -m 2G -display none -serial stdio -bios /path/to/u-boot/spl/u-boot-spl.bin -device loader,file=/path/to/u-boot/u-boot.itb,addr=0x80200000</span><br></pre></td></tr></table></figure>]]></content>
       <categories>
         <category>tools</category>
       </categories>
