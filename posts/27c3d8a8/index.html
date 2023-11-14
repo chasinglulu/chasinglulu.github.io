@@ -23,13 +23,13 @@
 
     <meta name="description" content="随着芯片开发的规模越来越大，验证无处不在，在整个开发流程中能够将系统软件的开发尽量向左前移，那么我们开发的芯片就能够更早地推向市场，甚至抢占先机。 使用Qemu来模拟替代我们开发的芯片，从而能够让软件开发人员提前进行BSP相关软件的开发，但是Qemu里面是没有我们芯片对应的machine，因此我们要根据芯片手册，新增一个芯片machine或者芯片平台，也就是说基于Qemu现有的代码，我们新开发一个">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Qemu新增芯片machine">
+<meta property="og:title" content="Qemu新增的芯片平台">
 <meta property="og:url" content="http://chasinglulu.github.io/posts/27c3d8a8/index.html">
 <meta property="og:site_name" content="点滴汇聚">
 <meta property="og:description" content="随着芯片开发的规模越来越大，验证无处不在，在整个开发流程中能够将系统软件的开发尽量向左前移，那么我们开发的芯片就能够更早地推向市场，甚至抢占先机。 使用Qemu来模拟替代我们开发的芯片，从而能够让软件开发人员提前进行BSP相关软件的开发，但是Qemu里面是没有我们芯片对应的machine，因此我们要根据芯片手册，新增一个芯片machine或者芯片平台，也就是说基于Qemu现有的代码，我们新开发一个">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2023-11-14T08:23:45.000Z">
-<meta property="article:modified_time" content="2023-11-14T09:09:40.708Z">
+<meta property="article:modified_time" content="2023-11-14T12:02:46.624Z">
 <meta property="article:author" content="Xinlu Wang">
 <meta property="article:tag" content="qemu">
 <meta property="article:tag" content="SoC">
@@ -41,10 +41,10 @@
 
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://chasinglulu.github.io/posts/27c3d8a8/","path":"posts/27c3d8a8/","title":"Qemu新增芯片machine"}</script>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://chasinglulu.github.io/posts/27c3d8a8/","path":"posts/27c3d8a8/","title":"Qemu新增的芯片平台"}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
-<title>Qemu新增芯片machine | 点滴汇聚</title>
+<title>Qemu新增的芯片平台 | 点滴汇聚</title>
   
 
 
@@ -170,7 +170,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%B0%E5%A2%9E%E7%9A%84%E5%B9%B3%E5%8F%B0"><span class="nav-number">1.</span> <span class="nav-text">新增的平台</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%9B%AE%E5%89%8D%E6%96%B0%E6%94%AF%E6%8C%81%E7%9A%84%E5%B9%B3%E5%8F%B0"><span class="nav-number">1.1.</span> <span class="nav-text">目前新支持的平台</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#hobot%E5%B9%B3%E5%8F%B0"><span class="nav-number">1.2.</span> <span class="nav-text">hobot平台</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#lambert%E5%B9%B3%E5%8F%B0"><span class="nav-number">1.3.</span> <span class="nav-text">lambert平台</span></a></li></ol></li></ol></div>
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#Qemu%E7%89%B9%E5%BE%81"><span class="nav-number">1.</span> <span class="nav-text">Qemu特征</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%B0%E5%A2%9E%E7%9A%84%E5%B9%B3%E5%8F%B0"><span class="nav-number">2.</span> <span class="nav-text">新增的平台</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%9B%AE%E5%89%8D%E6%96%B0%E6%94%AF%E6%8C%81%E7%9A%84%E5%B9%B3%E5%8F%B0"><span class="nav-number">2.1.</span> <span class="nav-text">目前新支持的平台</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#hobot%E5%B9%B3%E5%8F%B0"><span class="nav-number">2.2.</span> <span class="nav-text">hobot平台</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#lambert%E5%B9%B3%E5%8F%B0"><span class="nav-number">2.3.</span> <span class="nav-text">lambert平台</span></a></li></ol></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -262,12 +262,12 @@
     </span>
 
     <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="Qemu新增芯片machine | 点滴汇聚">
+      <meta itemprop="name" content="Qemu新增的芯片平台 | 点滴汇聚">
       <meta itemprop="description" content="">
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          Qemu新增芯片machine
+          Qemu新增的芯片平台
         </h1>
 
         <div class="post-meta-container">
@@ -279,7 +279,7 @@
       <span class="post-meta-item-text">发表于</span>
       
 
-      <time title="创建时间：2023-11-14 16:23:45 / 修改时间：17:09:40" itemprop="dateCreated datePublished" datetime="2023-11-14T16:23:45+08:00">2023-11-14</time>
+      <time title="创建时间：2023-11-14 16:23:45 / 修改时间：20:02:46" itemprop="dateCreated datePublished" datetime="2023-11-14T16:23:45+08:00">2023-11-14</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -319,14 +319,14 @@
         <i class="far fa-file-word"></i>
       </span>
       <span class="post-meta-item-text">本文字数：</span>
-      <span>704</span>
+      <span>1.4k</span>
     </span>
     <span class="post-meta-item" title="阅读时长">
       <span class="post-meta-item-icon">
         <i class="far fa-clock"></i>
       </span>
       <span class="post-meta-item-text">阅读时长 &asymp;</span>
-      <span>3 分钟</span>
+      <span>5 分钟</span>
     </span>
 </div>
 
@@ -338,8 +338,29 @@
     
     <div class="post-body" itemprop="articleBody"><p>随着芯片开发的规模越来越大，验证无处不在，在整个开发流程中能够将系统软件的开发尽量向左前移，那么我们开发的芯片就能够更早地推向市场，甚至抢占先机。</p>
 <p>使用Qemu来模拟替代我们开发的芯片，从而能够让软件开发人员提前进行BSP相关软件的开发，但是Qemu里面是没有我们芯片对应的machine，因此我们要根据芯片手册，新增一个芯片machine或者芯片平台，也就是说基于Qemu现有的代码，我们新开发一个自有芯片的machine，基于这个新开发的machine，我们就可以开发我们的U-Boot、Linux BSP相关的代码了，从而缩小BSP相关代码在FPAG上的验证时间。</p>
+<hr>
+<ul>
+<li><strong>Qemu:</strong> v7.2.0</li>
+</ul>
+<hr>
 <span id="more"></span>
 
+<h3 id="Qemu特征"><a href="#Qemu特征" class="headerlink" title="Qemu特征"></a>Qemu特征</h3><ul>
+<li>新增Cortex-A78ae CPU支持</li>
+<li>新增Cortex-R52 CPU支持</li>
+<li>新增THead-E907 CPU支持<ul>
+<li>移植THead扩展指令集</li>
+</ul>
+</li>
+<li>新增PCIe UFS支持</li>
+<li>新增eMMC和SD Card支持<ul>
+<li>支持RPMB分区</li>
+<li>支持Boot分区</li>
+</ul>
+</li>
+<li>新增synopsys GPIO and I2C Controller支持</li>
+<li>新增ARM SMMUv3支持</li>
+</ul>
 <h3 id="新增的平台"><a href="#新增的平台" class="headerlink" title="新增的平台"></a>新增的平台</h3><p>在我们开发Qemu machine之前，我们需要先熟悉芯片的基础架构：</p>
 <ol>
 <li>芯片的地址映射（memory map）</li>
@@ -353,59 +374,194 @@
   font-family:Arial, sans-serif;font-size:14px;overflow:hidden;padding:10px 5px;word-break:normal;}
 .tg th{background-color:#409cff;border-color:#9ABAD9;border-style:solid;border-width:1px;color:#fff;
   font-family:Arial, sans-serif;font-size:14px;font-weight:normal;overflow:hidden;padding:10px 5px;word-break:normal;}
-.tg .tg-g0b6{font-family:"Times New Roman", Times, serif !important;font-size:14px;text-align:left;vertical-align:middle}
-.tg .tg-xezk{background-color:#D2E4FC;font-family:"Times New Roman", Times, serif !important;font-size:14px;text-align:center;
+.tg .tg-z2s7{background-color:#D2E4FC;border-color:inherit;font-family:"Times New Roman", Times, serif !important;font-size:14px;
+  text-align:center;vertical-align:middle}
+.tg .tg-9lvt{border-color:inherit;font-family:"Times New Roman", Times, serif !important;font-size:14px;text-align:left;
   vertical-align:middle}
-.tg .tg-aoar{font-family:"Times New Roman", Times, serif !important;font-size:14px;position:-webkit-sticky;position:sticky;
-  text-align:center;top:-1px;vertical-align:middle;will-change:transform}
-.tg .tg-1xb4{font-family:"Times New Roman", Times, serif !important;font-size:14px;text-align:center;vertical-align:middle}
-.tg .tg-8yge{background-color:#D2E4FC;font-family:"Times New Roman", Times, serif !important;font-size:14px;text-align:left;
+.tg .tg-1bt8{border-color:inherit;font-family:"Times New Roman", Times, serif !important;font-size:14px;position:-webkit-sticky;
+  position:sticky;text-align:center;top:-1px;vertical-align:middle;will-change:transform}
+.tg .tg-l5pl{border-color:inherit;font-family:"Times New Roman", Times, serif !important;font-size:14px;text-align:center;
   vertical-align:middle}
+.tg .tg-gwzb{background-color:#D2E4FC;border-color:inherit;font-family:"Times New Roman", Times, serif !important;font-size:14px;
+  text-align:left;vertical-align:middle}
 @media screen and (max-width: 767px) {.tg {width: auto !important;}.tg col {width: auto !important;}.tg-wrap {overflow-x: auto;-webkit-overflow-scrolling: touch;margin: auto 0px;}}</style>
 <div class="tg-wrap"><table class="tg">
 <thead>
   <tr>
-    <th class="tg-aoar">SoC Platform</th>
-    <th class="tg-aoar">Machine Name</th>
-    <th class="tg-aoar">Arch</th>
-    <th class="tg-aoar">U-Boot defconfig</th>
-    <th class="tg-aoar">ATF defconfig</th>
-    <th class="tg-aoar">OP-TEE defconfig</th>
-    <th class="tg-aoar">Kernel defconfig</th>
+    <th class="tg-1bt8">SoC Platform</th>
+    <th class="tg-1bt8">Machine Name</th>
+    <th class="tg-1bt8">Arch</th>
+    <th class="tg-1bt8">U-Boot defconfig</th>
+    <th class="tg-1bt8">Kernel defconfig</th>
   </tr>
 </thead>
 <tbody>
   <tr>
-    <td class="tg-1xb4">hobot</td>
-    <td class="tg-xezk">hobot-sigi-virt</td>
-    <td class="tg-1xb4">aarch64</td>
-    <td class="tg-8yge"></td>
-    <td class="tg-g0b6"></td>
-    <td class="tg-8yge"></td>
-    <td class="tg-g0b6"></td>
+    <td class="tg-l5pl">hobot</td>
+    <td class="tg-z2s7">hobot-sigi-virt</td>
+    <td class="tg-l5pl">aarch64</td>
+    <td class="tg-gwzb">hobot-sigi-virt_defconfig</td>
+    <td class="tg-9lvt">hobot_sigi_tiny_defconfig</td>
   </tr>
   <tr>
-    <td class="tg-1xb4">lambert</td>
-    <td class="tg-xezk">lmt-virt</td>
-    <td class="tg-1xb4">aarch64</td>
-    <td class="tg-8yge"></td>
-    <td class="tg-g0b6"></td>
-    <td class="tg-8yge"></td>
-    <td class="tg-g0b6"></td>
+    <td class="tg-l5pl">lambert</td>
+    <td class="tg-z2s7">lmt-virt</td>
+    <td class="tg-l5pl">aarch64</td>
+    <td class="tg-gwzb">lambert-qemu-virt_defconfig</td>
+    <td class="tg-9lvt">lambert-tiny_defconfig</td>
   </tr>
   <tr>
-    <td class="tg-1xb4">lambert safety</td>
-    <td class="tg-xezk">lmt-riscv-virt</td>
-    <td class="tg-1xb4">riscv32</td>
-    <td class="tg-8yge"></td>
-    <td class="tg-g0b6"></td>
-    <td class="tg-8yge"></td>
-    <td class="tg-g0b6"></td>
+    <td class="tg-l5pl">lambert safety</td>
+    <td class="tg-z2s7">lmt-riscv-virt</td>
+    <td class="tg-l5pl">riscv32</td>
+    <td class="tg-gwzb">lambert-qemu-riscv-without-dram_defconfig</td>
+    <td class="tg-9lvt">NA</td>
   </tr>
 </tbody>
 </table></div>
 
-<h4 id="hobot平台"><a href="#hobot平台" class="headerlink" title="hobot平台"></a>hobot平台</h4><h4 id="lambert平台"><a href="#lambert平台" class="headerlink" title="lambert平台"></a>lambert平台</h4>
+<h4 id="hobot平台"><a href="#hobot平台" class="headerlink" title="hobot平台"></a>hobot平台</h4><p>支持的设备如下：</p>
+<ul>
+<li>four CPUs (ARM Cortex-A78ae)</li>
+<li>GICv3</li>
+<li>four NS16550 UARTs (synopsys)</li>
+<li>two SDHCI (Cadence)</li>
+<li>OCM (32 MiB)</li>
+<li>two GPIO Ctrl (synopsys)</li>
+<li>DRAM (96 GiB)</li>
+<li>PCIe (ECAM)</li>
+<li>USB (synopsys)</li>
+<li>NVMe</li>
+</ul>
+<center>表1 hobot平台的内存映射和中断映射</center>
+<style type="text/css">
+.tg  {border-collapse:collapse;border-color:#9ABAD9;border-spacing:0;margin:0px auto;}
+.tg td{background-color:#EBF5FF;border-color:#9ABAD9;border-style:solid;border-width:1px;color:#444;
+  font-family:Arial, sans-serif;font-size:14px;overflow:hidden;padding:10px 5px;word-break:normal;}
+.tg th{background-color:#409cff;border-color:#9ABAD9;border-style:solid;border-width:1px;color:#fff;
+  font-family:Arial, sans-serif;font-size:14px;font-weight:normal;overflow:hidden;padding:10px 5px;word-break:normal;}
+.tg .tg-ul38{position:-webkit-sticky;position:sticky;text-align:left;top:-1px;vertical-align:top;will-change:transform}
+.tg .tg-j1i3{border-color:inherit;position:-webkit-sticky;position:sticky;text-align:left;top:-1px;vertical-align:top;
+  will-change:transform}
+.tg .tg-hmp3{background-color:#D2E4FC;text-align:left;vertical-align:top}
+.tg .tg-0lax{text-align:left;vertical-align:top}
+@media screen and (max-width: 767px) {.tg {width: auto !important;}.tg col {width: auto !important;}.tg-wrap {overflow-x: auto;-webkit-overflow-scrolling: touch;margin: auto 0px;}}</style>
+<div class="tg-wrap"><table class="tg">
+<thead>
+  <tr>
+    <th class="tg-j1i3">IP name</th>
+    <th class="tg-ul38">memory <br>base address</th>
+    <th class="tg-ul38">memory <br>map size</th>
+    <th class="tg-ul38">interrupt</th>
+  </tr>
+</thead>
+<tbody>
+  <tr>
+    <td class="tg-0lax">OCM</td>
+    <td class="tg-hmp3">0x0400_0000</td>
+    <td class="tg-0lax">0x0200_0000</td>
+    <td class="tg-hmp3"></td>
+  </tr>
+  <tr>
+    <td class="tg-0lax">flash</td>
+    <td class="tg-hmp3">0x1800_0000</td>
+    <td class="tg-0lax">0x0800_0000</td>
+    <td class="tg-hmp3"></td>
+  </tr>
+  <tr>
+    <td class="tg-0lax">pmu</td>
+    <td class="tg-hmp3">0x2319_0000</td>
+    <td class="tg-0lax">0x0001_0000</td>
+    <td class="tg-hmp3"></td>
+  </tr>
+  <tr>
+    <td class="tg-0lax">gicv3</td>
+    <td class="tg-hmp3">0x30b0_0000</td>
+    <td class="tg-0lax">0x0001_0000</td>
+    <td class="tg-hmp3"></td>
+  </tr>
+  <tr>
+    <td class="tg-0lax">gicv3 redist</td>
+    <td class="tg-hmp3">0x30b6_0000</td>
+    <td class="tg-0lax">0x0010_0000</td>
+    <td class="tg-hmp3"></td>
+  </tr>
+  <tr>
+    <td class="tg-0lax">PCIe Ctrl</td>
+    <td class="tg-hmp3">0x3400_0000</td>
+    <td class="tg-0lax">0x0040_0000</td>
+    <td class="tg-hmp3">127~130</td>
+  </tr>
+  <tr>
+    <td class="tg-0lax">PCIe PIO</td>
+    <td class="tg-hmp3">0x7000_0000</td>
+    <td class="tg-0lax">0x1000_0000</td>
+    <td class="tg-hmp3"></td>
+  </tr>
+  <tr>
+    <td class="tg-0lax">PCIe MMIO</td>
+    <td class="tg-hmp3">0x8000_0000</td>
+    <td class="tg-0lax">0x4000_0000</td>
+    <td class="tg-hmp3"></td>
+  </tr>
+  <tr>
+    <td class="tg-0lax">PCIe high MMIO</td>
+    <td class="tg-hmp3">0x80_0000_0000</td>
+    <td class="tg-0lax">0x80_0000_0000</td>
+    <td class="tg-hmp3"></td>
+  </tr>
+  <tr>
+    <td class="tg-0lax">sdhci0</td>
+    <td class="tg-hmp3">0x3903_0000</td>
+    <td class="tg-0lax">0x0001_0000</td>
+    <td class="tg-hmp3">120</td>
+  </tr>
+  <tr>
+    <td class="tg-0lax">sdhci1</td>
+    <td class="tg-hmp3">0x3904_0000</td>
+    <td class="tg-0lax">0x0001_0000</td>
+    <td class="tg-hmp3">122</td>
+  </tr>
+  <tr>
+    <td class="tg-0lax">UART0</td>
+    <td class="tg-hmp3">0x3905_0000</td>
+    <td class="tg-0lax">0x0001_0000</td>
+    <td class="tg-hmp3">73</td>
+  </tr>
+  <tr>
+    <td class="tg-0lax">UART1</td>
+    <td class="tg-hmp3">0x3906_0000</td>
+    <td class="tg-0lax">0x0001_0000</td>
+    <td class="tg-hmp3">74</td>
+  </tr>
+  <tr>
+    <td class="tg-0lax">UART2</td>
+    <td class="tg-hmp3">0x3907_0000</td>
+    <td class="tg-0lax">0x0001_0000</td>
+    <td class="tg-hmp3">75</td>
+  </tr>
+  <tr>
+    <td class="tg-0lax">UART3</td>
+    <td class="tg-hmp3">0x3908_0000</td>
+    <td class="tg-0lax">0x0001_0000</td>
+    <td class="tg-hmp3">76</td>
+  </tr>
+  <tr>
+    <td class="tg-0lax">low DRAM</td>
+    <td class="tg-hmp3">0xC000_0000</td>
+    <td class="tg-0lax">0x4000_0000</td>
+    <td class="tg-hmp3"></td>
+  </tr>
+  <tr>
+    <td class="tg-0lax">high DRAM</td>
+    <td class="tg-hmp3">0x30_0000_0000</td>
+    <td class="tg-0lax">0x18_0000_0000</td>
+    <td class="tg-hmp3"></td>
+  </tr>
+</tbody>
+</table></div>
+
+<h4 id="lambert平台"><a href="#lambert平台" class="headerlink" title="lambert平台"></a>lambert平台</h4>
     </div>
 
     
@@ -446,7 +602,7 @@
   </li>
   <li class="post-copyright-link">
       <strong>本文链接：</strong>
-      <a href="http://chasinglulu.github.io/posts/27c3d8a8/" title="Qemu新增芯片machine">http://chasinglulu.github.io/posts/27c3d8a8/</a>
+      <a href="http://chasinglulu.github.io/posts/27c3d8a8/" title="Qemu新增的芯片平台">http://chasinglulu.github.io/posts/27c3d8a8/</a>
   </li>
   <li class="post-copyright-license">
       <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
@@ -501,14 +657,14 @@
       <i class="fa fa-chart-line"></i>
     </span>
       <span>站点总字数：</span>
-    <span title="站点总字数">75k</span>
+    <span title="站点总字数">76k</span>
   </span>
   <span class="post-meta-item">
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
       <span>站点阅读时长 &asymp;</span>
-    <span title="站点阅读时长">4:33</span>
+    <span title="站点阅读时长">4:36</span>
   </span>
 </div>
 <div class="busuanzi-count">
