@@ -2376,4 +2376,23 @@ N件商品的价格（以空格为分界符）</pre>
         <tag>schedule</tag>
       </tags>
   </entry>
+  <entry>
+    <title>Qemu Co-simulation</title>
+    <url>/posts/6c41dfb6/</url>
+    <content><![CDATA[<p>本文将展示如何使用qemu+systemC来完成IP的simulation，复用已有的高级语言实现的benchmark来剖析IP的性能。</p>
+<span id="more"></span>
+
+
+<p><img data-src="/images/25/qemu.jpg" alt="qemu-simulaton-uart"></p>
+<center>图1 verilog-uart的Qemu co-simulation</center>
+
+<p><img data-src="/images/25/qemu-ethernet.jpg" alt="qemu-simulaton-ethernet"></p>
+<center>图2 verilog-ethernet的Qemu co-simulation</center>]]></content>
+      <tags>
+        <tag>qemu</tag>
+        <tag>emulator</tag>
+        <tag>verilog</tag>
+        <tag>systemC</tag>
+      </tags>
+  </entry>
 </search>
