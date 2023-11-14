@@ -6,20 +6,20 @@
 <meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.0.0">
 <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
 <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
-  <link rel="apple-touch-icon" sizes="180x180" href="../../images/apple-touch-icon-next.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="../../images/blog.svg">
-  <link rel="icon" type="image/png" sizes="16x16" href="../../images/blog.svg">
-  <link rel="mask-icon" href="../../images/logo.svg" color="#222">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/blog.svg">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/blog.svg">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
   <meta name="google-site-verification" content="vuSkRYPVceK1DXhqZWm7wVxYV4YmmnI1Dv_C1M8rJJM">
 
-<link rel="stylesheet" href="../../css/main.css">
+<link rel="stylesheet" href="/css/main.css">
 
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Georgia:300,300italic,400,400italic,700,700italic%7CTimes+New+Roman:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha256-CTSx/A06dm1B063156EVh15m6Y67pAjZZaQc89LLSrU=" crossorigin="anonymous">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
 
-<script class="next-config" data-name="main" type="application/json">{"hostname":"chasinglulu.github.io","root":"/","images":"../../images","scheme":"Mist","darkmode":false,"version":"8.18.2","exturl":false,"sidebar":{"position":"right","display":"hide","padding":18,"offset":12},"copycode":{"enable":true,"style":"mac"},"fold":{"enable":true,"height":500},"bookmark":{"enable":true,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"../../search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="../../js/config.js"></script>
+<script class="next-config" data-name="main" type="application/json">{"hostname":"chasinglulu.github.io","root":"/","images":"/images","scheme":"Mist","darkmode":false,"version":"8.18.2","exturl":false,"sidebar":{"position":"right","display":"hide","padding":18,"offset":12},"copycode":{"enable":true,"style":"mac"},"fold":{"enable":true,"height":500},"bookmark":{"enable":true,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
 
     <meta name="description" content="&ensp;&ensp;&ensp;&ensp;内核启动初期，常用内存分配器（memory allocator）还未被初始化而不能使用，在此期间memblock是一种用于管理内存区域的方法。memblock也是一种内存分配器，在内核启动阶段它是第一个被启用的内存分配器，在其他内存分配器可用之前使用它向内核注册指定的物理内存区间。memblock主要在启动阶段被使用，但若启用了内存热插拔机制，在内核">
 <meta property="og:type" content="article">
@@ -28,24 +28,24 @@
 <meta property="og:site_name" content="点滴汇聚">
 <meta property="og:description" content="&ensp;&ensp;&ensp;&ensp;内核启动初期，常用内存分配器（memory allocator）还未被初始化而不能使用，在此期间memblock是一种用于管理内存区域的方法。memblock也是一种内存分配器，在内核启动阶段它是第一个被启用的内存分配器，在其他内存分配器可用之前使用它向内核注册指定的物理内存区间。memblock主要在启动阶段被使用，但若启用了内存热插拔机制，在内核">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://chasinglulu.github.io/posts/6c782175/memblock_struct.svg">
-<meta property="og:image" content="http://chasinglulu.github.io/posts/6c782175/memblock_config_struct.svg">
-<meta property="og:image" content="http://chasinglulu.github.io/posts/6c782175/memblock_add.svg">
-<meta property="og:image" content="http://chasinglulu.github.io/posts/6c782175/arm64_memblock_init.svg">
-<meta property="og:image" content="http://chasinglulu.github.io/posts/6c782175/memblock_alloc.svg">
-<meta property="og:image" content="http://chasinglulu.github.io/posts/6c782175/memblock_find.svg">
-<meta property="og:image" content="http://chasinglulu.github.io/posts/6c782175/memblock_example_iteration.svg">
-<meta property="og:image" content="http://chasinglulu.github.io/posts/6c782175/memblock_add_node.svg">
-<meta property="og:image" content="http://chasinglulu.github.io/posts/6c782175/memblock_merge.svg">
-<meta property="og:image" content="http://chasinglulu.github.io/posts/6c782175/memblock_merge_II.svg">
-<meta property="og:image" content="http://chasinglulu.github.io/posts/6c782175/memblock_remove.svg">
-<meta property="og:image" content="http://chasinglulu.github.io/posts/6c782175/memblock_isolate_range.svg">
+<meta property="og:image" content="http://chasinglulu.github.io/images/22/memblock_struct.svg">
+<meta property="og:image" content="http://chasinglulu.github.io/images/22/memblock_config_struct.svg">
+<meta property="og:image" content="http://chasinglulu.github.io/images/22/memblock_add.svg">
+<meta property="og:image" content="http://chasinglulu.github.io/images/22/arm64_memblock_init.svg">
+<meta property="og:image" content="http://chasinglulu.github.io/images/22/memblock_alloc.svg">
+<meta property="og:image" content="http://chasinglulu.github.io/images/22/memblock_find.svg">
+<meta property="og:image" content="http://chasinglulu.github.io/images/22/memblock_example_iteration.svg">
+<meta property="og:image" content="http://chasinglulu.github.io/images/22/memblock_add_node.svg">
+<meta property="og:image" content="http://chasinglulu.github.io/images/22/memblock_merge.svg">
+<meta property="og:image" content="http://chasinglulu.github.io/images/22/memblock_merge_II.svg">
+<meta property="og:image" content="http://chasinglulu.github.io/images/22/memblock_remove.svg">
+<meta property="og:image" content="http://chasinglulu.github.io/images/22/memblock_isolate_range.svg">
 <meta property="article:published_time" content="2019-05-28T12:27:47.000Z">
-<meta property="article:modified_time" content="2023-11-06T12:37:42.988Z">
+<meta property="article:modified_time" content="2023-11-14T06:12:36.794Z">
 <meta property="article:author" content="Xinlu Wang">
 <meta property="article:tag" content="memblock">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http://chasinglulu.github.io/posts/6c782175/memblock_struct.svg">
+<meta name="twitter:image" content="http://chasinglulu.github.io/images/22/memblock_struct.svg">
 
 
 <link rel="canonical" href="http://chasinglulu.github.io/posts/6c782175/">
@@ -92,7 +92,7 @@
 }
 </style>
   <noscript>
-    <link rel="stylesheet" href="../../css/noscript.css">
+    <link rel="stylesheet" href="/css/noscript.css">
   </noscript>
 </head>
 
@@ -130,7 +130,7 @@
 
 
 <nav class="site-nav">
-  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="../../index.html" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="../../about/" rel="section"><i class="fa fa-address-card fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="../../tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">60</span></a></li><li class="menu-item menu-item-categories"><a href="../../categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">9</span></a></li><li class="menu-item menu-item-archives"><a href="../../archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">37</span></a></li>
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-address-card fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">60</span></a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">9</span></a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">37</span></a></li>
       <li class="menu-item menu-item-search">
         <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
         </a>
@@ -188,25 +188,25 @@
         <div class="site-overview-wrap sidebar-panel">
           <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <img class="site-author-image" itemprop="image" alt="Xinlu Wang"
-      src="../../images/avatar.jpeg">
+      src="/images/avatar.jpeg">
   <p class="site-author-name" itemprop="name">Xinlu Wang</p>
   <div class="site-description" itemprop="description">不积跬步无以至千里，不积小流无以成江海</div>
 </div>
 <div class="site-state-wrap animated">
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
-        <a href="../../archives/">
+        <a href="/archives/">
           <span class="site-state-item-count">37</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
-          <a href="../../categories/">
+          <a href="/categories/">
         <span class="site-state-item-count">9</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
-          <a href="../../tags/">
+          <a href="/tags/">
         <span class="site-state-item-count">60</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
@@ -217,7 +217,7 @@
         <a href="https://github.com/chasinglulu" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;chasinglulu" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
       </span>
       <span class="links-of-author-item">
-        <a href="../../mailto:wangkart@aliyun.com" title="E-Mail → mailto:wangkart@aliyun.com" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+        <a href="mailto:wangkart@aliyun.com" title="E-Mail → mailto:wangkart@aliyun.com" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
       </span>
       <span class="links-of-author-item">
         <a href="https://weibo.com/5052275150" title="Weibo → https:&#x2F;&#x2F;weibo.com&#x2F;5052275150" rel="noopener me" target="_blank"><i class="fab fa-weibo fa-fw"></i>Weibo</a>
@@ -263,7 +263,7 @@
     <link itemprop="mainEntityOfPage" href="http://chasinglulu.github.io/posts/6c782175/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="../../images/avatar.jpeg">
+      <meta itemprop="image" content="/images/avatar.jpeg">
       <meta itemprop="name" content="Xinlu Wang">
     </span>
 
@@ -296,7 +296,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2023-11-06 20:37:42" itemprop="dateModified" datetime="2023-11-06T20:37:42+08:00">2023-11-06</time>
+      <time title="修改时间：2023-11-14 14:12:36" itemprop="dateModified" datetime="2023-11-14T14:12:36+08:00">2023-11-14</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -304,7 +304,7 @@
       </span>
       <span class="post-meta-item-text">分类于</span>
         <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="../../categories/memory-management/" itemprop="url" rel="index"><span itemprop="name">memory management</span></a>
+          <a href="/categories/memory-management/" itemprop="url" rel="index"><span itemprop="name">memory management</span></a>
         </span>
     </span>
 
@@ -324,8 +324,8 @@
     </span>
     <span class="post-meta-item-text">Waline：</span>
   
-    <a title="waline" href="#waline" itemprop="discussionUrl">
-      <span class="post-comments-count waline-comment-count" data-path="" itemprop="commentCount"></span>
+    <a title="waline" href="/posts/6c782175/#waline" itemprop="discussionUrl">
+      <span class="post-comments-count waline-comment-count" data-path="/posts/6c782175/" itemprop="commentCount"></span>
     </a>
   </span>
   
@@ -373,11 +373,11 @@
 </li>
 </ul>
 <p>如图1所示给出了memblock的内存区间类型和memblock数据结构的关系。</p>
-<p><img data-src="memblock_struct.svg" alt="memblock_struct.svg"></p>
+<p><img data-src="/images/22/memblock_struct.svg" alt="memblock_struct.svg"></p>
 <center>图1 memblock结构</center>
 
 <p>&ensp;&ensp;&ensp;&ensp;如图2所示给出了一个例子，用一个memblock_region实例描述memory类型的1GiB可用物理内存区间，并用两个memblock_region实例描述reserved类型的两个子区间，指示两个子内存区间正在被使用而保留。</p>
-<p><img data-src="memblock_config_struct.svg" alt="memblock_config_struct.svg"></p>
+<p><img data-src="/images/22/memblock_config_struct.svg" alt="memblock_config_struct.svg"></p>
 <center>图2 物理内存配置与memblock数据结构的联系</center>
 
 <p>通过下面三个表格分别说明memblock、memblock_type和memblock_region三个数据结构及其各个字段含义。</p>
@@ -402,7 +402,7 @@
 </li>
 </ul>
 <h4 id="memory-memblock添加内存区域"><a href="#memory-memblock添加内存区域" class="headerlink" title="memory memblock添加内存区域"></a>memory memblock添加内存区域</h4><p>&ensp;&ensp;&ensp;&ensp;内核通过解析DTB文件的memory节点获得可用物理内存的起始地址和大小，并能通过类memblock_add的API往memory.regions数组添加一个memblock_region实例，用于管理这个物理内存区域。不过，某些特别的体系架构还支持自动识别出已安装内存的起始地址和大小等属性。若通过解析DTB文件添加物理内存区域，memory节点的reg属性给出内存的起始地址和大小，内核执行如下的函数调用路径来完成物理内存区域的注册。如图3所示显示了解析设备树和通过memblock_add API注册物理内存区间的处理流程。</p>
-<p><img data-src="memblock_add.svg" alt="memblock_add.svg"></p>
+<p><img data-src="/images/22/memblock_add.svg" alt="memblock_add.svg"></p>
 <center>图3 memblock_add调用流程</center>
 
 <p>&ensp;&ensp;&ensp;&ensp;不管ARM还是ARM64都能够人为地限定可用物理内存的大小。在ARM64系统，若已安装DRAM的大小超过了虚拟内存的寻址界限（VA39-1，VA42-1，VA48-1等），则超过的物理内存区间目前将不能被利用。通过<code>mem=</code>内核参数能够限定可用物理内存的大小。</p>
@@ -415,7 +415,7 @@
 <li>用于CMA-DMA的内存区间</li>
 </ul>
 <p>&ensp;&ensp;&ensp;&ensp;此外，DTB文件中<code>chosen</code>节点的<code>linux,usable-memory-range</code>属性能指定可用物理内存的范围，在此范围外的物理内存区间将从memory memblock移除。如图4所示显示了arm64_memblock_init函数会预留的物理内存区间。</p>
-<p><img data-src="arm64_memblock_init.svg" alt="arm64_memblock_init.svg"></p>
+<p><img data-src="/images/22/arm64_memblock_init.svg" alt="arm64_memblock_init.svg"></p>
 <center>图4 arm64_memblock_init会预留的物理内存区间</center>
 
 <p>在arch&#x2F;arm64&#x2F;mm&#x2F;init.c中arm64_memblock_init函数（1&#x2F;2）：</p>
@@ -446,7 +446,7 @@
 <li>42行：允许memblock regions数组扩容</li>
 </ul>
 <h3 id="memblock分配"><a href="#memblock分配" class="headerlink" title="memblock分配"></a>memblock分配</h3><p>&ensp;&ensp;&ensp;&ensp;在内核启动的早期和内存热插拔「hotplug」过程都会使用涉及内存分配与释放的各种memblock API。如下图所示给出了在分配内时memblock API的调用流程。</p>
-<p><img data-src="memblock_alloc.svg" alt="memblock_alloc.svg"></p>
+<p><img data-src="/images/22/memblock_alloc.svg" alt="memblock_alloc.svg"></p>
 <center>图5 memblock_alloc的调用关系</center>
 
 <p>&ensp;&ensp;&ensp;&ensp;接下来，让我们仔细研究一下memblcok分配过程中涉及的各种函数。</p>
@@ -467,7 +467,7 @@
 <li>13～17行：如果寻找到了，将空闲内存区间插入reserved memblock，指示这段区间已被使用保留。若分配失败，返回0。</li>
 </ul>
 <p>&ensp;&ensp;&ensp;&ensp;如图6所示显示了memblock_find_in_range_node的处理流程。</p>
-<p><img data-src="memblock_find.svg" alt="memblock_find.svg"></p>
+<p><img data-src="/images/22/memblock_find.svg" alt="memblock_find.svg"></p>
 <center>图6 搜寻特定大小内存块的处理流程</center>
 
 <p><em>mm&#x2F;memblock.c</em></p>
@@ -479,18 +479,18 @@
 <li>以this_end为准线向下延伸得到一个不小于@size的子区间，并且通过向下取整的方式使其起始地址对齐@align</li>
 </ul>
 <p>&ensp;&ensp;&ensp;&ensp;如图7所示，假如在执行__memblock_find_range_top_down函数时内存已有这些使用和保留，那么在循环搜寻时会得到7个空闲内存区间，不过只有4个内存区间在要求的范围内，因此会依次从这4个内存区间寻找符合要求的子区间。 </p>
-<p><img data-src="memblock_example_iteration.svg" alt="memblock_example_iteration.svg"></p>
+<p><img data-src="/images/22/memblock_example_iteration.svg" alt="memblock_example_iteration.svg"></p>
 <center>图7 memblock iteration example</center>
 
 <p>&ensp;&ensp;&ensp;&ensp;若不考虑内存节点属性，使用下面函数直接将一个基地址（base）和区间长度（size）给定的内存区间加入reserved memblock。<br><em>mm&#x2F;memblock.c</em></p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> __init_memblock <span class="title function_">memblock_reserve</span><span class="params">(<span class="type">phys_addr_t</span> base, <span class="type">phys_addr_t</span> size)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="type">phys_addr_t</span> end = base + size - <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">	memblock_dbg(<span class="string">&quot;memblock_reserve: [%pa-%pa] %pF\n&quot;</span>,</span><br><span class="line">		     &amp;base, &amp;end, (<span class="type">void</span> *)_RET_IP_);</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> memblock_add_range(&amp;memblock.reserved, base, size, MAX_NUMNODES, <span class="number">0</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <h3 id="memblock增添"><a href="#memblock增添" class="headerlink" title="memblock增添"></a>memblock增添</h3><p>&ensp;&ensp;&ensp;&ensp;memblock_add函数只能用于非NUMA系统添加可用物理内存。NUMA系统需要使用具有nid参数的memblock_add_node函数添加NUMA节点中可用物理内存。尽管在设计芯片时会考虑绝不让各个物理内存区域互相重叠，但是可能存在例外情况，并不能保证注册的内存区域一定不与已注册的内存区域出现重叠。如图8所示显示了向memory memblock添加可用物理内存区域的处理流程。</p>
-<p><img data-src="memblock_add_node.svg" alt="memblock_add_node.svg"></p>
+<p><img data-src="/images/22/memblock_add_node.svg" alt="memblock_add_node.svg"></p>
 <center>图8 memblock添加的处理流程</center>
 
 <p>&ensp;&ensp;&ensp;&ensp;如图9所示，如果不考虑区间的内存节点属性，当在插入新的内存区域时有可能与已有区间重叠，这时会出现memblock的第一种合并。</p>
-<p><img data-src="memblock_merge.svg" alt="memblock_merge.svg"></p>
+<p><img data-src="/images/22/memblock_merge.svg" alt="memblock_merge.svg"></p>
 <center>图9 第一种memblock合并</center>
 
 <h4 id="memblock-add-向memory-memblock添加内存区域"><a href="#memblock-add-向memory-memblock添加内存区域" class="headerlink" title="memblock_add: 向memory memblock添加内存区域"></a>memblock_add: 向memory memblock添加内存区域</h4><p>&ensp;&ensp;&ensp;&ensp;由于这个函数只用于注册UMA系统中可用物理内存，因此不必设置描述内存区间的所有属性。只需设置base和size来指定起始物理地址和区间长度，区间所属的内存节点nid默认地设定为MAX_NUMNODES，以及区间flags默认地设为0，指示区间无任何特殊要求。</p>
@@ -554,11 +554,11 @@
 <li>19行：若确定这对区间符合限定条件，合并它们。</li>
 </ul>
 <p>如图10所示，除非具有不同的nid或flags属性，否则相邻的多个区间将被合并。</p>
-<p><img data-src="memblock_merge_II.svg" alt="memblock_merge_II.svg"></p>
+<p><img data-src="/images/22/memblock_merge_II.svg" alt="memblock_merge_II.svg"></p>
 <center>图10 第二种memblock合并</center>
 
 <h3 id="memblock删除"><a href="#memblock删除" class="headerlink" title="memblock删除"></a>memblock删除</h3><p>&ensp;&ensp;&ensp;&ensp;当调用memblock_free和memblock_remove函数时，会执行如图11所示的处理流程。</p>
-<p><img data-src="memblock_remove.svg" alt="memblock_remove.svg"></p>
+<p><img data-src="/images/22/memblock_remove.svg" alt="memblock_remove.svg"></p>
 <center>图11 memblock_remove函数的执行流程</center>
 
 <h4 id="memblock-free函数：从reserved-memblock中移除一个内存区间"><a href="#memblock-free函数：从reserved-memblock中移除一个内存区间" class="headerlink" title="memblock_free函数：从reserved memblock中移除一个内存区间"></a>memblock_free函数：从reserved memblock中移除一个内存区间</h4><p>&ensp;&ensp;&ensp;&ensp;如果memblock_free函数被调用，则调用memblock_remove_range函数将由起始物理地址base和区间长度size限定的内存区间从reserved memblock中删除。</p>
@@ -590,7 +590,7 @@
 <li>39行：如果当前区间的结束物理地址大于请求区间的结束物理地址，也就是说，请求区间的结束物理地址位于当前区间内，两者出现重叠子区间，则按如下方式处理：（如下图所示的条件D）：<br>首先以end为分界线从当前区间分离出非重叠的上半部子区间，并且将上半部区间向上移动一个索引位置，其次将包含重叠的下半部区间重新插入在给定memblock的当前索引位置，而且索引值idx减1。因此，这样也会将当前区间拆分出两个子区间。</li>
 <li>50行：由于不满足上面任何一个条件，所以当前区间被包含于请求区间。在这种情况下，只有end_rgn还未更新，start_rgn才记录当前区间的索引值，但无论如何都会用当前索引值 + 1更新end_rgn。</li>
 </ul>
-<p><img data-src="memblock_isolate_range.svg" alt="memblock_isolate_range.svg"></p>
+<p><img data-src="/images/22/memblock_isolate_range.svg" alt="memblock_isolate_range.svg"></p>
 <center>图12 memblock_isolate_range函数的执行流程</center>
 
 <h4 id="memblock-remove-region函数：从具体memblock中删除指定区间"><a href="#memblock-remove-region函数：从具体memblock中删除指定区间" class="headerlink" title="memblock_remove_region函数：从具体memblock中删除指定区间"></a>memblock_remove_region函数：从具体memblock中删除指定区间</h4><p>&ensp;&ensp;&ensp;&ensp;从给定类型的memblock中删除指定索引位置的区间。</p>
@@ -622,11 +622,11 @@
   </button>
   <div class="post-reward">
       <div>
-        <img src="../../images/wechatpay.png" alt="Xinlu Wang 微信">
+        <img src="/images/wechatpay.png" alt="Xinlu Wang 微信">
         <span>微信</span>
       </div>
       <div>
-        <img src="../../images/alipay.jpg" alt="Xinlu Wang 支付宝">
+        <img src="/images/alipay.jpg" alt="Xinlu Wang 支付宝">
         <span>支付宝</span>
       </div>
 
@@ -651,19 +651,19 @@
 </div>
 
           <div class="post-tags">
-              <a href="../../tags/memblock/" rel="tag"><i class="fa fa-tag"></i> memblock</a>
+              <a href="/tags/memblock/" rel="tag"><i class="fa fa-tag"></i> memblock</a>
           </div>
 
         
 
           <div class="post-nav">
             <div class="post-nav-item">
-                <a href="../e5da93df/" rel="prev" title="关于Exynos4412 SoC的启动分析">
+                <a href="/posts/e5da93df/" rel="prev" title="关于Exynos4412 SoC的启动分析">
                   <i class="fa fa-angle-left"></i> 关于Exynos4412 SoC的启动分析
                 </a>
             </div>
             <div class="post-nav-item">
-                <a href="../dae1ffea/" rel="next" title="内存模型「memory model」">
+                <a href="/posts/dae1ffea/" rel="next" title="内存模型「memory model」">
                   内存模型「memory model」 <i class="fa fa-angle-right"></i>
                 </a>
             </div>
@@ -739,10 +739,10 @@
   <script size="300" alpha="0.6" zIndex="-1" src="https://cdnjs.cloudflare.com/ajax/libs/ribbon.js/1.0.2/ribbon.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/lozad.js/1.16.0/lozad.min.js" integrity="sha256-mOFREFhqmHeQbXpK2lp4nA3qooVgACfh88fpJftLBbc=" crossorigin="anonymous"></script>
-<script src="../../js/comments.js"></script><script src="../../js/utils.js"></script><script src="../../js/motion.js"></script><script src="../../js/schemes/muse.js"></script><script src="../../js/next-boot.js"></script><script src="../../js/bookmark.js"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script><script src="/js/bookmark.js"></script>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
-<script src="../../js/third-party/search/local-search.js"></script>
+<script src="/js/third-party/search/local-search.js"></script>
 
 
 
@@ -758,8 +758,8 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/quicklink/2.3.0/quicklink.umd.js" integrity="sha256-yvJQOINiH9fWemHn0vCA5lsHWJaHs6/ZmO+1Ft04SvM=" crossorigin="anonymous"></script>
   <script class="next-config" data-name="quicklink" type="application/json">{"enable":true,"home":false,"archive":false,"delay":true,"timeout":3000,"priority":true,"url":"http://chasinglulu.github.io/posts/6c782175/"}</script>
-  <script src="../../js/third-party/quicklink.js"></script>
-<script class="next-config" data-name="waline" type="application/json">{"lang":"zh-cn","enable":true,"serverURL":"waline-server-weld-five.vercel.app","cssUrl":"https://unpkg.com/@waline/client@v2/dist/waline.css","commentCount":true,"pageview":false,"placeholder":"请文明评论呀","avatar":"mm","meta":["nick","mail","link"],"pageSize":10,"visitor":true,"comment_count":true,"requiredFields":[],"libUrl":"//unpkg.com/@waline/client@v2/dist/waline.js","el":"#waline","comment":true,"path":""}</script>
+  <script src="/js/third-party/quicklink.js"></script>
+<script class="next-config" data-name="waline" type="application/json">{"lang":"zh-cn","enable":true,"serverURL":"waline-server-weld-five.vercel.app","cssUrl":"https://unpkg.com/@waline/client@v2/dist/waline.css","commentCount":true,"pageview":false,"placeholder":"请文明评论呀","avatar":"mm","meta":["nick","mail","link"],"pageSize":10,"visitor":true,"comment_count":true,"requiredFields":[],"libUrl":"//unpkg.com/@waline/client@v2/dist/waline.js","el":"#waline","comment":true,"path":"/posts/6c782175/"}</script>
 <link rel="stylesheet" href="https://unpkg.com/@waline/client@v2/dist/waline.css">
 <script>
 document.addEventListener('page:loaded', () => {

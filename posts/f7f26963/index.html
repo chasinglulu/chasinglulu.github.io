@@ -6,20 +6,20 @@
 <meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.0.0">
 <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
 <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
-  <link rel="apple-touch-icon" sizes="180x180" href="../../images/apple-touch-icon-next.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="../../images/blog.svg">
-  <link rel="icon" type="image/png" sizes="16x16" href="../../images/blog.svg">
-  <link rel="mask-icon" href="../../images/logo.svg" color="#222">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/blog.svg">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/blog.svg">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
   <meta name="google-site-verification" content="vuSkRYPVceK1DXhqZWm7wVxYV4YmmnI1Dv_C1M8rJJM">
 
-<link rel="stylesheet" href="../../css/main.css">
+<link rel="stylesheet" href="/css/main.css">
 
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Georgia:300,300italic,400,400italic,700,700italic%7CTimes+New+Roman:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha256-CTSx/A06dm1B063156EVh15m6Y67pAjZZaQc89LLSrU=" crossorigin="anonymous">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
 
-<script class="next-config" data-name="main" type="application/json">{"hostname":"chasinglulu.github.io","root":"/","images":"../../images","scheme":"Mist","darkmode":false,"version":"8.18.2","exturl":false,"sidebar":{"position":"right","display":"hide","padding":18,"offset":12},"copycode":{"enable":true,"style":"mac"},"fold":{"enable":true,"height":500},"bookmark":{"enable":true,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"../../search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="../../js/config.js"></script>
+<script class="next-config" data-name="main" type="application/json">{"hostname":"chasinglulu.github.io","root":"/","images":"/images","scheme":"Mist","darkmode":false,"version":"8.18.2","exturl":false,"sidebar":{"position":"right","display":"hide","padding":18,"offset":12},"copycode":{"enable":true,"style":"mac"},"fold":{"enable":true,"height":500},"bookmark":{"enable":true,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
 
     <meta name="description" content="percpu变量指的是为每个CPU都创建一个同样的变量，也就是为每个CPU分配一份单独的内存空间，用来保存各自私有的数据。在SMP「Symmetry Multi-Processor」系统中，为了确保多个CPU能够正确地访问同一个资源，同步机制是必不可少的，比如缓存一致性「cache coherence」和自旋锁「spinlock」。但是通过使用percpu变量，内核能够使每个CPU只访问自己私有的">
 <meta property="og:type" content="article">
@@ -28,24 +28,24 @@
 <meta property="og:site_name" content="点滴汇聚">
 <meta property="og:description" content="percpu变量指的是为每个CPU都创建一个同样的变量，也就是为每个CPU分配一份单独的内存空间，用来保存各自私有的数据。在SMP「Symmetry Multi-Processor」系统中，为了确保多个CPU能够正确地访问同一个资源，同步机制是必不可少的，比如缓存一致性「cache coherence」和自旋锁「spinlock」。但是通过使用percpu变量，内核能够使每个CPU只访问自己私有的">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://chasinglulu.github.io/posts/f7f26963/percpu_count.svg">
-<meta property="og:image" content="http://chasinglulu.github.io/posts/f7f26963/percpu_unit_size.svg">
-<meta property="og:image" content="http://chasinglulu.github.io/posts/f7f26963/percpu_chunck_layout.svg">
-<meta property="og:image" content="http://chasinglulu.github.io/posts/f7f26963/percpu_unit_map.svg">
-<meta property="og:image" content="http://chasinglulu.github.io/posts/f7f26963/percpu_unit_offset.svg">
-<meta property="og:image" content="http://chasinglulu.github.io/posts/f7f26963/percpu_alloc_info.jpg">
-<meta property="og:image" content="http://chasinglulu.github.io/posts/f7f26963/pcpu_cpu_to_unit.svg">
-<meta property="og:image" content="http://chasinglulu.github.io/posts/f7f26963/pcpu_chunk_config.svg">
-<meta property="og:image" content="http://chasinglulu.github.io/posts/f7f26963/percpu_base_addr_location.svg">
-<meta property="og:image" content="http://chasinglulu.github.io/posts/f7f26963/percpu_first_chunk.svg">
-<meta property="og:image" content="http://chasinglulu.github.io/posts/f7f26963/percpu_mapping_management.svg">
+<meta property="og:image" content="http://chasinglulu.github.io/images/09/percpu_count.svg">
+<meta property="og:image" content="http://chasinglulu.github.io/images/09/percpu_unit_size.svg">
+<meta property="og:image" content="http://chasinglulu.github.io/images/09/percpu_chunck_layout.svg">
+<meta property="og:image" content="http://chasinglulu.github.io/images/09/percpu_unit_map.svg">
+<meta property="og:image" content="http://chasinglulu.github.io/images/09/percpu_unit_offset.svg">
+<meta property="og:image" content="http://chasinglulu.github.io/images/09/percpu_alloc_info.jpg">
+<meta property="og:image" content="http://chasinglulu.github.io/images/09/pcpu_cpu_to_unit.svg">
+<meta property="og:image" content="http://chasinglulu.github.io/images/09/pcpu_chunk_config.svg">
+<meta property="og:image" content="http://chasinglulu.github.io/images/09/percpu_base_addr_location.svg">
+<meta property="og:image" content="http://chasinglulu.github.io/images/09/percpu_first_chunk.svg">
+<meta property="og:image" content="http://chasinglulu.github.io/images/09/percpu_mapping_management.svg">
 <meta property="article:published_time" content="2019-08-10T14:30:55.000Z">
-<meta property="article:modified_time" content="2023-11-06T12:37:42.972Z">
+<meta property="article:modified_time" content="2023-11-14T05:56:40.258Z">
 <meta property="article:author" content="Xinlu Wang">
 <meta property="article:tag" content="memory allocator">
 <meta property="article:tag" content="percpu">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http://chasinglulu.github.io/posts/f7f26963/percpu_count.svg">
+<meta name="twitter:image" content="http://chasinglulu.github.io/images/09/percpu_count.svg">
 
 
 <link rel="canonical" href="http://chasinglulu.github.io/posts/f7f26963/">
@@ -92,7 +92,7 @@
 }
 </style>
   <noscript>
-    <link rel="stylesheet" href="../../css/noscript.css">
+    <link rel="stylesheet" href="/css/noscript.css">
   </noscript>
 </head>
 
@@ -130,7 +130,7 @@
 
 
 <nav class="site-nav">
-  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="../../index.html" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="../../about/" rel="section"><i class="fa fa-address-card fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="../../tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">60</span></a></li><li class="menu-item menu-item-categories"><a href="../../categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">9</span></a></li><li class="menu-item menu-item-archives"><a href="../../archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">37</span></a></li>
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-address-card fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">60</span></a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">9</span></a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">37</span></a></li>
       <li class="menu-item menu-item-search">
         <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
         </a>
@@ -188,25 +188,25 @@
         <div class="site-overview-wrap sidebar-panel">
           <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <img class="site-author-image" itemprop="image" alt="Xinlu Wang"
-      src="../../images/avatar.jpeg">
+      src="/images/avatar.jpeg">
   <p class="site-author-name" itemprop="name">Xinlu Wang</p>
   <div class="site-description" itemprop="description">不积跬步无以至千里，不积小流无以成江海</div>
 </div>
 <div class="site-state-wrap animated">
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
-        <a href="../../archives/">
+        <a href="/archives/">
           <span class="site-state-item-count">37</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
-          <a href="../../categories/">
+          <a href="/categories/">
         <span class="site-state-item-count">9</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
-          <a href="../../tags/">
+          <a href="/tags/">
         <span class="site-state-item-count">60</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
@@ -217,7 +217,7 @@
         <a href="https://github.com/chasinglulu" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;chasinglulu" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
       </span>
       <span class="links-of-author-item">
-        <a href="../../mailto:wangkart@aliyun.com" title="E-Mail → mailto:wangkart@aliyun.com" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+        <a href="mailto:wangkart@aliyun.com" title="E-Mail → mailto:wangkart@aliyun.com" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
       </span>
       <span class="links-of-author-item">
         <a href="https://weibo.com/5052275150" title="Weibo → https:&#x2F;&#x2F;weibo.com&#x2F;5052275150" rel="noopener me" target="_blank"><i class="fab fa-weibo fa-fw"></i>Weibo</a>
@@ -263,7 +263,7 @@
     <link itemprop="mainEntityOfPage" href="http://chasinglulu.github.io/posts/f7f26963/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="../../images/avatar.jpeg">
+      <meta itemprop="image" content="/images/avatar.jpeg">
       <meta itemprop="name" content="Xinlu Wang">
     </span>
 
@@ -296,7 +296,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2023-11-06 20:37:42" itemprop="dateModified" datetime="2023-11-06T20:37:42+08:00">2023-11-06</time>
+      <time title="修改时间：2023-11-14 13:56:40" itemprop="dateModified" datetime="2023-11-14T13:56:40+08:00">2023-11-14</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -304,7 +304,7 @@
       </span>
       <span class="post-meta-item-text">分类于</span>
         <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="../../categories/memory-management/" itemprop="url" rel="index"><span itemprop="name">memory management</span></a>
+          <a href="/categories/memory-management/" itemprop="url" rel="index"><span itemprop="name">memory management</span></a>
         </span>
     </span>
 
@@ -324,8 +324,8 @@
     </span>
     <span class="post-meta-item-text">Waline：</span>
   
-    <a title="waline" href="#waline" itemprop="discussionUrl">
-      <span class="post-comments-count waline-comment-count" data-path="" itemprop="commentCount"></span>
+    <a title="waline" href="/posts/f7f26963/#waline" itemprop="discussionUrl">
+      <span class="post-comments-count waline-comment-count" data-path="/posts/f7f26963/" itemprop="commentCount"></span>
     </a>
   </span>
   
@@ -365,37 +365,37 @@
 <hr>
 <h4 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h4><p>percpu是一种内存管理机制，它不仅能为每个CPU私有的变量分配内存空间，并且对percpu变量所用的内存空间进行集中统一管理。通过使用每个CPU自己的单独内存空间，内核既能够避免多CPU并发访问需要的锁机制不仅能够提高系统的性能，还能够改善处理器（CPU）的缓存命中率「cache hit rate」。</p>
 <h5 id="percpu机制主要特点"><a href="#percpu机制主要特点" class="headerlink" title="percpu机制主要特点"></a>percpu机制主要特点</h5><p>percpu内存管理机制是在内核2.6版本引入的。在SMP系统中，如果只访问CPU私有的数据，那么将极大减少对同步机制的依赖。为此，内核可以借助percpu机制在其管理的区域「percpu chunk」内为每个CPU分配一段内存空间，用于保存各自私有的数据，也就是每个CPU都有一份自己的数据副本。当你想在不使用锁机制的情况实现大量的写操作时，percpu机制在设计阶段就应该首先考虑进去。不过，percpu机制不是无条件的，在使用时还是需要考虑中断和内核抢占时的保护任务。不管怎样，percpu机制在内核被广泛使用，比如网络报文统计、磁盘IO统计和内核对象计数等。由于不需要使用锁机制，所以在需要完成每秒上千次的数据更新时percpu机制的性能还是有大幅提升和改进的。</p>
-<p><img data-src="percpu_count.svg" alt="percpu_count.svg"></p>
+<p><img data-src="/images/09/percpu_count.svg" alt="percpu_count.svg"></p>
 <center>图1 percpu count</center>
 
-<p><img data-src="percpu_unit_size.svg" alt="percpu_unit_size.svg"></p>
+<p><img data-src="/images/09/percpu_unit_size.svg" alt="percpu_unit_size.svg"></p>
 <center>图2 percpu chunck</center>
 
-<p><img data-src="percpu_chunck_layout.svg" alt="percpu_chunck_layout.svg"></p>
+<p><img data-src="/images/09/percpu_chunck_layout.svg" alt="percpu_chunck_layout.svg"></p>
 <center>图3 percpu chunck layout</center>
 
-<p><img data-src="percpu_unit_map.svg" alt="percpu_unit_map.svg"></p>
+<p><img data-src="/images/09/percpu_unit_map.svg" alt="percpu_unit_map.svg"></p>
 <center>图4 数组pcpu_unit_map[]</center>
 
-<p><img data-src="percpu_unit_offset.svg" alt="percpu_unit_offset.svg"></p>
+<p><img data-src="/images/09/percpu_unit_offset.svg" alt="percpu_unit_offset.svg"></p>
 <center>图5 数组pcpu_unit_offsets[]</center>
 
-<p><img data-src="percpu_alloc_info.jpg" alt="percpu_alloc_info.jpg"></p>
+<p><img data-src="/images/09/percpu_alloc_info.jpg" alt="percpu_alloc_info.jpg"></p>
 <center>图6 设置struct pcpu_alloc_info实例</center>
 
-<p><img data-src="pcpu_cpu_to_unit.svg" alt="pcpu_cpu_to_unit.svg"></p>
+<p><img data-src="/images/09/pcpu_cpu_to_unit.svg" alt="pcpu_cpu_to_unit.svg"></p>
 <center>图7 cpu->unit映射</center>
 
-<p><img data-src="pcpu_chunk_config.svg" alt="pcpu_chunk_configuration.svg"></p>
+<p><img data-src="/images/09/pcpu_chunk_config.svg" alt="pcpu_chunk_configuration.svg"></p>
 <center>图8 chunk配置</center>
 
-<p><img data-src="percpu_base_addr_location.svg" alt="percpu_base_addr_location.svg"></p>
+<p><img data-src="/images/09/percpu_base_addr_location.svg" alt="percpu_base_addr_location.svg"></p>
 <center>图9 pcpu_base_addr定位</center>
 
-<p><img data-src="percpu_first_chunk.svg" alt="percpu_first_chunk.svg"></p>
+<p><img data-src="/images/09/percpu_first_chunk.svg" alt="percpu_first_chunk.svg"></p>
 <center>图10 first chunk与unit的关系</center>
 
-<p><img data-src="percpu_mapping_management.svg" alt="percpu_mapping_management.svg"></p>
+<p><img data-src="/images/09/percpu_mapping_management.svg" alt="percpu_mapping_management.svg"></p>
 <center>图11 first chunk的地址空间映射</center>
     </div>
 
@@ -417,11 +417,11 @@
   </button>
   <div class="post-reward">
       <div>
-        <img src="../../images/wechatpay.png" alt="Xinlu Wang 微信">
+        <img src="/images/wechatpay.png" alt="Xinlu Wang 微信">
         <span>微信</span>
       </div>
       <div>
-        <img src="../../images/alipay.jpg" alt="Xinlu Wang 支付宝">
+        <img src="/images/alipay.jpg" alt="Xinlu Wang 支付宝">
         <span>支付宝</span>
       </div>
 
@@ -446,20 +446,20 @@
 </div>
 
           <div class="post-tags">
-              <a href="../../tags/memory-allocator/" rel="tag"><i class="fa fa-tag"></i> memory allocator</a>
-              <a href="../../tags/percpu/" rel="tag"><i class="fa fa-tag"></i> percpu</a>
+              <a href="/tags/memory-allocator/" rel="tag"><i class="fa fa-tag"></i> memory allocator</a>
+              <a href="/tags/percpu/" rel="tag"><i class="fa fa-tag"></i> percpu</a>
           </div>
 
         
 
           <div class="post-nav">
             <div class="post-nav-item">
-                <a href="../d9f20f58/" rel="prev" title="利用Qemu-4.0虚拟ARM64实验平台">
+                <a href="/posts/d9f20f58/" rel="prev" title="利用Qemu-4.0虚拟ARM64实验平台">
                   <i class="fa fa-angle-left"></i> 利用Qemu-4.0虚拟ARM64实验平台
                 </a>
             </div>
             <div class="post-nav-item">
-                <a href="../96d82d1e/" rel="next" title="基于Exynos4412开发板的uboot-2019.07移植">
+                <a href="/posts/96d82d1e/" rel="next" title="基于Exynos4412开发板的uboot-2019.07移植">
                   基于Exynos4412开发板的uboot-2019.07移植 <i class="fa fa-angle-right"></i>
                 </a>
             </div>
@@ -535,10 +535,10 @@
   <script size="300" alpha="0.6" zIndex="-1" src="https://cdnjs.cloudflare.com/ajax/libs/ribbon.js/1.0.2/ribbon.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/lozad.js/1.16.0/lozad.min.js" integrity="sha256-mOFREFhqmHeQbXpK2lp4nA3qooVgACfh88fpJftLBbc=" crossorigin="anonymous"></script>
-<script src="../../js/comments.js"></script><script src="../../js/utils.js"></script><script src="../../js/motion.js"></script><script src="../../js/schemes/muse.js"></script><script src="../../js/next-boot.js"></script><script src="../../js/bookmark.js"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script><script src="/js/bookmark.js"></script>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
-<script src="../../js/third-party/search/local-search.js"></script>
+<script src="/js/third-party/search/local-search.js"></script>
 
 
 
@@ -554,8 +554,8 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/quicklink/2.3.0/quicklink.umd.js" integrity="sha256-yvJQOINiH9fWemHn0vCA5lsHWJaHs6/ZmO+1Ft04SvM=" crossorigin="anonymous"></script>
   <script class="next-config" data-name="quicklink" type="application/json">{"enable":true,"home":false,"archive":false,"delay":true,"timeout":3000,"priority":true,"url":"http://chasinglulu.github.io/posts/f7f26963/"}</script>
-  <script src="../../js/third-party/quicklink.js"></script>
-<script class="next-config" data-name="waline" type="application/json">{"lang":"zh-cn","enable":true,"serverURL":"waline-server-weld-five.vercel.app","cssUrl":"https://unpkg.com/@waline/client@v2/dist/waline.css","commentCount":true,"pageview":false,"placeholder":"请文明评论呀","avatar":"mm","meta":["nick","mail","link"],"pageSize":10,"visitor":true,"comment_count":true,"requiredFields":[],"libUrl":"//unpkg.com/@waline/client@v2/dist/waline.js","el":"#waline","comment":true,"path":""}</script>
+  <script src="/js/third-party/quicklink.js"></script>
+<script class="next-config" data-name="waline" type="application/json">{"lang":"zh-cn","enable":true,"serverURL":"waline-server-weld-five.vercel.app","cssUrl":"https://unpkg.com/@waline/client@v2/dist/waline.css","commentCount":true,"pageview":false,"placeholder":"请文明评论呀","avatar":"mm","meta":["nick","mail","link"],"pageSize":10,"visitor":true,"comment_count":true,"requiredFields":[],"libUrl":"//unpkg.com/@waline/client@v2/dist/waline.js","el":"#waline","comment":true,"path":"/posts/f7f26963/"}</script>
 <link rel="stylesheet" href="https://unpkg.com/@waline/client@v2/dist/waline.css">
 <script>
 document.addEventListener('page:loaded', () => {

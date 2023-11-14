@@ -6,20 +6,20 @@
 <meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.0.0">
 <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
 <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
-  <link rel="apple-touch-icon" sizes="180x180" href="../../images/apple-touch-icon-next.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="../../images/blog.svg">
-  <link rel="icon" type="image/png" sizes="16x16" href="../../images/blog.svg">
-  <link rel="mask-icon" href="../../images/logo.svg" color="#222">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/blog.svg">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/blog.svg">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
   <meta name="google-site-verification" content="vuSkRYPVceK1DXhqZWm7wVxYV4YmmnI1Dv_C1M8rJJM">
 
-<link rel="stylesheet" href="../../css/main.css">
+<link rel="stylesheet" href="/css/main.css">
 
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Georgia:300,300italic,400,400italic,700,700italic%7CTimes+New+Roman:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha256-CTSx/A06dm1B063156EVh15m6Y67pAjZZaQc89LLSrU=" crossorigin="anonymous">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
 
-<script class="next-config" data-name="main" type="application/json">{"hostname":"chasinglulu.github.io","root":"/","images":"../../images","scheme":"Mist","darkmode":false,"version":"8.18.2","exturl":false,"sidebar":{"position":"right","display":"hide","padding":18,"offset":12},"copycode":{"enable":true,"style":"mac"},"fold":{"enable":true,"height":500},"bookmark":{"enable":true,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"../../search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="../../js/config.js"></script>
+<script class="next-config" data-name="main" type="application/json">{"hostname":"chasinglulu.github.io","root":"/","images":"/images","scheme":"Mist","darkmode":false,"version":"8.18.2","exturl":false,"sidebar":{"position":"right","display":"hide","padding":18,"offset":12},"copycode":{"enable":true,"style":"mac"},"fold":{"enable":true,"height":500},"bookmark":{"enable":true,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
 
     <meta name="description" content="在无aarch64开发板的情况下，为了能够学习实验aarch64相关的代码，通过Qemu模拟器搭建aarch64运行环境，这样就能完全达到实验学习的目的，既节省了硬件成本又便于实验操作。本文记录一下环境的搭建过程和小坑，方便以后自己快速搭建调试环境。">
 <meta property="og:type" content="article">
@@ -28,21 +28,21 @@
 <meta property="og:site_name" content="点滴汇聚">
 <meta property="og:description" content="在无aarch64开发板的情况下，为了能够学习实验aarch64相关的代码，通过Qemu模拟器搭建aarch64运行环境，这样就能完全达到实验学习的目的，既节省了硬件成本又便于实验操作。本文记录一下环境的搭建过程和小坑，方便以后自己快速搭建调试环境。">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://chasinglulu.github.io/posts/d9f20f58/output.jpeg">
-<meta property="og:image" content="http://chasinglulu.github.io/posts/d9f20f58/update-binfmt.jpeg">
-<meta property="og:image" content="http://chasinglulu.github.io/posts/d9f20f58/ubuntu-rootfs.jpeg">
-<meta property="og:image" content="http://chasinglulu.github.io/posts/d9f20f58/hangdown.jpeg">
-<meta property="og:image" content="http://chasinglulu.github.io/posts/d9f20f58/modify.jpeg">
-<meta property="og:image" content="http://chasinglulu.github.io/posts/d9f20f58/menuconfig.jpeg">
-<meta property="og:image" content="http://chasinglulu.github.io/posts/d9f20f58/busybox-output.jpeg">
-<meta property="og:image" content="http://chasinglulu.github.io/posts/d9f20f58/initramfs.jpeg">
+<meta property="og:image" content="http://chasinglulu.github.io/images/17/output.jpeg">
+<meta property="og:image" content="http://chasinglulu.github.io/images/17/update-binfmt.jpeg">
+<meta property="og:image" content="http://chasinglulu.github.io/images/17/ubuntu-rootfs.jpeg">
+<meta property="og:image" content="http://chasinglulu.github.io/images/17/hangdown.jpeg">
+<meta property="og:image" content="http://chasinglulu.github.io/images/17/modify.jpeg">
+<meta property="og:image" content="http://chasinglulu.github.io/images/17/menuconfig.jpeg">
+<meta property="og:image" content="http://chasinglulu.github.io/images/17/busybox-output.jpeg">
+<meta property="og:image" content="http://chasinglulu.github.io/images/17/initramfs.jpeg">
 <meta property="article:published_time" content="2019-07-27T04:22:03.000Z">
-<meta property="article:modified_time" content="2023-11-06T12:37:42.980Z">
+<meta property="article:modified_time" content="2023-11-14T06:07:10.514Z">
 <meta property="article:author" content="Xinlu Wang">
 <meta property="article:tag" content="aarch64">
 <meta property="article:tag" content="qemu">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http://chasinglulu.github.io/posts/d9f20f58/output.jpeg">
+<meta name="twitter:image" content="http://chasinglulu.github.io/images/17/output.jpeg">
 
 
 <link rel="canonical" href="http://chasinglulu.github.io/posts/d9f20f58/">
@@ -89,7 +89,7 @@
 }
 </style>
   <noscript>
-    <link rel="stylesheet" href="../../css/noscript.css">
+    <link rel="stylesheet" href="/css/noscript.css">
   </noscript>
 </head>
 
@@ -127,7 +127,7 @@
 
 
 <nav class="site-nav">
-  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="../../index.html" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="../../about/" rel="section"><i class="fa fa-address-card fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="../../tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">60</span></a></li><li class="menu-item menu-item-categories"><a href="../../categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">9</span></a></li><li class="menu-item menu-item-archives"><a href="../../archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">37</span></a></li>
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-address-card fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">60</span></a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">9</span></a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">37</span></a></li>
       <li class="menu-item menu-item-search">
         <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
         </a>
@@ -185,25 +185,25 @@
         <div class="site-overview-wrap sidebar-panel">
           <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <img class="site-author-image" itemprop="image" alt="Xinlu Wang"
-      src="../../images/avatar.jpeg">
+      src="/images/avatar.jpeg">
   <p class="site-author-name" itemprop="name">Xinlu Wang</p>
   <div class="site-description" itemprop="description">不积跬步无以至千里，不积小流无以成江海</div>
 </div>
 <div class="site-state-wrap animated">
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
-        <a href="../../archives/">
+        <a href="/archives/">
           <span class="site-state-item-count">37</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
-          <a href="../../categories/">
+          <a href="/categories/">
         <span class="site-state-item-count">9</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
-          <a href="../../tags/">
+          <a href="/tags/">
         <span class="site-state-item-count">60</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
@@ -214,7 +214,7 @@
         <a href="https://github.com/chasinglulu" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;chasinglulu" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
       </span>
       <span class="links-of-author-item">
-        <a href="../../mailto:wangkart@aliyun.com" title="E-Mail → mailto:wangkart@aliyun.com" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+        <a href="mailto:wangkart@aliyun.com" title="E-Mail → mailto:wangkart@aliyun.com" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
       </span>
       <span class="links-of-author-item">
         <a href="https://weibo.com/5052275150" title="Weibo → https:&#x2F;&#x2F;weibo.com&#x2F;5052275150" rel="noopener me" target="_blank"><i class="fab fa-weibo fa-fw"></i>Weibo</a>
@@ -260,7 +260,7 @@
     <link itemprop="mainEntityOfPage" href="http://chasinglulu.github.io/posts/d9f20f58/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="../../images/avatar.jpeg">
+      <meta itemprop="image" content="/images/avatar.jpeg">
       <meta itemprop="name" content="Xinlu Wang">
     </span>
 
@@ -293,7 +293,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2023-11-06 20:37:42" itemprop="dateModified" datetime="2023-11-06T20:37:42+08:00">2023-11-06</time>
+      <time title="修改时间：2023-11-14 14:07:10" itemprop="dateModified" datetime="2023-11-14T14:07:10+08:00">2023-11-14</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -301,7 +301,7 @@
       </span>
       <span class="post-meta-item-text">分类于</span>
         <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="../../categories/tools/" itemprop="url" rel="index"><span itemprop="name">tools</span></a>
+          <a href="/categories/tools/" itemprop="url" rel="index"><span itemprop="name">tools</span></a>
         </span>
     </span>
 
@@ -321,8 +321,8 @@
     </span>
     <span class="post-meta-item-text">Waline：</span>
   
-    <a title="waline" href="#waline" itemprop="discussionUrl">
-      <span class="post-comments-count waline-comment-count" data-path="" itemprop="commentCount"></span>
+    <a title="waline" href="/posts/d9f20f58/#waline" itemprop="discussionUrl">
+      <span class="post-comments-count waline-comment-count" data-path="/posts/d9f20f58/" itemprop="commentCount"></span>
     </a>
   </span>
   
@@ -378,7 +378,7 @@
 <li>-smp 指定对称多处理的核心数</li>
 <li>-append 指定内核启动时使用的命令行参数「cmdline」</li>
 </ul>
-<p><img data-src="output.jpeg" alt="output"></p>
+<p><img data-src="/images/17/output.jpeg" alt="output"></p>
 <center>图1 无根文件系统的情况下模拟运行的输出</center>
 
 <p>由于缺少根文件系统，虚拟aarch64平台还未能正常启动。<br>按Ctrl+A+X组合键退出qemu模拟器<br>按Ctrl+A+C组合键进入qemu-monitor，输入help可以查看操作命令</p>
@@ -388,7 +388,7 @@
 </li>
 <li><p>检验</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">update-binfmts --display</span><br></pre></td></tr></table></figure>
-<p><img data-src="update-binfmt.jpeg" alt="update-binfmts"></p>
+<p><img data-src="/images/17/update-binfmt.jpeg" alt="update-binfmts"></p>
 <center>图2 运行update-binfmts的输出</center></li>
 </ul>
 <p><strong>制作步骤</strong></p>
@@ -397,11 +397,11 @@
 <p><strong>模拟运行验证</strong></p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">qemu-system-aarch64 -machine virt,gic_version=3 -machine virtualization=<span class="literal">true</span> -cpu cortex-a57 -machine <span class="built_in">type</span>=virt -nographic -smp 4 -m 4096 -kernel build/arch/arm64/boot/Image -append <span class="string">&quot;console=ttyAMA0 root=/dev/vda rw&quot;</span> -drive <span class="keyword">if</span>=none,file=ubuntu-18.04.1-rootfs_ext4.img,<span class="built_in">id</span>=hd0,format=raw -device virtio-blk-device,drive=hd0 -netdev tap,<span class="built_in">id</span>=net0,ifname=tap0,script=no,downscript=no -device virtio-net-device,netdev=net0,mac=52:55:00:d1:55:01</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
-<p><img data-src="ubuntu-rootfs.jpeg" alt="ubuntu-rootfs.jpeg"></p>
+<p><img data-src="/images/17/ubuntu-rootfs.jpeg" alt="ubuntu-rootfs.jpeg"></p>
 <center>图3 使用ubuntu-rootfs模拟运行的输出</center>
 
 <p><strong>问题</strong><br>在使用ubuntu-base启动虚拟aarch64平台时，等待dev-ttyAMA0.device超时而卡住，从而导致无法登录进入bash</p>
-<p><img data-src="hangdown.jpeg" alt="hang up on device-ttyAMA0 "></p>
+<p><img data-src="/images/17/hangdown.jpeg" alt="hang up on device-ttyAMA0 "></p>
 <center>图4 在使用ubuntu-rootfs模拟运行时挂机问题</center>
 
 <p><strong>解决方法</strong></p>
@@ -409,7 +409,7 @@
 <p><strong>修改内容</strong></p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo vim rootfs/lib/systemd/system/serial-getty@ttyAMA0.service </span><br></pre></td></tr></table></figure>
 
-<p><img data-src="modify.jpeg" alt="modify "></p>
+<p><img data-src="/images/17/modify.jpeg" alt="modify "></p>
 <center>图5 修改的内容</center>
 
 <p>将<code>BindsTo</code>和<code>After</code>开头的行注释掉<br>参考地址：<a target="_blank" rel="noopener" href="http://0pointer.de/blog/projects/serial-console.html">systemd for Administrators, Part XVI</a> </p>
@@ -417,7 +417,7 @@
 <p>最后卸载挂载，完成根文件系统的制作</p>
 <h4 id="busybox"><a href="#busybox" class="headerlink" title="busybox"></a>busybox</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">wget  https://busybox.net/downloads/busybox-1.30.0.tar.bz2</span><br><span class="line">tar -xjf busybox-1.30.0.tar.bz2</span><br><span class="line"><span class="built_in">cd</span> busybox-1.30.0</span><br><span class="line">make defconfig</span><br><span class="line">make menuconfig</span><br><span class="line">make -j4</span><br><span class="line">make install</span><br></pre></td></tr></table></figure>
 
-<p><img data-src="menuconfig.jpeg" alt="menuconfig.jpeg"></p>
+<p><img data-src="/images/17/menuconfig.jpeg" alt="menuconfig.jpeg"></p>
 <center>图6 执行make menuconfig后修改的配置选项</center>
 
 <p><strong>制作步骤</strong></p>
@@ -425,7 +425,7 @@
 <p><strong>模拟运行</strong></p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">qemu-system-aarch64 -kernel build/arch/arm64/boot/Image -append <span class="string">&quot;console=ttyAMA0 root=/dev/vda init=/linuxrc rw&quot;</span> -m 2048M -smp 4  -M virt -cpu cortex-a57 -nographic -hda busybox-1.30.0-rootfs_ext4.img</span><br></pre></td></tr></table></figure>
 
-<p><img data-src="busybox-output.jpeg" alt="busybox-output.jpeg"></p>
+<p><img data-src="/images/17/busybox-output.jpeg" alt="busybox-output.jpeg"></p>
 <center>图7 使用busybox-rootfs模拟运行的输出</center>
 
 <p>由于未作任何系统配置，比如&#x2F;etc&#x2F;passwd、&#x2F;etc&#x2F;group、&#x2F;etc&#x2F;shadow、&#x2F;etc&#x2F;hostname等文件，所以系统的操作和易用性还有待改进。</p>
@@ -434,7 +434,7 @@
 <p><strong>运行实验</strong></p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">qemu-system-aarch64 -kernel build/arch/arm64/boot/Image -initrd initramfs.cpio.gz -append <span class="string">&quot;console=ttyAMA0 rdinit=/linuxrc&quot;</span> -M virt -cpu cortex-a53 -nographic -m 2048M</span><br></pre></td></tr></table></figure>
 
-<p><img data-src="initramfs.jpeg" alt="initramfs.jpeg"></p>
+<p><img data-src="/images/17/initramfs.jpeg" alt="initramfs.jpeg"></p>
 <center>图8 使用initramfs.cpio.gz模拟运行的输出</center>
 
     </div>
@@ -457,11 +457,11 @@
   </button>
   <div class="post-reward">
       <div>
-        <img src="../../images/wechatpay.png" alt="Xinlu Wang 微信">
+        <img src="/images/wechatpay.png" alt="Xinlu Wang 微信">
         <span>微信</span>
       </div>
       <div>
-        <img src="../../images/alipay.jpg" alt="Xinlu Wang 支付宝">
+        <img src="/images/alipay.jpg" alt="Xinlu Wang 支付宝">
         <span>支付宝</span>
       </div>
 
@@ -486,20 +486,20 @@
 </div>
 
           <div class="post-tags">
-              <a href="../../tags/aarch64/" rel="tag"><i class="fa fa-tag"></i> aarch64</a>
-              <a href="../../tags/qemu/" rel="tag"><i class="fa fa-tag"></i> qemu</a>
+              <a href="/tags/aarch64/" rel="tag"><i class="fa fa-tag"></i> aarch64</a>
+              <a href="/tags/qemu/" rel="tag"><i class="fa fa-tag"></i> qemu</a>
           </div>
 
         
 
           <div class="post-nav">
             <div class="post-nav-item">
-                <a href="../undefined/" rel="prev" title="中断延迟处理机制「interrupt delay processing」">
+                <a href="/posts/undefined/" rel="prev" title="中断延迟处理机制「interrupt delay processing」">
                   <i class="fa fa-angle-left"></i> 中断延迟处理机制「interrupt delay processing」
                 </a>
             </div>
             <div class="post-nav-item">
-                <a href="../f7f26963/" rel="next" title="percpu内存分配器">
+                <a href="/posts/f7f26963/" rel="next" title="percpu内存分配器">
                   percpu内存分配器 <i class="fa fa-angle-right"></i>
                 </a>
             </div>
@@ -575,10 +575,10 @@
   <script size="300" alpha="0.6" zIndex="-1" src="https://cdnjs.cloudflare.com/ajax/libs/ribbon.js/1.0.2/ribbon.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/lozad.js/1.16.0/lozad.min.js" integrity="sha256-mOFREFhqmHeQbXpK2lp4nA3qooVgACfh88fpJftLBbc=" crossorigin="anonymous"></script>
-<script src="../../js/comments.js"></script><script src="../../js/utils.js"></script><script src="../../js/motion.js"></script><script src="../../js/schemes/muse.js"></script><script src="../../js/next-boot.js"></script><script src="../../js/bookmark.js"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script><script src="/js/bookmark.js"></script>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
-<script src="../../js/third-party/search/local-search.js"></script>
+<script src="/js/third-party/search/local-search.js"></script>
 
 
 
@@ -594,8 +594,8 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/quicklink/2.3.0/quicklink.umd.js" integrity="sha256-yvJQOINiH9fWemHn0vCA5lsHWJaHs6/ZmO+1Ft04SvM=" crossorigin="anonymous"></script>
   <script class="next-config" data-name="quicklink" type="application/json">{"enable":true,"home":false,"archive":false,"delay":true,"timeout":3000,"priority":true,"url":"http://chasinglulu.github.io/posts/d9f20f58/"}</script>
-  <script src="../../js/third-party/quicklink.js"></script>
-<script class="next-config" data-name="waline" type="application/json">{"lang":"zh-cn","enable":true,"serverURL":"waline-server-weld-five.vercel.app","cssUrl":"https://unpkg.com/@waline/client@v2/dist/waline.css","commentCount":true,"pageview":false,"placeholder":"请文明评论呀","avatar":"mm","meta":["nick","mail","link"],"pageSize":10,"visitor":true,"comment_count":true,"requiredFields":[],"libUrl":"//unpkg.com/@waline/client@v2/dist/waline.js","el":"#waline","comment":true,"path":""}</script>
+  <script src="/js/third-party/quicklink.js"></script>
+<script class="next-config" data-name="waline" type="application/json">{"lang":"zh-cn","enable":true,"serverURL":"waline-server-weld-five.vercel.app","cssUrl":"https://unpkg.com/@waline/client@v2/dist/waline.css","commentCount":true,"pageview":false,"placeholder":"请文明评论呀","avatar":"mm","meta":["nick","mail","link"],"pageSize":10,"visitor":true,"comment_count":true,"requiredFields":[],"libUrl":"//unpkg.com/@waline/client@v2/dist/waline.js","el":"#waline","comment":true,"path":"/posts/d9f20f58/"}</script>
 <link rel="stylesheet" href="https://unpkg.com/@waline/client@v2/dist/waline.css">
 <script>
 document.addEventListener('page:loaded', () => {

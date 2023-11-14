@@ -6,20 +6,20 @@
 <meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.0.0">
 <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
 <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
-  <link rel="apple-touch-icon" sizes="180x180" href="../../images/apple-touch-icon-next.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="../../images/blog.svg">
-  <link rel="icon" type="image/png" sizes="16x16" href="../../images/blog.svg">
-  <link rel="mask-icon" href="../../images/logo.svg" color="#222">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/blog.svg">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/blog.svg">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
   <meta name="google-site-verification" content="vuSkRYPVceK1DXhqZWm7wVxYV4YmmnI1Dv_C1M8rJJM">
 
-<link rel="stylesheet" href="../../css/main.css">
+<link rel="stylesheet" href="/css/main.css">
 
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Georgia:300,300italic,400,400italic,700,700italic%7CTimes+New+Roman:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha256-CTSx/A06dm1B063156EVh15m6Y67pAjZZaQc89LLSrU=" crossorigin="anonymous">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
 
-<script class="next-config" data-name="main" type="application/json">{"hostname":"chasinglulu.github.io","root":"/","images":"../../images","scheme":"Mist","darkmode":false,"version":"8.18.2","exturl":false,"sidebar":{"position":"right","display":"hide","padding":18,"offset":12},"copycode":{"enable":true,"style":"mac"},"fold":{"enable":true,"height":500},"bookmark":{"enable":true,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"../../search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="../../js/config.js"></script>
+<script class="next-config" data-name="main" type="application/json">{"hostname":"chasinglulu.github.io","root":"/","images":"/images","scheme":"Mist","darkmode":false,"version":"8.18.2","exturl":false,"sidebar":{"position":"right","display":"hide","padding":18,"offset":12},"copycode":{"enable":true,"style":"mac"},"fold":{"enable":true,"height":500},"bookmark":{"enable":true,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
 
     <meta name="description" content="&ensp;&ensp;&ensp;&ensp;中断使交互式计算的实现成为可能。如果在任务执行期间发生了中断，操作系统将响应处理中断请求，然后继续执行上一个任务或新任务。借助中断，内核能够实现多任务处理「multitasking」。其实在计算机中有很多场景会发生中断，比如从网络设备发送和接收数据包「packet」、通过鼠标或触摸屏等输入设备接收用户输入内容。本文首先从硬件角度了解了什么是中断，然后">
 <meta property="og:type" content="article">
@@ -28,18 +28,18 @@
 <meta property="og:site_name" content="点滴汇聚">
 <meta property="og:description" content="&ensp;&ensp;&ensp;&ensp;中断使交互式计算的实现成为可能。如果在任务执行期间发生了中断，操作系统将响应处理中断请求，然后继续执行上一个任务或新任务。借助中断，内核能够实现多任务处理「multitasking」。其实在计算机中有很多场景会发生中断，比如从网络设备发送和接收数据包「packet」、通过鼠标或触摸屏等输入设备接收用户输入内容。本文首先从硬件角度了解了什么是中断，然后">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://chasinglulu.github.io/posts/a0d0775f/interrupt.svg">
-<meta property="og:image" content="http://chasinglulu.github.io/posts/a0d0775f/interrupt_multiple.svg">
-<meta property="og:image" content="http://chasinglulu.github.io/posts/a0d0775f/interrupt_irq_handling.svg">
-<meta property="og:image" content="http://chasinglulu.github.io/posts/a0d0775f/proc-interrupts.jpeg">
-<meta property="og:image" content="http://chasinglulu.github.io/posts/a0d0775f/interrupt_irq_handle_process.svg">
-<meta property="og:image" content="http://chasinglulu.github.io/posts/a0d0775f/interrupt_PSTATE_DAIF.svg">
+<meta property="og:image" content="http://chasinglulu.github.io/images/23/interrupt.svg">
+<meta property="og:image" content="http://chasinglulu.github.io/images/23/interrupt_multiple.svg">
+<meta property="og:image" content="http://chasinglulu.github.io/images/23/interrupt_irq_handling.svg">
+<meta property="og:image" content="http://chasinglulu.github.io/images/23/proc-interrupts.jpeg">
+<meta property="og:image" content="http://chasinglulu.github.io/images/23/interrupt_irq_handle_process.svg">
+<meta property="og:image" content="http://chasinglulu.github.io/images/23/interrupt_PSTATE_DAIF.svg">
 <meta property="article:published_time" content="2019-07-07T13:33:28.000Z">
-<meta property="article:modified_time" content="2023-11-06T12:37:42.976Z">
+<meta property="article:modified_time" content="2023-11-14T06:14:36.149Z">
 <meta property="article:author" content="Xinlu Wang">
 <meta property="article:tag" content="interrupt">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http://chasinglulu.github.io/posts/a0d0775f/interrupt.svg">
+<meta name="twitter:image" content="http://chasinglulu.github.io/images/23/interrupt.svg">
 
 
 <link rel="canonical" href="http://chasinglulu.github.io/posts/a0d0775f/">
@@ -86,7 +86,7 @@
 }
 </style>
   <noscript>
-    <link rel="stylesheet" href="../../css/noscript.css">
+    <link rel="stylesheet" href="/css/noscript.css">
   </noscript>
 </head>
 
@@ -124,7 +124,7 @@
 
 
 <nav class="site-nav">
-  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="../../index.html" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="../../about/" rel="section"><i class="fa fa-address-card fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="../../tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">60</span></a></li><li class="menu-item menu-item-categories"><a href="../../categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">9</span></a></li><li class="menu-item menu-item-archives"><a href="../../archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">37</span></a></li>
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-address-card fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">60</span></a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">9</span></a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">37</span></a></li>
       <li class="menu-item menu-item-search">
         <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
         </a>
@@ -182,25 +182,25 @@
         <div class="site-overview-wrap sidebar-panel">
           <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <img class="site-author-image" itemprop="image" alt="Xinlu Wang"
-      src="../../images/avatar.jpeg">
+      src="/images/avatar.jpeg">
   <p class="site-author-name" itemprop="name">Xinlu Wang</p>
   <div class="site-description" itemprop="description">不积跬步无以至千里，不积小流无以成江海</div>
 </div>
 <div class="site-state-wrap animated">
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
-        <a href="../../archives/">
+        <a href="/archives/">
           <span class="site-state-item-count">37</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
-          <a href="../../categories/">
+          <a href="/categories/">
         <span class="site-state-item-count">9</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
-          <a href="../../tags/">
+          <a href="/tags/">
         <span class="site-state-item-count">60</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
@@ -211,7 +211,7 @@
         <a href="https://github.com/chasinglulu" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;chasinglulu" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
       </span>
       <span class="links-of-author-item">
-        <a href="../../mailto:wangkart@aliyun.com" title="E-Mail → mailto:wangkart@aliyun.com" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+        <a href="mailto:wangkart@aliyun.com" title="E-Mail → mailto:wangkart@aliyun.com" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
       </span>
       <span class="links-of-author-item">
         <a href="https://weibo.com/5052275150" title="Weibo → https:&#x2F;&#x2F;weibo.com&#x2F;5052275150" rel="noopener me" target="_blank"><i class="fab fa-weibo fa-fw"></i>Weibo</a>
@@ -257,7 +257,7 @@
     <link itemprop="mainEntityOfPage" href="http://chasinglulu.github.io/posts/a0d0775f/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="../../images/avatar.jpeg">
+      <meta itemprop="image" content="/images/avatar.jpeg">
       <meta itemprop="name" content="Xinlu Wang">
     </span>
 
@@ -290,7 +290,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2023-11-06 20:37:42" itemprop="dateModified" datetime="2023-11-06T20:37:42+08:00">2023-11-06</time>
+      <time title="修改时间：2023-11-14 14:14:36" itemprop="dateModified" datetime="2023-11-14T14:14:36+08:00">2023-11-14</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -298,7 +298,7 @@
       </span>
       <span class="post-meta-item-text">分类于</span>
         <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="../../categories/interrupt-management/" itemprop="url" rel="index"><span itemprop="name">interrupt management</span></a>
+          <a href="/categories/interrupt-management/" itemprop="url" rel="index"><span itemprop="name">interrupt management</span></a>
         </span>
     </span>
 
@@ -318,8 +318,8 @@
     </span>
     <span class="post-meta-item-text">Waline：</span>
   
-    <a title="waline" href="#waline" itemprop="discussionUrl">
-      <span class="post-comments-count waline-comment-count" data-path="" itemprop="commentCount"></span>
+    <a title="waline" href="/posts/a0d0775f/#waline" itemprop="discussionUrl">
+      <span class="post-comments-count waline-comment-count" data-path="/posts/a0d0775f/" itemprop="commentCount"></span>
     </a>
   </span>
   
@@ -359,7 +359,7 @@
 <hr>
 <h3 id="中断概念"><a href="#中断概念" class="headerlink" title="中断概念"></a>中断概念</h3><h4 id="什么是中断？"><a href="#什么是中断？" class="headerlink" title="什么是中断？"></a>什么是中断？</h4><p>&ensp;&ensp;&ensp;&ensp;中断就是硬件或软件生成的信号「signal」和事件「event」。一旦中断发生，处理器会立即中止现在的执行并响应中断请求。硬件中断就是从设备发送给处理器的物理信号「physical signal」。一旦设备满足特定条件，它就会通知处理器并要求立刻处理。软件中断是由运行在处理器上的软件生成的信号，且它多发生在特殊情况，比如执行系统调用「system call」、陷阱「trap」指令或系统提供的其他中断生成指令。</p>
 <h4 id="中断控制器「interrupt-controller」"><a href="#中断控制器「interrupt-controller」" class="headerlink" title="中断控制器「interrupt controller」"></a>中断控制器「interrupt controller」</h4><p>&ensp;&ensp;&ensp;&ensp;处理器能不能接受和处理很多设备同时发送的中断？实际上这是可能的，正是由于中断控制器的存在，使多个设备产生的中断复用处理器的一条中断线。中断控制器仲裁并按顺序转递设备发出的中断给处理器。在多核系统「multicore system」中，每个核心都可以接收中断，因此中断控制器要与每个核心的控制接口相连接。</p>
-<p><img data-src="interrupt.svg" alt="interrupt"></p>
+<p><img data-src="/images/23/interrupt.svg" alt="interrupt"></p>
 <center>图1 中断与中断控制器</center>
 
 <h5 id="中断控制器的功能"><a href="#中断控制器的功能" class="headerlink" title="中断控制器的功能"></a>中断控制器的功能</h5><p>中断控制器有如下主要功能：</p>
@@ -370,11 +370,11 @@
 </ul>
 <p>&ensp;&ensp;&ensp;&ensp;除了以上主要功能外，中断控制器目前引入越来越多的其他功能，比如支持多核处理器「multicore processor」、支持唤醒事件「wakeup event」以及生成软件中断等。随着各个体系架构的改进，中断控制器所需的功能也在不断变化。例如，ARM定义了通用中断控制器「Generic Interrupt Controller，GIC」，随着ARM体系架构的演进，GIC的版本也在不断迭代，目前已经迭代到GICv3&#x2F;v4。比如，最新的GICV3&#x2F;v4支持了ARMv8架构的安全扩展[security extension]和虚拟化扩展[virtualization extension]，其能够分配安全和非安全状态【secure&#x2F;non-secure state】的中断，以及能够触发产生虚拟中断并发送给虚拟机【virtual machine, VM】</p>
 <h5 id="多中断控制器的结构"><a href="#多中断控制器的结构" class="headerlink" title="多中断控制器的结构"></a>多中断控制器的结构</h5><p>&ensp;&ensp;&ensp;&ensp;一个简单的系统仅需使用一个中断控制器，但有些系统却需使用多个中断控制器。比如，在有些系统中GPIO控制器具有中断功能，通常以级联方式将它与主中断控制器相连，并被配置成从中断控制器。如图2所示，给出了两种关于多个中断控制器的配置示例。</p>
-<p><img data-src="interrupt_multiple.svg" alt="multiple interrupt controller structure"></p>
+<p><img data-src="/images/23/interrupt_multiple.svg" alt="multiple interrupt controller structure"></p>
 <center>图2 多个中断控制器的连接方式</center>
 
 <h3 id="Linux中断子系统"><a href="#Linux中断子系统" class="headerlink" title="Linux中断子系统"></a>Linux中断子系统</h3><p>&ensp;&ensp;&ensp;&ensp;尽管中断控制器硬件差异很大，但通常都可以对中断控制器进行编程配置，使其能够按照设置进行操作。为了使Linux支持多种硬件系统，因此内核从中断控制器和中断信号的物理特性抽象出一个通用中断处理层「generic interrupt handling layer 」。当设备驱动调用诸如请求「requesting」、取消「canceling」、启用「enabling」和禁止「disabling」等中断操作函数时，配置数据会通过通用中断处理层被传递给中断控制器驱动的处理函数。正是由于这个抽象层的存在，不管体系架构和平台如何变化，设备驱动都能以相似的方式处理中断。相关代码都位于&lt;kernel &#x2F; irq&gt;目录下。</p>
-<p><img data-src="interrupt_irq_handling.svg" alt="linux generic irq handling layer"></p>
+<p><img data-src="/images/23/interrupt_irq_handling.svg" alt="linux generic irq handling layer"></p>
 <center>图3 Linux通用IRQ处理方式</center>
 
 <h4 id="irq-chip：-描述中断控制器的结构体"><a href="#irq-chip：-描述中断控制器的结构体" class="headerlink" title="irq_chip： 描述中断控制器的结构体"></a>irq_chip： 描述中断控制器的结构体</h4><p>结构体struct irq_chip用于描述和管理硬件中断芯片（控制器），称之为中断芯片描述符，其大部分字段都是由中断控制器驱动程序负责初始化的函数指针。在初始化后，内部中断处理函数「函数前面带有两个下划线__」就能直接调用它们。</p>
@@ -394,12 +394,12 @@
 <h3 id="中断处理函数「interrupter-handler」"><a href="#中断处理函数「interrupter-handler」" class="headerlink" title="中断处理函数「interrupter handler」"></a>中断处理函数「interrupter handler」</h3><p>本小节首先介绍了内核代码在请求中断时如何完成中断处理函数的注册以及中断管脚的配置。然后分析了在CPU接收到物理中断信号后中断处理函数的调用流程。最后说明了各个中断容许和禁止函数、以及中断子系统初始化函数。</p>
 <h4 id="中断请求"><a href="#中断请求" class="headerlink" title="中断请求"></a>中断请求</h4><p>所谓的中断请求其实就是启用中断号对应的中断管脚以及注册中断触发后执行的中断处理函数。一个中断管脚「interrupt line」就是一条传递中断电信号的媒介，其与中断控制器相连并且拥有一个硬件中断号「hwirq」作为标识。一旦启用的中断管脚上触发了中断，就会调用中断号对应的中断处理函数。</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&lt;include/linux/interrupt.h&gt;</span><br><span class="line"><span class="type">static</span> <span class="keyword">inline</span> <span class="type">int</span> __must_check</span><br><span class="line"><span class="title function_">request_irq</span><span class="params">(<span class="type">unsigned</span> <span class="type">int</span> irq, <span class="type">irq_handler_t</span> handler, <span class="type">unsigned</span> <span class="type">long</span> flags,</span></span><br><span class="line"><span class="params">	    <span class="type">const</span> <span class="type">char</span> *name, <span class="type">void</span> *dev)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="keyword">return</span> request_threaded_irq(irq, handler, <span class="literal">NULL</span>, flags, name, dev);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>request_irq()用于注册给定的中断处理函数，它直接把给定参数全传递给request_threaded_irq()。但是除了这些参数，还为request_threaded_irq()的irq_handler_t thread_fn参数赋值NULL，因此request_irq()仅注册中断处理函数而不会创建中断线程「interrupt thread」。关于中断线程「thread_fn」的更多细节，请参考<a href>中断延迟处理</a>。<br>在请求中断时传递给request_irq函数的参数如表4所示：</p>
+<p>request_irq()用于注册给定的中断处理函数，它直接把给定参数全传递给request_threaded_irq()。但是除了这些参数，还为request_threaded_irq()的irq_handler_t thread_fn参数赋值NULL，因此request_irq()仅注册中断处理函数而不会创建中断线程「interrupt thread」。关于中断线程「thread_fn」的更多细节，请参考<a href="">中断延迟处理</a>。<br>在请求中断时传递给request_irq函数的参数如表4所示：</p>
 <div align="center">表4 传递给request_irq()的参数
 <table style="border-collapse:collapse;border-spacing:0;border-color:#9ABAD9;margin:0px auto" class="tg"><tr><th style="font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#fff;background-color:#409cff;text-align:center">数据类型</th><th style="font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#fff;background-color:#409cff;text-align:center">参数名称</th><th style="font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#fff;background-color:#409cff;text-align:center">含义解释</th></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:center">unsigned int<br></td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#D2E4FC;text-align:center">irq<br></td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:left">指定的中断编号<br></td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:center">irq_handler_t</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#D2E4FC;text-align:center">handler<br></td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:left">在中断发生时执行的中断处理函数<br></td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:center">unsigned long</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#D2E4FC;text-align:center">flags</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:left">中断属性标识<br></td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:center">const char &#42;</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#D2E4FC;text-align:center">name</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:left">中断名称，在读取/proc/interrupts时输出的名称<br></td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center">void &#42;</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#D2E4FC;text-align:center">dev</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:left">中断处理函数在执行时使用的私有数据</td></tr></table></div>
 
 <p>可以通过读取<code>/proc/interrupts</code>查看系统中已注册的所有中断，如图4所示。 </p>
-<p><img data-src="proc-interrupts.jpeg" alt="proc-interrupts.jpeg"></p>
+<p><img data-src="/images/23/proc-interrupts.jpeg" alt="proc-interrupts.jpeg"></p>
 <center>图4 当读取/proc/interrupts时输出画面</center>
 
 <h5 id="request-threaded-irq函数：注册中断处理函数"><a href="#request-threaded-irq函数：注册中断处理函数" class="headerlink" title="request_threaded_irq函数：注册中断处理函数"></a>request_threaded_irq函数：注册中断处理函数</h5><p>在请求中断时调用的request_threaded_irq()函数不仅能够注册一个在中断上下文「interrupt context」执行的中断处理程序「intrrupt handler」，还可以注册一个在线程环境运行的中断处理函数「thread_fn」。除了thread_fn参数（中断线程调用执行的函数）外，其他参数都是与request_irq()的参数相同。下面代码将分析介绍该函数的具体细节。</p>
@@ -419,7 +419,7 @@
 <li>56行：将struct irqaction实例添入irq_desc对象的action链表</li>
 </ul>
 <h4 id="中断流处理函数「interrupt-flow-handler」的调用流程"><a href="#中断流处理函数「interrupt-flow-handler」的调用流程" class="headerlink" title="中断流处理函数「interrupt flow handler」的调用流程"></a>中断流处理函数「interrupt flow handler」的调用流程</h4><p>尽管中断控制器千差万别，但采用的中断流处理函数（比如handle_level_irq()、handle_percpu_irq()、handle_fasteoi_irq()、handle_edge_irq()等等）却大同小异。正如我们所知道的，基于ARMv8架构实现的AArch64核心在捕获到中断控制器触发的中断时会生成一个异步中断异常，该异常会使CPU暂停当前执行来响应处理中断。在中断异常发生后，CPU会执行函数指针handle_arch_irq所指向的一个回调函数，其是在中断控制器驱动初始化时调用set_handle_irq()设定的。<br>更具体地说，使用GIC的ARM64内核在初始化时会调用set_handle_irq()使函数指针handle_arch_irq指向gic_handle_irq()函数，因此在发生中断时就会调用执行gic_handle_irq()函数，然后其调用执行通用中断处理层的generic_handle_irq()函数，接着调用执行函数指针desc-&gt;handle_irq所指向的一个回调函数。而且desc-&gt;handle_irq指向的回调函数也是在由中断控制器驱动初始化时根据中断类型负责设定的。比如在ARM64内核中，对于单个CPU响应的中断，为desc-&gt;handle_irq所设定的回调函数都是handle_percpu_devid_irq()，对于多CPU响应的中断，为desc-&gt;handle_irq所设定的回调函数都是handle_fasteoi_irq()。</p>
-<p><img data-src="interrupt_irq_handle_process.svg" alt="irq handle process"></p>
+<p><img data-src="/images/23/interrupt_irq_handle_process.svg" alt="irq handle process"></p>
 <center>图5 中断处理函数的调用流程</center>
 
 <p>接下来看一下handle_fasteoi_irq()函数，其处理常见设备触发的中断。</p>
@@ -454,7 +454,7 @@
 <li>4行：将2写入DAIF清除寄存器「DAIF clear register」就能屏蔽「diable」本地中断。</li>
 <li>13行：将2写入DAIF置位寄存器「DAIF set register」就能容许「enable」本地中断。<br>在ARMv8体系架构中，能够利用汇编指令仅操作PSTATE寄存器的DAIF字段。写入寄存器的值也仅根据DAIF计算得出，如果IRQ位被掩蔽「mask」，那么当前核心不再接收中断，从而使中断被挂起。反之，如果IRQ位被去除掩蔽「unmask」，那么当前核心能继续接收中断。如图6所示说明了PSTATE的DAIF位操作。</li>
 </ul>
-<p><img data-src="interrupt_PSTATE_DAIF.svg" alt="DAIF field of PSTATE register"></p>
+<p><img data-src="/images/23/interrupt_PSTATE_DAIF.svg" alt="DAIF field of PSTATE register"></p>
 <center>图6 PSTATE寄存器的DAIF字段</center>
 
 <h5 id="启用和屏蔽特定中断管脚「interrupt-line」"><a href="#启用和屏蔽特定中断管脚「interrupt-line」" class="headerlink" title="启用和屏蔽特定中断管脚「interrupt line」"></a>启用和屏蔽特定中断管脚「interrupt line」</h5><p>如果必要的话，驱动程序可以先屏蔽已激活的中断管脚，然后再启用那个中断管脚。然而如果中断管脚被多个设备共享，那么它就不可以被屏蔽。对中断禁止函数的调用本质上就是调用中断控制器驱动提供的回调函数。容许和屏蔽中断管脚函数都允许多次被调用，但它们只能被成对地调用。也就是说，只要调用了中断管脚屏蔽函数，就必须调用中断管脚容许函数，以致于实际的中断管脚任然是激活的。具体细节参考下面的代码。</p>
@@ -546,11 +546,11 @@
   </button>
   <div class="post-reward">
       <div>
-        <img src="../../images/wechatpay.png" alt="Xinlu Wang 微信">
+        <img src="/images/wechatpay.png" alt="Xinlu Wang 微信">
         <span>微信</span>
       </div>
       <div>
-        <img src="../../images/alipay.jpg" alt="Xinlu Wang 支付宝">
+        <img src="/images/alipay.jpg" alt="Xinlu Wang 支付宝">
         <span>支付宝</span>
       </div>
 
@@ -575,19 +575,19 @@
 </div>
 
           <div class="post-tags">
-              <a href="../../tags/interrupt/" rel="tag"><i class="fa fa-tag"></i> interrupt</a>
+              <a href="/tags/interrupt/" rel="tag"><i class="fa fa-tag"></i> interrupt</a>
           </div>
 
         
 
           <div class="post-nav">
             <div class="post-nav-item">
-                <a href="../dae1ffea/" rel="prev" title="内存模型「memory model」">
+                <a href="/posts/dae1ffea/" rel="prev" title="内存模型「memory model」">
                   <i class="fa fa-angle-left"></i> 内存模型「memory model」
                 </a>
             </div>
             <div class="post-nav-item">
-                <a href="../8b7c2647/" rel="next" title="时间管理「time management」">
+                <a href="/posts/8b7c2647/" rel="next" title="时间管理「time management」">
                   时间管理「time management」 <i class="fa fa-angle-right"></i>
                 </a>
             </div>
@@ -663,10 +663,10 @@
   <script size="300" alpha="0.6" zIndex="-1" src="https://cdnjs.cloudflare.com/ajax/libs/ribbon.js/1.0.2/ribbon.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/lozad.js/1.16.0/lozad.min.js" integrity="sha256-mOFREFhqmHeQbXpK2lp4nA3qooVgACfh88fpJftLBbc=" crossorigin="anonymous"></script>
-<script src="../../js/comments.js"></script><script src="../../js/utils.js"></script><script src="../../js/motion.js"></script><script src="../../js/schemes/muse.js"></script><script src="../../js/next-boot.js"></script><script src="../../js/bookmark.js"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script><script src="/js/bookmark.js"></script>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
-<script src="../../js/third-party/search/local-search.js"></script>
+<script src="/js/third-party/search/local-search.js"></script>
 
 
 
@@ -682,8 +682,8 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/quicklink/2.3.0/quicklink.umd.js" integrity="sha256-yvJQOINiH9fWemHn0vCA5lsHWJaHs6/ZmO+1Ft04SvM=" crossorigin="anonymous"></script>
   <script class="next-config" data-name="quicklink" type="application/json">{"enable":true,"home":false,"archive":false,"delay":true,"timeout":3000,"priority":true,"url":"http://chasinglulu.github.io/posts/a0d0775f/"}</script>
-  <script src="../../js/third-party/quicklink.js"></script>
-<script class="next-config" data-name="waline" type="application/json">{"lang":"zh-cn","enable":true,"serverURL":"waline-server-weld-five.vercel.app","cssUrl":"https://unpkg.com/@waline/client@v2/dist/waline.css","commentCount":true,"pageview":false,"placeholder":"请文明评论呀","avatar":"mm","meta":["nick","mail","link"],"pageSize":10,"visitor":true,"comment_count":true,"requiredFields":[],"libUrl":"//unpkg.com/@waline/client@v2/dist/waline.js","el":"#waline","comment":true,"path":""}</script>
+  <script src="/js/third-party/quicklink.js"></script>
+<script class="next-config" data-name="waline" type="application/json">{"lang":"zh-cn","enable":true,"serverURL":"waline-server-weld-five.vercel.app","cssUrl":"https://unpkg.com/@waline/client@v2/dist/waline.css","commentCount":true,"pageview":false,"placeholder":"请文明评论呀","avatar":"mm","meta":["nick","mail","link"],"pageSize":10,"visitor":true,"comment_count":true,"requiredFields":[],"libUrl":"//unpkg.com/@waline/client@v2/dist/waline.js","el":"#waline","comment":true,"path":"/posts/a0d0775f/"}</script>
 <link rel="stylesheet" href="https://unpkg.com/@waline/client@v2/dist/waline.css">
 <script>
 document.addEventListener('page:loaded', () => {

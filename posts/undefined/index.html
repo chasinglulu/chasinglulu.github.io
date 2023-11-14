@@ -6,20 +6,20 @@
 <meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.0.0">
 <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
 <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
-  <link rel="apple-touch-icon" sizes="180x180" href="../../images/apple-touch-icon-next.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="../../images/blog.svg">
-  <link rel="icon" type="image/png" sizes="16x16" href="../../images/blog.svg">
-  <link rel="mask-icon" href="../../images/logo.svg" color="#222">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/blog.svg">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/blog.svg">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
   <meta name="google-site-verification" content="vuSkRYPVceK1DXhqZWm7wVxYV4YmmnI1Dv_C1M8rJJM">
 
-<link rel="stylesheet" href="../../css/main.css">
+<link rel="stylesheet" href="/css/main.css">
 
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Georgia:300,300italic,400,400italic,700,700italic%7CTimes+New+Roman:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha256-CTSx/A06dm1B063156EVh15m6Y67pAjZZaQc89LLSrU=" crossorigin="anonymous">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
 
-<script class="next-config" data-name="main" type="application/json">{"hostname":"chasinglulu.github.io","root":"/","images":"../../images","scheme":"Mist","darkmode":false,"version":"8.18.2","exturl":false,"sidebar":{"position":"right","display":"hide","padding":18,"offset":12},"copycode":{"enable":true,"style":"mac"},"fold":{"enable":true,"height":500},"bookmark":{"enable":true,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"../../search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="../../js/config.js"></script>
+<script class="next-config" data-name="main" type="application/json">{"hostname":"chasinglulu.github.io","root":"/","images":"/images","scheme":"Mist","darkmode":false,"version":"8.18.2","exturl":false,"sidebar":{"position":"right","display":"hide","padding":18,"offset":12},"copycode":{"enable":true,"style":"mac"},"fold":{"enable":true,"height":500},"bookmark":{"enable":true,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
 
     <meta name="description" content="本文主要讨论中断的延迟处理机制，不仅说明了什么是上半部分「top-half」和下半部分「bottom-half」，还介绍了如何使用下半部分实现中断的延迟处理。">
 <meta property="og:type" content="article">
@@ -28,23 +28,23 @@
 <meta property="og:site_name" content="点滴汇聚">
 <meta property="og:description" content="本文主要讨论中断的延迟处理机制，不仅说明了什么是上半部分「top-half」和下半部分「bottom-half」，还介绍了如何使用下半部分实现中断的延迟处理。">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://chasinglulu.github.io/posts/undefined/interrupt_delay_top_bottom.svg">
-<meta property="og:image" content="http://chasinglulu.github.io/posts/undefined/softirqs_stat.jpeg">
-<meta property="og:image" content="http://chasinglulu.github.io/posts/undefined/tasklet_vec_list.svg">
-<meta property="og:image" content="http://chasinglulu.github.io/posts/undefined/softirq_flow.svg">
-<meta property="og:image" content="http://chasinglulu.github.io/posts/undefined/workqueu_state_change.svg">
-<meta property="og:image" content="http://chasinglulu.github.io/posts/undefined/cmwq_structure.svg">
-<meta property="og:image" content="http://chasinglulu.github.io/posts/undefined/queue_work_call_flow.svg">
-<meta property="og:image" content="http://chasinglulu.github.io/posts/undefined/queue_work_call_flow_II.svg">
+<meta property="og:image" content="http://chasinglulu.github.io/images/24/interrupt_delay_top_bottom.svg">
+<meta property="og:image" content="http://chasinglulu.github.io/images/24/softirqs_stat.jpeg">
+<meta property="og:image" content="http://chasinglulu.github.io/images/24/tasklet_vec_list.svg">
+<meta property="og:image" content="http://chasinglulu.github.io/images/24/softirq_flow.svg">
+<meta property="og:image" content="http://chasinglulu.github.io/images/24/workqueu_state_change.svg">
+<meta property="og:image" content="http://chasinglulu.github.io/images/24/cmwq_structure.svg">
+<meta property="og:image" content="http://chasinglulu.github.io/images/24/queue_work_call_flow.svg">
+<meta property="og:image" content="http://chasinglulu.github.io/images/24/queue_work_call_flow_II.svg">
 <meta property="article:published_time" content="2019-07-16T13:37:11.000Z">
-<meta property="article:modified_time" content="2023-11-06T12:37:42.980Z">
+<meta property="article:modified_time" content="2023-11-14T06:15:45.396Z">
 <meta property="article:author" content="Xinlu Wang">
 <meta property="article:tag" content="interrupt">
 <meta property="article:tag" content="softirq">
 <meta property="article:tag" content="tasklet">
 <meta property="article:tag" content="workqueue">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http://chasinglulu.github.io/posts/undefined/interrupt_delay_top_bottom.svg">
+<meta name="twitter:image" content="http://chasinglulu.github.io/images/24/interrupt_delay_top_bottom.svg">
 
 
 <link rel="canonical" href="http://chasinglulu.github.io/posts/undefined/">
@@ -91,7 +91,7 @@
 }
 </style>
   <noscript>
-    <link rel="stylesheet" href="../../css/noscript.css">
+    <link rel="stylesheet" href="/css/noscript.css">
   </noscript>
 </head>
 
@@ -129,7 +129,7 @@
 
 
 <nav class="site-nav">
-  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="../../index.html" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="../../about/" rel="section"><i class="fa fa-address-card fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="../../tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">60</span></a></li><li class="menu-item menu-item-categories"><a href="../../categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">9</span></a></li><li class="menu-item menu-item-archives"><a href="../../archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">37</span></a></li>
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-address-card fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">60</span></a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">9</span></a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">37</span></a></li>
       <li class="menu-item menu-item-search">
         <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
         </a>
@@ -187,25 +187,25 @@
         <div class="site-overview-wrap sidebar-panel">
           <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <img class="site-author-image" itemprop="image" alt="Xinlu Wang"
-      src="../../images/avatar.jpeg">
+      src="/images/avatar.jpeg">
   <p class="site-author-name" itemprop="name">Xinlu Wang</p>
   <div class="site-description" itemprop="description">不积跬步无以至千里，不积小流无以成江海</div>
 </div>
 <div class="site-state-wrap animated">
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
-        <a href="../../archives/">
+        <a href="/archives/">
           <span class="site-state-item-count">37</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
-          <a href="../../categories/">
+          <a href="/categories/">
         <span class="site-state-item-count">9</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
-          <a href="../../tags/">
+          <a href="/tags/">
         <span class="site-state-item-count">60</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
@@ -216,7 +216,7 @@
         <a href="https://github.com/chasinglulu" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;chasinglulu" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
       </span>
       <span class="links-of-author-item">
-        <a href="../../mailto:wangkart@aliyun.com" title="E-Mail → mailto:wangkart@aliyun.com" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+        <a href="mailto:wangkart@aliyun.com" title="E-Mail → mailto:wangkart@aliyun.com" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
       </span>
       <span class="links-of-author-item">
         <a href="https://weibo.com/5052275150" title="Weibo → https:&#x2F;&#x2F;weibo.com&#x2F;5052275150" rel="noopener me" target="_blank"><i class="fab fa-weibo fa-fw"></i>Weibo</a>
@@ -262,7 +262,7 @@
     <link itemprop="mainEntityOfPage" href="http://chasinglulu.github.io/posts/undefined/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="../../images/avatar.jpeg">
+      <meta itemprop="image" content="/images/avatar.jpeg">
       <meta itemprop="name" content="Xinlu Wang">
     </span>
 
@@ -295,7 +295,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2023-11-06 20:37:42" itemprop="dateModified" datetime="2023-11-06T20:37:42+08:00">2023-11-06</time>
+      <time title="修改时间：2023-11-14 14:15:45" itemprop="dateModified" datetime="2023-11-14T14:15:45+08:00">2023-11-14</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -303,7 +303,7 @@
       </span>
       <span class="post-meta-item-text">分类于</span>
         <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="../../categories/interrupt-management/" itemprop="url" rel="index"><span itemprop="name">interrupt management</span></a>
+          <a href="/categories/interrupt-management/" itemprop="url" rel="index"><span itemprop="name">interrupt management</span></a>
         </span>
     </span>
 
@@ -323,8 +323,8 @@
     </span>
     <span class="post-meta-item-text">Waline：</span>
   
-    <a title="waline" href="#waline" itemprop="discussionUrl">
-      <span class="post-comments-count waline-comment-count" data-path="" itemprop="commentCount"></span>
+    <a title="waline" href="/posts/undefined/#waline" itemprop="discussionUrl">
+      <span class="post-comments-count waline-comment-count" data-path="/posts/undefined/" itemprop="commentCount"></span>
     </a>
   </span>
   
@@ -368,7 +368,7 @@
 <table style="border-collapse:collapse;border-spacing:0;border-color:#9ABAD9;margin:0px auto" class="tg"><tr><th style="font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#fff;background-color:#409cff;text-align:center">比对内容</th><th style="font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#fff;background-color:#409cff;text-align:center">top-half</th><th style="font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#fff;background-color:#409cff;text-align:center">bottom-half</th></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:center">执行位置</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#D2E4FC;text-align:left">在硬中断处理程序中完成<br></td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:left">在执行完硬件中断处理程序后进行</td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:center;vertical-align:top">执行环境</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#D2E4FC;text-align:left;vertical-align:top">硬中断上下文</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:top">软中断上下文或进程上下文</td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center;vertical-align:top">中断状态</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#D2E4FC;text-align:left;vertical-align:top">在禁止中断的状态下执行</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:top">在容许中断的状态下执行</td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center">主要任务</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#D2E4FC;text-align:left;vertical-align:top">尽量执行最少的任务，越快执行完越好，防止丢失后续发生的中断<br>并利用下半部分的机制延迟处理任务</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:top">处理较费时的或可能阻塞的延迟任务</td></tr></table></div>
 
 <p>在Linux内核中，实现的多个下半部分机制分别是softirq、tasklet、workqueue和kernel thread。注意hardirq和softirq与top-half和bottom-half并不等同，softirq和tasklet都是执行在中断上下文「interrupt context」，而workqueue「工作队列」和kernel thread「内核线程」都是执行在进程上下文「process context」。</p>
-<p><img data-src="interrupt_delay_top_bottom.svg" alt="top-half vs bottom-half"></p>
+<p><img data-src="/images/24/interrupt_delay_top_bottom.svg" alt="top-half vs bottom-half"></p>
 <center>图1 上半部分与下半部分</center>
 
 <h5 id="硬中断「hardirq」和软中断「softirq」"><a href="#硬中断「hardirq」和软中断「softirq」" class="headerlink" title="硬中断「hardirq」和软中断「softirq」"></a>硬中断「hardirq」和软中断「softirq」</h5><p>在<a href="https://chasinglulu.github.io/2019/07/07/%E4%B8%AD%E6%96%AD%E3%80%8Cinterrupt%E3%80%8D/">中断「interrupt」</a> 的第一节，从体系架构的角度说明了硬件中断「hardware irq」和软件中断「software irq」。在Linux内核，所有中断也划分为两类：硬件中断和软件中断。接下来看看Linux内核是如何定义硬中断和软中断的，硬中断指的是处理硬件中断和IPIs「Inter Processor Interrupts」的硬中断上下文「hard interrupt context」，其既不可能出现睡眠也不可能被抢占「preemption」，对处理时间的要求比较苛刻，中断处理程序执行的速度越快越好，这样能够提高系统的实时性。软中断指的是处理费时任务的软中断上下文，其既不可能出现睡眠也不可能被软中断上下文执行的其它任务抢占，但可以被硬中断上下文执行的处理任务抢占， 对处理时间的要求较宽松，主要处理比较耗时的和可中断的任务。不过，在硬中断上下文和软中断上下文之间出现共享数据时必须考虑数据同步「synchronization」问题。</p>
@@ -377,7 +377,7 @@
 <table style="border-collapse:collapse;border-spacing:0;border-color:#9ABAD9;margin:0px auto" class="tg"><tr><th style="font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#fff;background-color:#409cff;text-align:center;vertical-align:top">优先级「priority」<br></th><th style="font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#fff;background-color:#409cff;text-align:center;vertical-align:top">名 称</th><th style="font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#fff;background-color:#409cff;text-align:center;vertical-align:top">含义解释</th></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:center;vertical-align:top">0</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#D2E4FC;text-align:center;vertical-align:top">HI_SOFTIRQ<br></td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:top">最高优先级，用于处理TASKLET_HI<br></td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:center;vertical-align:top">1</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#D2E4FC;text-align:center;vertical-align:top">TIMER_SOFTIRQ<br></td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:top">用于处理每个CPU的计时器中断「timer interrupt」<br></td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:center;vertical-align:top">2</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#D2E4FC;text-align:center;vertical-align:top">NET_TX_SOFTIRQ<br></td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:top">用于处理网络设备的报文发送中断<br></td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center;vertical-align:top">3</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#D2E4FC;text-align:center;vertical-align:top">NET_RX_SOFTIRQ</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:top">用于处理网络设备的报文接收中断</td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center;vertical-align:top">4</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#D2E4FC;text-align:center;vertical-align:top">BLOCK_SOFTIRQ</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:top">用于处理块设备「block device」的中断</td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center;vertical-align:top">5</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#D2E4FC;text-align:center;vertical-align:top">IRQ_POLL_SOFTIRQ</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:top">用于执行IOPOLL的回调函数「handler」</td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center;vertical-align:top">6</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#D2E4FC;text-align:center;vertical-align:top">TASKLET_SOFTIRQ</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:top">用于处理tasklet</td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center;vertical-align:top">7</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#D2E4FC;text-align:center;vertical-align:top">SCHED_SOFTIRQ</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:top">用于处理调度「schedule」相关的IPI和执行CFS的负载均衡例程</td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center;vertical-align:top">8</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#D2E4FC;text-align:center;vertical-align:top">HRTIMER_SOFTIRQ</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:top">目前没有使用，还保留也只是为了占用一个数字</td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center;vertical-align:top">9</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#D2E4FC;text-align:center;vertical-align:top">RCU_SOFTIRQ</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:top">用于处理RCU中断，最低优先级，因此每次都在最后处理</td></tr></table></div>
 
 <p>通过查看&#x2F;proc&#x2F;softirq能够获得系统各个CPU的softirq统计信息。</p>
-<p><img data-src="softirqs_stat.jpeg" alt="softirqs_stat"></p>
+<p><img data-src="/images/24/softirqs_stat.jpeg" alt="softirqs_stat"></p>
 <center>图2 读取/proc/softirqs时输出内容 </center>
 
 <h5 id="softirq机制初始化"><a href="#softirq机制初始化" class="headerlink" title="softirq机制初始化"></a>softirq机制初始化</h5><p>在start_kernel()中，先完成中断硬件的初始化，然后才进行softirq机制的初始化。由于tasklet是softirq「软中断」的一部分，在softirq初始化中不仅为实现tasklet机制做准备，而且还注册处理tasklet的动作「action」。</p>
@@ -386,7 +386,7 @@
 <p>通过遍历支持的所有CPU「possible cpu」初始化每个CPU对应的tasklet_vec和tassklet_hi_vec两个链表。这样做的缘由是分别指向两个链表头部的两个tasklet变量都被声明为percpu变量，如下所示：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&lt;kernel/softirq.c&gt;</span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">tasklet_head</span> &#123;</span></span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">tasklet_struct</span> *<span class="title">head</span>;</span></span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">tasklet_struct</span> **<span class="title">tail</span>;</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="title function_">DEFINE_PER_CPU</span><span class="params">(<span class="keyword">struct</span> tasklet_head, tasklet_vec)</span>;</span><br><span class="line"><span class="type">static</span> <span class="title function_">DEFINE_PER_CPU</span><span class="params">(<span class="keyword">struct</span> tasklet_head, tasklet_hi_vec)</span>;</span><br></pre></td></tr></table></figure>
 
-<p><img data-src="tasklet_vec_list.svg" alt="tasklet_vec_list"></p>
+<p><img data-src="/images/24/tasklet_vec_list.svg" alt="tasklet_vec_list"></p>
 <center>图3 tasklet_vec链表的示意图</center>
 
 <p>为TASKLET_SOFTIRQ和HI_SOFTIRQ分别指定了tasklet_action和tasklet_hi_action处理函数，至于其他的softirq的处理函数也都是在它们各自的初始化函数中通过open_softirq函数指定的。</p>
@@ -414,23 +414,23 @@
 <li>在硬件中断处理路径上检测到已经设置了force_irqthreads（在内核命令行添加threadirqs参数）</li>
 <li>已经较长时间在__do_softirq()内处理待处理的softirq或超过了最大重复次数</li>
 </ul>
-<p><img data-src="softirq_flow.svg" alt="softirq_execution_path"></p>
+<p><img data-src="/images/24/softirq_flow.svg" alt="softirq_execution_path"></p>
 <center>图4 softirq的处理流程</center>
 
 <h6 id="do-softirq-：核心的softirq处理函数"><a href="#do-softirq-：核心的softirq处理函数" class="headerlink" title="__do_softirq()：核心的softirq处理函数"></a>__do_softirq()：核心的softirq处理函数</h6><p>接下来详细地分析一下softirq是如何在__do_softirq函数中被准确处理的。</p>
 <p><strong>kernel&#x2F;softirq.c中__do_softirq()</strong></p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br></pre></td><td class="code"><pre><span class="line">asmlinkage __visible <span class="type">void</span> __softirq_entry __do_softirq(<span class="type">void</span>)</span><br><span class="line">&#123;</span><br><span class="line">	<span class="type">unsigned</span> <span class="type">long</span> end = jiffies + MAX_SOFTIRQ_TIME;</span><br><span class="line">	<span class="type">unsigned</span> <span class="type">long</span> old_flags = current-&gt;flags;</span><br><span class="line">	<span class="type">int</span> max_restart = MAX_SOFTIRQ_RESTART;</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">softirq_action</span> *<span class="title">h</span>;</span></span><br><span class="line">	<span class="type">bool</span> in_hardirq;</span><br><span class="line">	__u32 pending;</span><br><span class="line">	<span class="type">int</span> softirq_bit;</span><br><span class="line"></span><br><span class="line">	<span class="comment">/*</span></span><br><span class="line"><span class="comment">	 * Mask out PF_MEMALLOC s current task context is borrowed for the</span></span><br><span class="line"><span class="comment">	 * softirq. A softirq handled such as network RX might set PF_MEMALLOC</span></span><br><span class="line"><span class="comment">	 * again if the socket is related to swap</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	current-&gt;flags &amp;= ~PF_MEMALLOC;</span><br><span class="line"></span><br><span class="line">	pending = local_softirq_pending();</span><br><span class="line">	account_irq_enter_time(current);</span><br><span class="line"></span><br><span class="line">	__local_bh_disable_ip(_RET_IP_, SOFTIRQ_OFFSET);</span><br><span class="line">	in_hardirq = lockdep_softirq_start();</span><br><span class="line"></span><br><span class="line">restart:</span><br><span class="line">	<span class="comment">/* Reset the pending bitmask before enabling irqs */</span></span><br><span class="line">	set_softirq_pending(<span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">	local_irq_enable();</span><br><span class="line"></span><br><span class="line">	h = softirq_vec;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">while</span> ((softirq_bit = ffs(pending))) &#123;</span><br><span class="line">		<span class="type">unsigned</span> <span class="type">int</span> vec_nr;</span><br><span class="line">		<span class="type">int</span> prev_count;</span><br><span class="line"></span><br><span class="line">		h += softirq_bit - <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">		vec_nr = h - softirq_vec;</span><br><span class="line">		prev_count = preempt_count();</span><br><span class="line"></span><br><span class="line">		kstat_incr_softirqs_this_cpu(vec_nr);</span><br><span class="line"></span><br><span class="line">		trace_softirq_entry(vec_nr);</span><br><span class="line">		h-&gt;action(h);</span><br><span class="line">		trace_softirq_exit(vec_nr);</span><br><span class="line">		<span class="keyword">if</span> (unlikely(prev_count != preempt_count())) &#123;</span><br><span class="line">			pr_err(<span class="string">&quot;huh, entered softirq %u %s %p with preempt_count %08x, exited with %08x?\n&quot;</span>,</span><br><span class="line">			       vec_nr, softirq_to_name[vec_nr], h-&gt;action,</span><br><span class="line">			       prev_count, preempt_count());</span><br><span class="line">			preempt_count_set(prev_count);</span><br><span class="line">		&#125;</span><br><span class="line">		h++;</span><br><span class="line">		pending &gt;&gt;= softirq_bit;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	rcu_bh_qs();</span><br><span class="line">	local_irq_disable();</span><br><span class="line"></span><br><span class="line">	pending = local_softirq_pending();</span><br><span class="line">	<span class="keyword">if</span> (pending) &#123;</span><br><span class="line">		<span class="keyword">if</span> (time_before(jiffies, end) &amp;&amp; !need_resched() &amp;&amp;</span><br><span class="line">		    --max_restart)</span><br><span class="line">			<span class="keyword">goto</span> restart;</span><br><span class="line"></span><br><span class="line">		wakeup_softirqd();</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	lockdep_softirq_end(in_hardirq);</span><br><span class="line">	account_irq_exit_time(current);</span><br><span class="line">	__local_bh_enable(SOFTIRQ_OFFSET);</span><br><span class="line">	WARN_ON_ONCE(in_interrupt());</span><br><span class="line">	current_restore_flags(old_flags, PF_MEMALLOC);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<h4 id="workqueue「工作队列」"><a href="#workqueue「工作队列」" class="headerlink" title="workqueue「工作队列」"></a>workqueue「工作队列」</h4><p><img data-src="workqueu_state_change.svg" alt="workqueu_state_change"></p>
+<h4 id="workqueue「工作队列」"><a href="#workqueue「工作队列」" class="headerlink" title="workqueue「工作队列」"></a>workqueue「工作队列」</h4><p><img data-src="/images/24/workqueu_state_change.svg" alt="workqueu_state_change"></p>
 <center>图5 wokequeue的状态变化</center>
 
-<h5 id="cmwq「Concurrency-Managed-Workqueues」"><a href="#cmwq「Concurrency-Managed-Workqueues」" class="headerlink" title="cmwq「Concurrency-Managed Workqueues」"></a>cmwq「Concurrency-Managed Workqueues」</h5><p><img data-src="cmwq_structure.svg" alt="cmwq_structure"></p>
+<h5 id="cmwq「Concurrency-Managed-Workqueues」"><a href="#cmwq「Concurrency-Managed-Workqueues」" class="headerlink" title="cmwq「Concurrency-Managed Workqueues」"></a>cmwq「Concurrency-Managed Workqueues」</h5><p><img data-src="/images/24/cmwq_structure.svg" alt="cmwq_structure"></p>
 <center>图6 cmwq框架结构</center>
 
-<p><img data-src="queue_work_call_flow.svg" alt="__queue_work_call_flow"></p>
+<p><img data-src="/images/24/queue_work_call_flow.svg" alt="__queue_work_call_flow"></p>
 <center>图7 __queue_work()调用流程 I</center>
 
-<p><img data-src="queue_work_call_flow_II.svg" alt="__queue_work_call_flow_II"></p>
+<p><img data-src="/images/24/queue_work_call_flow_II.svg" alt="__queue_work_call_flow_II"></p>
 <center>图8 __queue_work()调用流程 II</center>
     </div>
 
@@ -452,11 +452,11 @@
   </button>
   <div class="post-reward">
       <div>
-        <img src="../../images/wechatpay.png" alt="Xinlu Wang 微信">
+        <img src="/images/wechatpay.png" alt="Xinlu Wang 微信">
         <span>微信</span>
       </div>
       <div>
-        <img src="../../images/alipay.jpg" alt="Xinlu Wang 支付宝">
+        <img src="/images/alipay.jpg" alt="Xinlu Wang 支付宝">
         <span>支付宝</span>
       </div>
 
@@ -481,22 +481,22 @@
 </div>
 
           <div class="post-tags">
-              <a href="../../tags/interrupt/" rel="tag"><i class="fa fa-tag"></i> interrupt</a>
-              <a href="../../tags/softirq/" rel="tag"><i class="fa fa-tag"></i> softirq</a>
-              <a href="../../tags/tasklet/" rel="tag"><i class="fa fa-tag"></i> tasklet</a>
-              <a href="../../tags/workqueue/" rel="tag"><i class="fa fa-tag"></i> workqueue</a>
+              <a href="/tags/interrupt/" rel="tag"><i class="fa fa-tag"></i> interrupt</a>
+              <a href="/tags/softirq/" rel="tag"><i class="fa fa-tag"></i> softirq</a>
+              <a href="/tags/tasklet/" rel="tag"><i class="fa fa-tag"></i> tasklet</a>
+              <a href="/tags/workqueue/" rel="tag"><i class="fa fa-tag"></i> workqueue</a>
           </div>
 
         
 
           <div class="post-nav">
             <div class="post-nav-item">
-                <a href="../8b7c2647/" rel="prev" title="时间管理「time management」">
+                <a href="/posts/8b7c2647/" rel="prev" title="时间管理「time management」">
                   <i class="fa fa-angle-left"></i> 时间管理「time management」
                 </a>
             </div>
             <div class="post-nav-item">
-                <a href="../d9f20f58/" rel="next" title="利用Qemu-4.0虚拟ARM64实验平台">
+                <a href="/posts/d9f20f58/" rel="next" title="利用Qemu-4.0虚拟ARM64实验平台">
                   利用Qemu-4.0虚拟ARM64实验平台 <i class="fa fa-angle-right"></i>
                 </a>
             </div>
@@ -572,10 +572,10 @@
   <script size="300" alpha="0.6" zIndex="-1" src="https://cdnjs.cloudflare.com/ajax/libs/ribbon.js/1.0.2/ribbon.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/lozad.js/1.16.0/lozad.min.js" integrity="sha256-mOFREFhqmHeQbXpK2lp4nA3qooVgACfh88fpJftLBbc=" crossorigin="anonymous"></script>
-<script src="../../js/comments.js"></script><script src="../../js/utils.js"></script><script src="../../js/motion.js"></script><script src="../../js/schemes/muse.js"></script><script src="../../js/next-boot.js"></script><script src="../../js/bookmark.js"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script><script src="/js/bookmark.js"></script>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
-<script src="../../js/third-party/search/local-search.js"></script>
+<script src="/js/third-party/search/local-search.js"></script>
 
 
 
@@ -591,8 +591,8 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/quicklink/2.3.0/quicklink.umd.js" integrity="sha256-yvJQOINiH9fWemHn0vCA5lsHWJaHs6/ZmO+1Ft04SvM=" crossorigin="anonymous"></script>
   <script class="next-config" data-name="quicklink" type="application/json">{"enable":true,"home":false,"archive":false,"delay":true,"timeout":3000,"priority":true,"url":"http://chasinglulu.github.io/posts/undefined/"}</script>
-  <script src="../../js/third-party/quicklink.js"></script>
-<script class="next-config" data-name="waline" type="application/json">{"lang":"zh-cn","enable":true,"serverURL":"waline-server-weld-five.vercel.app","cssUrl":"https://unpkg.com/@waline/client@v2/dist/waline.css","commentCount":true,"pageview":false,"placeholder":"请文明评论呀","avatar":"mm","meta":["nick","mail","link"],"pageSize":10,"visitor":true,"comment_count":true,"requiredFields":[],"libUrl":"//unpkg.com/@waline/client@v2/dist/waline.js","el":"#waline","comment":true,"path":""}</script>
+  <script src="/js/third-party/quicklink.js"></script>
+<script class="next-config" data-name="waline" type="application/json">{"lang":"zh-cn","enable":true,"serverURL":"waline-server-weld-five.vercel.app","cssUrl":"https://unpkg.com/@waline/client@v2/dist/waline.css","commentCount":true,"pageview":false,"placeholder":"请文明评论呀","avatar":"mm","meta":["nick","mail","link"],"pageSize":10,"visitor":true,"comment_count":true,"requiredFields":[],"libUrl":"//unpkg.com/@waline/client@v2/dist/waline.js","el":"#waline","comment":true,"path":"/posts/undefined/"}</script>
 <link rel="stylesheet" href="https://unpkg.com/@waline/client@v2/dist/waline.css">
 <script>
 document.addEventListener('page:loaded', () => {
