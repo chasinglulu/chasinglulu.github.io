@@ -21,26 +21,30 @@
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"chasinglulu.github.io","root":"/","images":"/images","scheme":"Mist","darkmode":false,"version":"8.18.2","exturl":false,"sidebar":{"position":"right","display":"hide","padding":18,"offset":12},"copycode":{"enable":true,"style":"mac"},"fold":{"enable":true,"height":500},"bookmark":{"enable":true,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
 
-    <meta name="description" content="不积跬步无以至千里 不积小流无以成江海">
-<meta property="og:type" content="website">
-<meta property="og:title" content="点滴汇聚">
-<meta property="og:url" content="http://chasinglulu.github.io/tags/timer/index.html">
+    <meta name="description" content="随着芯片开发的规模越来越大，验证无处不在，在整个开发流程中能够将系统软件的开发尽量向左前移，那么我们开发的芯片就能够更早地推向市场，甚至抢占先机。 使用Qemu来模拟替代我们开发的芯片，从而能够让软件开发人员提前进行BSP相关软件的开发，但是Qemu里面是没有我们芯片对应的machine，因此我们要根据芯片手册，新增一个芯片machine或者芯片平台，也就是说基于Qemu现有的代码，我们新开发一个">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Qemu新增芯片machine">
+<meta property="og:url" content="http://chasinglulu.github.io/posts/27c3d8a8/index.html">
 <meta property="og:site_name" content="点滴汇聚">
-<meta property="og:description" content="不积跬步无以至千里 不积小流无以成江海">
+<meta property="og:description" content="随着芯片开发的规模越来越大，验证无处不在，在整个开发流程中能够将系统软件的开发尽量向左前移，那么我们开发的芯片就能够更早地推向市场，甚至抢占先机。 使用Qemu来模拟替代我们开发的芯片，从而能够让软件开发人员提前进行BSP相关软件的开发，但是Qemu里面是没有我们芯片对应的machine，因此我们要根据芯片手册，新增一个芯片machine或者芯片平台，也就是说基于Qemu现有的代码，我们新开发一个">
 <meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2023-11-14T08:23:45.000Z">
+<meta property="article:modified_time" content="2023-11-14T09:09:40.708Z">
 <meta property="article:author" content="Xinlu Wang">
-<meta property="article:tag" content="IT宅、DIY技术">
+<meta property="article:tag" content="qemu">
+<meta property="article:tag" content="SoC">
+<meta property="article:tag" content="emulation">
 <meta name="twitter:card" content="summary">
 
 
-<link rel="canonical" href="http://chasinglulu.github.io/tags/timer/">
+<link rel="canonical" href="http://chasinglulu.github.io/posts/27c3d8a8/">
 
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":false,"lang":"zh-CN","comments":"","permalink":"","path":"tags/timer/index.html","title":""}</script>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://chasinglulu.github.io/posts/27c3d8a8/","path":"posts/27c3d8a8/","title":"Qemu新增芯片machine"}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
-<title>标签: timer | 点滴汇聚</title>
+<title>Qemu新增芯片machine | 点滴汇聚</title>
   
 
 
@@ -153,7 +157,7 @@
   
   <aside class="sidebar">
 
-    <div class="sidebar-inner sidebar-overview-active">
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
       <ul class="sidebar-nav">
         <li class="sidebar-nav-toc">
           文章目录
@@ -166,6 +170,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%B0%E5%A2%9E%E7%9A%84%E5%B9%B3%E5%8F%B0"><span class="nav-number">1.</span> <span class="nav-text">新增的平台</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%9B%AE%E5%89%8D%E6%96%B0%E6%94%AF%E6%8C%81%E7%9A%84%E5%B9%B3%E5%8F%B0"><span class="nav-number">1.1.</span> <span class="nav-text">目前新支持的平台</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#hobot%E5%B9%B3%E5%8F%B0"><span class="nav-number">1.2.</span> <span class="nav-text">hobot平台</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#lambert%E5%B9%B3%E5%8F%B0"><span class="nav-number">1.3.</span> <span class="nav-text">lambert平台</span></a></li></ol></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -233,51 +238,249 @@
 
     </div>
 
-    <div class="main-inner tag posts-collapse">
+    <div class="main-inner post posts-expand">
 
 
   
+
+
+<div class="post-block">
   
   
-  <div class="post-block">
-    <div class="post-content">
-      <div class="collection-title">
-        <h1 class="collection-header">timer
-          <small>标签</small>
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://chasinglulu.github.io/posts/27c3d8a8/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpeg">
+      <meta itemprop="name" content="Xinlu Wang">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="点滴汇聚">
+      <meta itemprop="description" content="不积跬步无以至千里 不积小流无以成江海">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Qemu新增芯片machine | 点滴汇聚">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Qemu新增芯片machine
         </h1>
-      </div>
 
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
       
-    <div class="collection-year">
-      <span class="collection-header">2019</span>
+
+      <time title="创建时间：2023-11-14 16:23:45 / 修改时间：17:09:40" itemprop="dateCreated datePublished" datetime="2023-11-14T16:23:45+08:00">2023-11-14</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/tools/" itemprop="url" rel="index"><span itemprop="name">tools</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+  
+  <span class="post-meta-item">
+    
+    <span class="post-meta-item-icon">
+      <i class="far fa-comment"></i>
+    </span>
+    <span class="post-meta-item-text">Waline：</span>
+  
+    <a title="waline" href="/posts/27c3d8a8/#waline" itemprop="discussionUrl">
+      <span class="post-comments-count waline-comment-count" data-path="/posts/27c3d8a8/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>704</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>3 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>随着芯片开发的规模越来越大，验证无处不在，在整个开发流程中能够将系统软件的开发尽量向左前移，那么我们开发的芯片就能够更早地推向市场，甚至抢占先机。</p>
+<p>使用Qemu来模拟替代我们开发的芯片，从而能够让软件开发人员提前进行BSP相关软件的开发，但是Qemu里面是没有我们芯片对应的machine，因此我们要根据芯片手册，新增一个芯片machine或者芯片平台，也就是说基于Qemu现有的代码，我们新开发一个自有芯片的machine，基于这个新开发的machine，我们就可以开发我们的U-Boot、Linux BSP相关的代码了，从而缩小BSP相关代码在FPAG上的验证时间。</p>
+<span id="more"></span>
+
+<h3 id="新增的平台"><a href="#新增的平台" class="headerlink" title="新增的平台"></a>新增的平台</h3><p>在我们开发Qemu machine之前，我们需要先熟悉芯片的基础架构：</p>
+<ol>
+<li>芯片的地址映射（memory map）</li>
+<li>芯片的中断映射（interrupt map）</li>
+<li>芯片的指令集架构（ARM、RISC-V等）</li>
+<li>芯片涉及的外设（GIC、timer、UART和ethernet等）</li>
+</ol>
+<h4 id="目前新支持的平台"><a href="#目前新支持的平台" class="headerlink" title="目前新支持的平台"></a>目前新支持的平台</h4><style type="text/css">
+.tg  {border-collapse:collapse;border-color:#9ABAD9;border-spacing:0;margin:0px auto;}
+.tg td{background-color:#EBF5FF;border-color:#9ABAD9;border-style:solid;border-width:1px;color:#444;
+  font-family:Arial, sans-serif;font-size:14px;overflow:hidden;padding:10px 5px;word-break:normal;}
+.tg th{background-color:#409cff;border-color:#9ABAD9;border-style:solid;border-width:1px;color:#fff;
+  font-family:Arial, sans-serif;font-size:14px;font-weight:normal;overflow:hidden;padding:10px 5px;word-break:normal;}
+.tg .tg-g0b6{font-family:"Times New Roman", Times, serif !important;font-size:14px;text-align:left;vertical-align:middle}
+.tg .tg-xezk{background-color:#D2E4FC;font-family:"Times New Roman", Times, serif !important;font-size:14px;text-align:center;
+  vertical-align:middle}
+.tg .tg-aoar{font-family:"Times New Roman", Times, serif !important;font-size:14px;position:-webkit-sticky;position:sticky;
+  text-align:center;top:-1px;vertical-align:middle;will-change:transform}
+.tg .tg-1xb4{font-family:"Times New Roman", Times, serif !important;font-size:14px;text-align:center;vertical-align:middle}
+.tg .tg-8yge{background-color:#D2E4FC;font-family:"Times New Roman", Times, serif !important;font-size:14px;text-align:left;
+  vertical-align:middle}
+@media screen and (max-width: 767px) {.tg {width: auto !important;}.tg col {width: auto !important;}.tg-wrap {overflow-x: auto;-webkit-overflow-scrolling: touch;margin: auto 0px;}}</style>
+<div class="tg-wrap"><table class="tg">
+<thead>
+  <tr>
+    <th class="tg-aoar">SoC Platform</th>
+    <th class="tg-aoar">Machine Name</th>
+    <th class="tg-aoar">Arch</th>
+    <th class="tg-aoar">U-Boot defconfig</th>
+    <th class="tg-aoar">ATF defconfig</th>
+    <th class="tg-aoar">OP-TEE defconfig</th>
+    <th class="tg-aoar">Kernel defconfig</th>
+  </tr>
+</thead>
+<tbody>
+  <tr>
+    <td class="tg-1xb4">hobot</td>
+    <td class="tg-xezk">hobot-sigi-virt</td>
+    <td class="tg-1xb4">aarch64</td>
+    <td class="tg-8yge"></td>
+    <td class="tg-g0b6"></td>
+    <td class="tg-8yge"></td>
+    <td class="tg-g0b6"></td>
+  </tr>
+  <tr>
+    <td class="tg-1xb4">lambert</td>
+    <td class="tg-xezk">lmt-virt</td>
+    <td class="tg-1xb4">aarch64</td>
+    <td class="tg-8yge"></td>
+    <td class="tg-g0b6"></td>
+    <td class="tg-8yge"></td>
+    <td class="tg-g0b6"></td>
+  </tr>
+  <tr>
+    <td class="tg-1xb4">lambert safety</td>
+    <td class="tg-xezk">lmt-riscv-virt</td>
+    <td class="tg-1xb4">riscv32</td>
+    <td class="tg-8yge"></td>
+    <td class="tg-g0b6"></td>
+    <td class="tg-8yge"></td>
+    <td class="tg-g0b6"></td>
+  </tr>
+</tbody>
+</table></div>
+
+<h4 id="hobot平台"><a href="#hobot平台" class="headerlink" title="hobot平台"></a>hobot平台</h4><h4 id="lambert平台"><a href="#lambert平台" class="headerlink" title="lambert平台"></a>lambert平台</h4>
     </div>
 
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-      <div class="post-meta-container">
-        <time itemprop="dateCreated"
-              datetime="2019-07-15T21:21:50+08:00"
-              content="2019-07-15">
-          07-15
-        </time>
+    
+    
+    
+
+    <footer class="post-footer"><div class="post-widgets">
+      <div id="needsharebutton-postbottom">
+        <span class="btn">
+          <i class="fa fa-share-alt" aria-hidden="true"></i>
+        </span>
       </div>
-
-      <div class="post-title">
-        <a class="post-title-link" href="/posts/8b7c2647/" itemprop="url">
-          <span itemprop="name">时间管理「time management」</span>
-        </a>
-      </div>
-
-      
-    </header>
-  </article>
-
     </div>
+          <div class="reward-container">
+  <div>请我一杯咖啡吧！</div>
+  <button>
+    赞赏
+  </button>
+  <div class="post-reward">
+      <div>
+        <img src="/images/wechatpay.png" alt="Xinlu Wang 微信">
+        <span>微信</span>
+      </div>
+      <div>
+        <img src="/images/alipay.jpg" alt="Xinlu Wang 支付宝">
+        <span>支付宝</span>
+      </div>
+
   </div>
-  
-  
-  
+</div>
 
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>本文作者： </strong>Xinlu Wang
+  </li>
+  <li class="post-copyright-link">
+      <strong>本文链接：</strong>
+      <a href="http://chasinglulu.github.io/posts/27c3d8a8/" title="Qemu新增芯片machine">http://chasinglulu.github.io/posts/27c3d8a8/</a>
+  </li>
+  <li class="post-copyright-license">
+      <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/qemu/" rel="tag"><i class="fa fa-tag"></i> qemu</a>
+              <a href="/tags/SoC/" rel="tag"><i class="fa fa-tag"></i> SoC</a>
+              <a href="/tags/emulation/" rel="tag"><i class="fa fa-tag"></i> emulation</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/6c41dfb6/" rel="prev" title="Qemu Co-simulation">
+                  <i class="fa fa-angle-left"></i> Qemu Co-simulation
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments" id="waline"></div>
 </div>
   </main>
 
@@ -357,9 +560,9 @@
 
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/quicklink/2.3.0/quicklink.umd.js" integrity="sha256-yvJQOINiH9fWemHn0vCA5lsHWJaHs6/ZmO+1Ft04SvM=" crossorigin="anonymous"></script>
-  <script class="next-config" data-name="quicklink" type="application/json">{"enable":true,"home":false,"archive":false,"delay":true,"timeout":3000,"priority":true,"url":"http://chasinglulu.github.io/tags/timer/"}</script>
+  <script class="next-config" data-name="quicklink" type="application/json">{"enable":true,"home":false,"archive":false,"delay":true,"timeout":3000,"priority":true,"url":"http://chasinglulu.github.io/posts/27c3d8a8/"}</script>
   <script src="/js/third-party/quicklink.js"></script>
-<script class="next-config" data-name="waline" type="application/json">{"lang":"zh-cn","enable":true,"serverURL":"waline-server-weld-five.vercel.app","cssUrl":"https://unpkg.com/@waline/client@v2/dist/waline.css","commentCount":true,"pageview":false,"placeholder":"请文明评论呀","avatar":"mm","meta":["nick","mail","link"],"pageSize":10,"visitor":true,"comment_count":true,"requiredFields":[],"libUrl":"//unpkg.com/@waline/client@v2/dist/waline.js","el":"#waline","comment":true,"path":"/tags/timer/"}</script>
+<script class="next-config" data-name="waline" type="application/json">{"lang":"zh-cn","enable":true,"serverURL":"waline-server-weld-five.vercel.app","cssUrl":"https://unpkg.com/@waline/client@v2/dist/waline.css","commentCount":true,"pageview":false,"placeholder":"请文明评论呀","avatar":"mm","meta":["nick","mail","link"],"pageSize":10,"visitor":true,"comment_count":true,"requiredFields":[],"libUrl":"//unpkg.com/@waline/client@v2/dist/waline.js","el":"#waline","comment":true,"path":"/posts/27c3d8a8/"}</script>
 <link rel="stylesheet" href="https://unpkg.com/@waline/client@v2/dist/waline.css">
 <script>
 document.addEventListener('page:loaded', () => {
