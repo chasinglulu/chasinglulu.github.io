@@ -2099,26 +2099,24 @@
 <p>打开<code>~/.bashrc</code>后在文件末尾添加如下命令：</p>
 <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">export</span> PATH=<span class="variable">$PATH</span>:/path/to/riscv32/bin</span><br></pre></td></tr></table></figure>
 <p>保存之后，同步修改：</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ <span class="built_in">source</span> ~/.bashrc</span><br><span class="line"></span><br><span class="line">$ riscv32-unknown-linux-gnu-gcc --version</span><br><span class="line"></span><br><span class="line">riscv32-unknown-linux-gnu-gcc () 12.2.0</span><br><span class="line">Copyright (C) 2022 Free Software Foundation, Inc.</span><br><span class="line">This is free software; see the <span class="built_in">source</span> <span class="keyword">for</span> copying conditions.  There is NO</span><br><span class="line">warranty; not even <span class="keyword">for</span> MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">source</span> ~/.bashrc</span><br><span class="line">riscv32-unknown-linux-gnu-gcc --version</span><br></pre></td></tr></table></figure>
+<p><img data-src="/images/26/carbon0.svg" alt="carbon"></p>
 <h3 id="Qemu构建"><a href="#Qemu构建" class="headerlink" title="Qemu构建"></a>Qemu构建</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git <span class="built_in">clone</span> -b qemu-v7.2.0 https://github.com/chasinglulu/qemu.git</span><br><span class="line"><span class="built_in">cd</span> qemu</span><br><span class="line">./configure --target-list=aarch64-softmmu,riscv64-softmmu,riscv32-softmmu --enable-fdt --disable-kvm --disable-xen --enable-gcrypt</span><br><span class="line">make -j64</span><br><span class="line"></span><br><span class="line"><span class="built_in">cd</span> build</span><br><span class="line">./qemu-system-riscv32 --version</span><br></pre></td></tr></table></figure>
-<p><img data-src="/images/26/version.jpg" alt="qemu-system-riscv32-version"></p>
-<center>图1 检查qemu-system-riscv32的版本</center>
-
+<p><img data-src="/images/26/qemu.svg" alt="qemu-system-riscv32-version"></p>
 <h3 id="OpenSBI构建"><a href="#OpenSBI构建" class="headerlink" title="OpenSBI构建"></a>OpenSBI构建</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git <span class="built_in">clone</span> https://github.com/chasinglulu/opensbi.git</span><br><span class="line"></span><br><span class="line"><span class="built_in">export</span> CROSS_COMPILE=riscv32-unknown-linux-gnu-</span><br><span class="line">make PLATFORM=generic</span><br></pre></td></tr></table></figure>
 <p>更多关于OpenSBI的构建说明，参考<a href="https://github.com/riscv-software-src/opensbi">OpenSBI README</a></p>
 <h3 id="U-Boot构建"><a href="#U-Boot构建" class="headerlink" title="U-Boot构建"></a>U-Boot构建</h3><p>首先要将<code>/path/to/opensbi/build/platform/generic/firmware</code>目录下<code>fw_dynamic.bin</code>文件复制到u-boot源代码目录下，在编译时binman会使用这个bin文件打包出一个u-boot.itb。</p>
 <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git <span class="built_in">clone</span> -b hobot-uboot https://github.com/chasinglulu/u-boot.git</span><br><span class="line"><span class="built_in">cd</span> u-boot</span><br><span class="line">make ARCH=riscv CROSS_COMPILE=riscv32-unknown-linux-gnu- qemu-riscv32_spl_defconfig</span><br><span class="line">make ARCH=riscv CROSS_COMPILE=riscv32-unknown-linux-gnu- -j4</span><br></pre></td></tr></table></figure>
 
 <h3 id="运行调试"><a href="#运行调试" class="headerlink" title="运行调试"></a>运行调试</h3><h4 id="启动顺序"><a href="#启动顺序" class="headerlink" title="启动顺序"></a>启动顺序</h4><p><img data-src="/images/26/opensbi-introduction.jpg" alt="What is SBI"></p>
-<center>图2 SBI介绍</center>
+<center>图1 SBI介绍</center>
 
 <p><img data-src="/images/26/riscv-bootflow.jpg" alt="riscv bootflow"></p>
-<center>图3 RISC-V启动流</center>
+<center>图2 RISC-V启动流</center>
 
 <h4 id="启动案例"><a href="#启动案例" class="headerlink" title="启动案例"></a>启动案例</h4><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">qemu-system-riscv32 -M virt -smp 4 -m 2G -display none -serial stdio -bios /path/to/u-boot/spl/u-boot-spl.bin -device loader,file=/path/to/u-boot/u-boot.itb,addr=0x80200000</span><br></pre></td></tr></table></figure>
 
-<p>运行输出日志如下：<br><img data-src="/images/26/carbon.png" alt="carbon"></p>
+<p>运行输出日志如下：<br><img data-src="/images/26/carbon.svg" alt="carbon"></p>
 <h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><ol>
 <li><a href="https://riscv.org/wp-content/uploads/2019/12/Summit_bootflow.pdf">RISC-V BootFlow</a></li>
 </ol>
