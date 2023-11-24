@@ -269,7 +269,11 @@
 <center>图1 verilog-uart的Qemu co-simulation</center>
 
 <p><img data-src="/images/25/qemu-ethernet.jpg" alt="qemu-simulaton-ethernet"></p>
-<center>图2 verilog-ethernet的Qemu co-simulation</center>]]></content>
+<center>图2 verilog-ethernet的Qemu co-simulation</center>
+
+<p><img data-src="/images/25/mult-process-qemu.jpg" alt="mult-process-qemu"></p>
+<center>图3 Multi-Process Qemu的协同仿真</center>
+]]></content>
       <categories>
         <category>tools</category>
       </categories>
