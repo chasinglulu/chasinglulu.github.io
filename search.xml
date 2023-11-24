@@ -2880,4 +2880,56 @@ Number 99 is palindrom in basis 10.</pre>
         <tag>schedule</tag>
       </tags>
   </entry>
+  <entry>
+    <title>基于Qemu eMMC模拟设备的启动</title>
+    <url>/posts/7cba3cf4/</url>
+    <content><![CDATA[<p>从eMMC中加载镜像并启动是我们常见开发板的启动方式，通过Qemu模拟eMMC设备，这样我们可以在Qemu上直接验证我们很多相关的逻辑功能，比如eMMC的启动、文件系统的mount、文件读写等。</p>
+<span id="more"></span>
+
+<hr>
+<ul>
+<li><strong>Qemu:</strong> v7.2.0</li>
+<li><strong>U-Boot:</strong> v2022.04</li>
+<li><strong>ATF:</strong> lts-v2.8.1</li>
+<li><strong>Linux Kernel:</strong> linux-6.1.12</li>
+</ul>
+<hr>
+<h3 id="eMMC镜像制作"><a href="#eMMC镜像制作" class="headerlink" title="eMMC镜像制作"></a>eMMC镜像制作</h3><h3 id="Ubuntu启动"><a href="#Ubuntu启动" class="headerlink" title="Ubuntu启动"></a>Ubuntu启动</h3><h3 id="基于Buildroot文件系统启动"><a href="#基于Buildroot文件系统启动" class="headerlink" title="基于Buildroot文件系统启动"></a>基于Buildroot文件系统启动</h3>]]></content>
+      <categories>
+        <category>tools</category>
+      </categories>
+      <tags>
+        <tag>qemu</tag>
+        <tag>u-boot</tag>
+        <tag>linux</tag>
+        <tag>ATF</tag>
+        <tag>eMMC</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>基于Qemu搭建Xen on ARM开发环境</title>
+    <url>/posts/8ef16649/</url>
+    <content><![CDATA[]]></content>
+      <categories>
+        <category>tools</category>
+      </categories>
+      <tags>
+        <tag>qemu</tag>
+        <tag>u-boot</tag>
+        <tag>linux</tag>
+        <tag>ATF</tag>
+        <tag>eMMC</tag>
+        <tag>Xen</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>基于Qemu lmt-virt平台的Nuttx移植</title>
+    <url>/posts/18f80048/</url>
+    <content><![CDATA[]]></content>
+  </entry>
+  <entry>
+    <title>基于Qemu lmt-virt平台的bringup</title>
+    <url>/posts/61970ccf/</url>
+    <content><![CDATA[]]></content>
+  </entry>
 </search>
