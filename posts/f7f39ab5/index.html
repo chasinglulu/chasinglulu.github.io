@@ -36,7 +36,7 @@
 <meta property="og:image" content="http://chasinglulu.github.io/images/27/atf.svg">
 <meta property="og:image" content="http://chasinglulu.github.io/images/27/atf_kernel.svg">
 <meta property="article:published_time" content="2023-11-14T12:43:22.000Z">
-<meta property="article:modified_time" content="2023-11-24T17:36:20.410Z">
+<meta property="article:modified_time" content="2023-11-24T17:41:49.398Z">
 <meta property="article:author" content="Xinlu Wang">
 <meta property="article:tag" content="qemu">
 <meta property="article:tag" content="u-boot">
@@ -294,7 +294,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2023-11-25 01:36:20" itemprop="dateModified" datetime="2023-11-25T01:36:20+08:00">2023-11-25</time>
+      <time title="修改时间：2023-11-25 01:41:49" itemprop="dateModified" datetime="2023-11-25T01:41:49+08:00">2023-11-25</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -334,7 +334,7 @@
         <i class="far fa-file-word"></i>
       </span>
       <span class="post-meta-item-text">本文字数：</span>
-      <span>818</span>
+      <span>824</span>
     </span>
     <span class="post-meta-item" title="阅读时长">
       <span class="post-meta-item-icon">
@@ -399,7 +399,7 @@
 <h3 id="启动验证"><a href="#启动验证" class="headerlink" title="启动验证"></a>启动验证</h3><h4 id="仅启动U-Boot"><a href="#仅启动U-Boot" class="headerlink" title="仅启动U-Boot"></a>仅启动U-Boot</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">qemu-system-aarch64 -M hobot-sigi-virt -m 4G -display none -device loader,addr=0x3000200000,file=/path/to/u-boot/u-boot.bin,cpu-num=0 -serial stdio</span><br></pre></td></tr></table></figure>
 
 <p><img data-src="/images/27/uboot.svg" alt="uboot"></p>
-<h4 id="启动U-Boot-Kernel"><a href="#启动U-Boot-Kernel" class="headerlink" title="启动U-Boot+Kernel"></a>启动U-Boot+Kernel</h4><p>将<code>Image</code>、<code>hobot-sigi-virt.dtb</code>和<code>rootfs.cpio.lz4</code>三个镜像先复制到执行qemu-system-aarch64的当前目录<code>$(PWD)</code>下，U-Boot将使用semihosting方式让qemu自动把这三个镜像搭载到对应的内存中。</p>
+<h4 id="启动U-Boot-Kernel"><a href="#启动U-Boot-Kernel" class="headerlink" title="启动U-Boot+Kernel"></a>启动U-Boot+Kernel</h4><p>将<code>Image</code>、<code>hobot-sigi-virt.dtb</code>和<code>rootfs.cpio.lz4</code>三个镜像先复制到执行qemu-system-aarch64的当前目录<code>$(PWD)</code>下，U-Boot将使用semihosting方式让qemu自动地将这三个镜像加载到hobot-sigi-virt平台模拟的内存中。</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">qemu-system-aarch64 -M hobot-sigi-virt -m 4G -display none -device loader,addr=0x3000200000,file=/home/charleye/24-Xen/u-boot/u-boot.bin,cpu-num=0 -serial stdio -semihosting</span><br></pre></td></tr></table></figure>
 <p><img data-src="/images/27/kernel.svg" alt="kernel"></p>
 <h4 id="启动ATF-U-Boot"><a href="#启动ATF-U-Boot" class="headerlink" title="启动ATF+U-Boot"></a>启动ATF+U-Boot</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">qemu-system-aarch64 -M hobot-sigi-virt,virt=on,secure=on -m 4G -display none -device loader,addr=0x04001000,file=/path/to/arm-trusted-firmware/build/sigi/release/bl31.bin,cpu-num=0 -device loader,addr=0x3004000000,file=/path/to/u-boot/u-boot-dtb.bin -serial stdio</span><br></pre></td></tr></table></figure>
