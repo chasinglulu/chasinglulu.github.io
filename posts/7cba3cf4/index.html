@@ -28,8 +28,10 @@
 <meta property="og:site_name" content="点滴汇聚">
 <meta property="og:description" content="从eMMC中加载镜像并启动是我们常见开发板的启动方式，通过Qemu模拟eMMC设备，这样我们可以在Qemu上直接验证我们很多相关的逻辑功能，比如eMMC的启动、文件系统的mount、文件读写等。">
 <meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://chasinglulu.github.io/images/28/uboot-sdhci-framework.jpg">
+<meta property="og:image" content="http://chasinglulu.github.io/images/28/eMMC.svg">
 <meta property="article:published_time" content="2023-11-24T17:48:51.000Z">
-<meta property="article:modified_time" content="2023-11-24T17:53:58.858Z">
+<meta property="article:modified_time" content="2023-11-25T14:42:24.844Z">
 <meta property="article:author" content="Xinlu Wang">
 <meta property="article:tag" content="qemu">
 <meta property="article:tag" content="u-boot">
@@ -37,6 +39,7 @@
 <meta property="article:tag" content="ATF">
 <meta property="article:tag" content="eMMC">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://chasinglulu.github.io/images/28/uboot-sdhci-framework.jpg">
 
 
 <link rel="canonical" href="http://chasinglulu.github.io/posts/7cba3cf4/">
@@ -172,7 +175,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#eMMC%E9%95%9C%E5%83%8F%E5%88%B6%E4%BD%9C"><span class="nav-number">1.</span> <span class="nav-text">eMMC镜像制作</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Ubuntu%E5%90%AF%E5%8A%A8"><span class="nav-number">2.</span> <span class="nav-text">Ubuntu启动</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8EBuildroot%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E5%90%AF%E5%8A%A8"><span class="nav-number">3.</span> <span class="nav-text">基于Buildroot文件系统启动</span></a></li></ol></div>
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#U-Boot-eMMC%E6%9E%B6%E6%9E%84"><span class="nav-number">1.</span> <span class="nav-text">U-Boot eMMC架构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#eMMC%E9%95%9C%E5%83%8F%E5%88%B6%E4%BD%9C"><span class="nav-number">2.</span> <span class="nav-text">eMMC镜像制作</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#eMMC%E9%AA%8C%E8%AF%81"><span class="nav-number">3.</span> <span class="nav-text">eMMC验证</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#U-Boot%E9%85%8D%E7%BD%AE%E9%80%89%E9%A1%B9"><span class="nav-number">3.1.</span> <span class="nav-text">U-Boot配置选项</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%BF%90%E8%A1%8C%E9%AA%8C%E8%AF%81"><span class="nav-number">3.2.</span> <span class="nav-text">运行验证</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Ubuntu%E5%90%AF%E5%8A%A8"><span class="nav-number">4.</span> <span class="nav-text">Ubuntu启动</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Ubuntu%E9%95%9C%E5%83%8F%E5%88%B6%E4%BD%9C"><span class="nav-number">4.1.</span> <span class="nav-text">Ubuntu镜像制作</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%BF%90%E8%A1%8C%E9%AA%8C%E8%AF%81-1"><span class="nav-number">4.2.</span> <span class="nav-text">运行验证</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8EBuildroot%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E5%90%AF%E5%8A%A8"><span class="nav-number">5.</span> <span class="nav-text">基于Buildroot文件系统启动</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#eMMC-RPMB"><span class="nav-number">6.</span> <span class="nav-text">eMMC RPMB</span></a></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -281,7 +284,7 @@
       <span class="post-meta-item-text">发表于</span>
       
 
-      <time title="创建时间：2023-11-25 01:48:51 / 修改时间：01:53:58" itemprop="dateCreated datePublished" datetime="2023-11-25T01:48:51+08:00">2023-11-25</time>
+      <time title="创建时间：2023-11-25 01:48:51 / 修改时间：22:42:24" itemprop="dateCreated datePublished" datetime="2023-11-25T01:48:51+08:00">2023-11-25</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -321,7 +324,7 @@
         <i class="far fa-file-word"></i>
       </span>
       <span class="post-meta-item-text">本文字数：</span>
-      <span>102</span>
+      <span>367</span>
     </span>
     <span class="post-meta-item" title="阅读时长">
       <span class="post-meta-item-icon">
@@ -345,11 +348,23 @@
 <ul>
 <li><strong>Qemu:</strong> v7.2.0</li>
 <li><strong>U-Boot:</strong> v2022.04</li>
-<li><strong>ATF:</strong> lts-v2.8.1</li>
 <li><strong>Linux Kernel:</strong> linux-6.1.12</li>
 </ul>
 <hr>
-<h3 id="eMMC镜像制作"><a href="#eMMC镜像制作" class="headerlink" title="eMMC镜像制作"></a>eMMC镜像制作</h3><h3 id="Ubuntu启动"><a href="#Ubuntu启动" class="headerlink" title="Ubuntu启动"></a>Ubuntu启动</h3><h3 id="基于Buildroot文件系统启动"><a href="#基于Buildroot文件系统启动" class="headerlink" title="基于Buildroot文件系统启动"></a>基于Buildroot文件系统启动</h3>
+<h3 id="U-Boot-eMMC架构"><a href="#U-Boot-eMMC架构" class="headerlink" title="U-Boot eMMC架构"></a>U-Boot eMMC架构</h3><p><img data-src="/images/28/uboot-sdhci-framework.jpg" alt="framework"></p>
+<h3 id="eMMC镜像制作"><a href="#eMMC镜像制作" class="headerlink" title="eMMC镜像制作"></a>eMMC镜像制作</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">dd</span> <span class="keyword">if</span>=/dev/zero of=emmc.img bs=1M count=1024</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h3 id="eMMC验证"><a href="#eMMC验证" class="headerlink" title="eMMC验证"></a>eMMC验证</h3><h4 id="U-Boot配置选项"><a href="#U-Boot配置选项" class="headerlink" title="U-Boot配置选项"></a>U-Boot配置选项</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">CONFIG_MMC=y</span><br><span class="line">CONFIG_MMC_WRITE=y</span><br><span class="line">CONFIG_DM_MMC=y</span><br><span class="line">CONFIG_MMC_SDHCI_ADMA_HELPERS=y</span><br><span class="line">CONFIG_MMC_HW_PARTITIONING=y</span><br><span class="line">CONFIG_SUPPORT_EMMC_RPMB=y</span><br><span class="line">CONFIG_SUPPORT_EMMC_BOOT=y</span><br><span class="line">CONFIG_CMD_MMC=y</span><br><span class="line">CONFIG_MMC_VERBOSE=y</span><br><span class="line">CONFIG_MMC_SDHCI=y</span><br><span class="line">CONFIG_MMC_SDHCI_SDMA=y</span><br><span class="line">CONFIG_MMC_SDHCI_ADMA=y</span><br><span class="line"># CONFIG_SPL_MMC_SDHCI_ADMA is not <span class="built_in">set</span></span><br><span class="line"># CONFIG_MMC_SDHCI_BCMSTB is not <span class="built_in">set</span></span><br><span class="line">CONFIG_MMC_SDHCI_CADENCE=y</span><br></pre></td></tr></table></figure>
+<h4 id="运行验证"><a href="#运行验证" class="headerlink" title="运行验证"></a>运行验证</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">qemu-system-aarch64 -M hobot-sigi-virt,emmc=on,virt=on -m 4G -display none -device loader,addr=0x3000200000,file=/path/to/u-boot/u-boot-dtb.bin,cpu-num=0 -drive file=/path/to/emmc.img,format=raw,<span class="keyword">if</span>=emmc -serial stdio</span><br></pre></td></tr></table></figure>
+
+<p><img data-src="/images/28/eMMC.svg" alt="eMMC"></p>
+<h3 id="Ubuntu启动"><a href="#Ubuntu启动" class="headerlink" title="Ubuntu启动"></a>Ubuntu启动</h3><h4 id="Ubuntu镜像制作"><a href="#Ubuntu镜像制作" class="headerlink" title="Ubuntu镜像制作"></a>Ubuntu镜像制作</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">wget http://cdimage.ubuntu.com/ubuntu-base/releases/20.04.4/release/ubuntu-base-20.04.4-base-arm64.tar.gz</span><br><span class="line"><span class="built_in">dd</span> <span class="keyword">if</span>=/dev/zero of=ubuntu.img bs=1M count=1024 oflag=direct</span><br><span class="line">mkfs.ext4 ubuntu.img</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>将生成的ubuntu.img里面的内容都复制到emmc.img的<code>part 8</code>里面，这样U-Boot启动时才能挂载Ubuntu文件系统。</p>
+<h4 id="运行验证-1"><a href="#运行验证-1" class="headerlink" title="运行验证"></a>运行验证</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">qemu-system-aarch64 -M hobot-sigi-virt,emmc=on,virt=on -m 4G -display none -device loader,addr=0x3000200000,file=/path/to/u-boot/u-boot-dtb.bin,cpu-num=0 -drive file=/path/to/emmc.img,format=raw,<span class="keyword">if</span>=emmc -serial stdio</span><br></pre></td></tr></table></figure>
+
+<h3 id="基于Buildroot文件系统启动"><a href="#基于Buildroot文件系统启动" class="headerlink" title="基于Buildroot文件系统启动"></a>基于Buildroot文件系统启动</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">qemu-system-aarch64 -M hobot-sigi-virt,emmc=on,virt=on -m 4G -display none -device loader,addr=0x3000200000,file=/path/to/u-boot/u-boot-dtb.bin,cpu-num=0 -drive file=/path/to/emmc.img,format=raw,<span class="keyword">if</span>=emmc -serial stdio</span><br></pre></td></tr></table></figure>
+
+<h3 id="eMMC-RPMB"><a href="#eMMC-RPMB" class="headerlink" title="eMMC RPMB"></a>eMMC RPMB</h3>
     </div>
 
     
@@ -457,7 +472,7 @@
       <i class="fa fa-coffee"></i>
     </span>
       <span>站点阅读时长 &asymp;</span>
-    <span title="站点阅读时长">4:41</span>
+    <span title="站点阅读时长">4:42</span>
   </span>
 </div>
 <div class="busuanzi-count">
