@@ -31,8 +31,9 @@
 <meta property="og:image" content="http://chasinglulu.github.io/images/25/qemu.jpg">
 <meta property="og:image" content="http://chasinglulu.github.io/images/25/qemu-ethernet.jpg">
 <meta property="og:image" content="http://chasinglulu.github.io/images/25/mult-process-qemu.jpg">
+<meta property="og:image" content="http://chasinglulu.github.io/images/25/qemu-network.png">
 <meta property="article:published_time" content="2023-11-14T06:32:07.000Z">
-<meta property="article:modified_time" content="2023-11-24T09:39:00.811Z">
+<meta property="article:modified_time" content="2023-12-15T03:01:18.236Z">
 <meta property="article:author" content="Xinlu Wang">
 <meta property="article:tag" content="qemu">
 <meta property="article:tag" content="emulator">
@@ -162,7 +163,7 @@
   
   <aside class="sidebar">
 
-    <div class="sidebar-inner sidebar-overview-active">
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
       <ul class="sidebar-nav">
         <li class="sidebar-nav-toc">
           文章目录
@@ -175,6 +176,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#Qemu-inside-VirtualBox"><span class="nav-number">1.</span> <span class="nav-text">Qemu inside VirtualBox</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%B8%89%E4%B8%AAOS"><span class="nav-number">1.1.</span> <span class="nav-text">三个OS</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%8E%AF%E5%A2%83"><span class="nav-number">1.2.</span> <span class="nav-text">环境</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BD%91%E7%BB%9C"><span class="nav-number">1.3.</span> <span class="nav-text">网络</span></a></li></ol></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -289,7 +291,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2023-11-24 17:39:00" itemprop="dateModified" datetime="2023-11-24T17:39:00+08:00">2023-11-24</time>
+      <time title="修改时间：2023-12-15 11:01:18" itemprop="dateModified" datetime="2023-12-15T11:01:18+08:00">2023-12-15</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -329,14 +331,14 @@
         <i class="far fa-file-word"></i>
       </span>
       <span class="post-meta-item-text">本文字数：</span>
-      <span>79</span>
+      <span>642</span>
     </span>
     <span class="post-meta-item" title="阅读时长">
       <span class="post-meta-item-icon">
         <i class="far fa-clock"></i>
       </span>
       <span class="post-meta-item-text">阅读时长 &asymp;</span>
-      <span>1 分钟</span>
+      <span>2 分钟</span>
     </span>
 </div>
 
@@ -358,6 +360,25 @@
 
 <p><img data-src="/images/25/mult-process-qemu.jpg" alt="mult-process-qemu"></p>
 <center>图3 Multi-Process Qemu的协同仿真</center>
+
+<h3 id="Qemu-inside-VirtualBox"><a href="#Qemu-inside-VirtualBox" class="headerlink" title="Qemu inside VirtualBox"></a>Qemu inside VirtualBox</h3><p><img data-src="/images/25/qemu-network.png" alt="qemu-network-inside-virtualbox"></p>
+<center>图4 在VirtualBox环境下QEMU网络配置</center>
+
+<h4 id="三个OS"><a href="#三个OS" class="headerlink" title="三个OS"></a>三个OS</h4><ul>
+<li>Host OS: Windows 11</li>
+<li>VirtualBox Guest OS: Ubuntu 20.04 x86_64</li>
+<li>Qemu AArch64 OS: AArch64 Embedded OS</li>
+</ul>
+<h4 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h4><p>在PC物理机上面安装Windows Host OS，在Windows里面安装VirtualBox软件，通过VirtualBox提供一个虚拟机环境，在此环境中安装一个Ubuntu 20.04 Guest OS，然后我们进入Ubuntu操作系统内下运行qemu-system-aarch64软件，通过Qemu再提供一个虚拟机环境， 在这个Qemu提供的VM环境中，我们运行AArch64 Linux OS。这样就得到一个虚拟机里面再嵌套一个虚拟机的环境（VM inside VM）</p>
+<p>Physical Host OS<br>&ensp;&ensp;&ensp;&ensp;Ubuntu Guest OS<br>&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;Qemu AArch64 OS</p>
+<h4 id="网络"><a href="#网络" class="headerlink" title="网络"></a>网络</h4><ul>
+<li><p>关注Ubuntu Guest OS和Windows Host OS之间的网络通路<br>通过NAT技术将Ubuntu OS里面的网络报文传递给Host OS，在Ubuntu的环境中我们可以直接ping到Host OS网络和外部网络。也就是说，在Ubuntu环境下我们可以访问Host OS提供的网络服务和外部网络服务，但是在Host OS环境下，我们不能直接通过NAT技术ping到Ubuntu OS网络，只能通过VirtualBox提供的Host-only network访问Ubuntu OS里面提供的服务。</p>
+</li>
+<li><p>关注QEMU AArch64 OS和Ubuntu Guest OS之间的网络通路<br>通过TAP桥接的方式将Qemu OS里面的网络报文传递给Ubuntu OS，在Qemu OS里面可以直接ping到Ubuntu OS网络，在Ubuntu OS里面也可以直接ping到Qemu OS网络。也就是说，在QEMU OS里面我们可以直接访问Ubuntu OS提供的服务，在Ubuntu OS里面也可以直接访问Qemu OS提供的服务，相当于Qemu OS和Ubuntu OS以直连的方式进行通信。</p>
+</li>
+<li><p>关注QEMU AArch64 OS和Windows Host OS之间的网络通路<br>不能直接ping，也就是说，我们在Qemu AArch64 OS里面不能直接ping到Host OS网络和外部网络，这时候需要借助Ubuntu里面安装的tinyporxy代理将Qemu OS里面发出的网络报文转发到Host OS和外部网络，这样Qemu OS才能访问到Host OS和外部网络提供的服务</p>
+</li>
+</ul>
 
     </div>
 
@@ -458,14 +479,14 @@
       <i class="fa fa-chart-line"></i>
     </span>
       <span>站点总字数：</span>
-    <span title="站点总字数">78k</span>
+    <span title="站点总字数">79k</span>
   </span>
   <span class="post-meta-item">
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
       <span>站点阅读时长 &asymp;</span>
-    <span title="站点阅读时长">4:45</span>
+    <span title="站点阅读时长">4:47</span>
   </span>
 </div>
 <div class="busuanzi-count">
