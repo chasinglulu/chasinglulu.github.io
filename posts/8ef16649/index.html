@@ -56,7 +56,7 @@
 
 
 
-<link rel="stylesheet" href="//cdn.jsdelivr.net/gh/theme-next/theme-next-needmoreshare2@1/needsharebutton.min.css"><style>
+<link rel="dns-prefetch" href="www.chasinglulu.cn"><link rel="stylesheet" href="//cdn.jsdelivr.net/gh/theme-next/theme-next-needmoreshare2@1/needsharebutton.min.css"><style>
 #needsharebutton-postbottom {
   cursor: pointer;
   height: 26px;
@@ -301,6 +301,20 @@
       <span class="post-meta-item-text">阅读次数：</span>
       <span id="busuanzi_value_page_pv"></span>
     </span>
+  
+  <span class="post-meta-item">
+    
+    <span class="post-meta-item-icon">
+      <i class="far fa-comment"></i>
+    </span>
+    <span class="post-meta-item-text">Waline：</span>
+  
+    <a title="waline" href="/posts/8ef16649/#waline" itemprop="discussionUrl">
+      <span class="post-comments-count waline-comment-count" data-path="/posts/8ef16649/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
     <span class="post-meta-break"></span>
     <span class="post-meta-item" title="本文字数">
       <span class="post-meta-item-icon">
@@ -405,6 +419,7 @@
 
 
 
+    <div class="comments" id="waline"></div>
 </div>
   </main>
 
@@ -486,6 +501,17 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/quicklink/2.3.0/quicklink.umd.js" integrity="sha256-yvJQOINiH9fWemHn0vCA5lsHWJaHs6/ZmO+1Ft04SvM=" crossorigin="anonymous"></script>
   <script class="next-config" data-name="quicklink" type="application/json">{"enable":true,"home":false,"archive":false,"delay":true,"timeout":3000,"priority":true,"url":"http://chasinglulu.github.io/posts/8ef16649/"}</script>
   <script src="/js/third-party/quicklink.js"></script>
+<script class="next-config" data-name="waline" type="application/json">{"lang":"zh-cn","enable":true,"serverURL":"www.chasinglulu.cn","libUrl":"https://cdn.jsdelivr.net/npm/@waline/client@v2.0/dist/waline.js","cssUrl":"https://cdn.jsdelivr.net/npm/@waline/client@2.0/dist/waline.css","commentCount":true,"pageview":false,"placeholder":"请文明评论呀","avatar":"mm","meta":["nick","mail","link"],"pageSize":10,"visitor":true,"comment_count":true,"requiredFields":[],"el":"#waline","comment":true,"path":"/posts/8ef16649/"}</script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@waline/client@2.0/dist/waline.css">
+<script>
+document.addEventListener('page:loaded', () => {
+  NexT.utils.loadComments(CONFIG.waline.el).then(() =>
+    NexT.utils.getScript(CONFIG.waline.libUrl, { condition: window.Waline })
+  ).then(() => 
+    Waline.init(Object.assign({}, CONFIG.waline,{ el: document.querySelector(CONFIG.waline.el) }))
+  );
+});
+</script>
 <div id="needsharebutton-float">
       <span class="btn">
         <i class="fa fa-share-alt" aria-hidden="true"></i>
