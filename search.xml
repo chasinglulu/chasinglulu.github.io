@@ -360,6 +360,7 @@
 </li>
 <li>新增synopsys GPIO and I2C Controller支持</li>
 <li>新增ARM SMMUv3支持</li>
+<li>新增Synopsys ethernet QoS支持</li>
 </ul>
 <h3 id="新增的平台"><a href="#新增的平台" class="headerlink" title="新增的平台"></a>新增的平台</h3><p>在我们开发Qemu machine之前，我们需要先熟悉芯片的基础架构：</p>
 <ol>
@@ -566,6 +567,7 @@
 <ul>
 <li>8 CPUs (ARM Cortex-A76)</li>
 <li>2 NS16550 UART (synopsys)</li>
+<li>DWC Ethernet QoS (synopsys)</li>
 <li>GICv2 (GIC-400)</li>
 <li>DRAM (48 GiB)</li>
 <li>iRAM (128 KiB)</li>
@@ -578,57 +580,66 @@
   font-family:Arial, sans-serif;font-size:14px;overflow:hidden;padding:10px 5px;word-break:normal;}
 .tg th{background-color:#409cff;border-color:#9ABAD9;border-style:solid;border-width:1px;color:#fff;
   font-family:Arial, sans-serif;font-size:14px;font-weight:normal;overflow:hidden;padding:10px 5px;word-break:normal;}
-.tg .tg-zkuo{background-color:#D2E4FC;font-family:"Times New Roman", Times, serif !important;font-size:16px;text-align:left;
+.tg .tg-hmp3{background-color:#D2E4FC;text-align:left;vertical-align:top}
+.tg .tg-x8j9{background-color:#D2E4FC;border-color:inherit;font-family:"Times New Roman", Times, serif !important;font-size:16px;
+  text-align:left;vertical-align:top}
+.tg .tg-rxf2{border-color:inherit;font-family:"Times New Roman", Times, serif !important;font-size:16px;position:-webkit-sticky;
+  position:sticky;text-align:left;top:-1px;vertical-align:top;will-change:transform}
+.tg .tg-ud8r{border-color:inherit;font-family:"Times New Roman", Times, serif !important;font-size:16px;text-align:left;
   vertical-align:top}
-.tg .tg-bcyb{font-family:"Times New Roman", Times, serif !important;font-size:16px;position:-webkit-sticky;position:sticky;
-  text-align:left;top:-1px;vertical-align:middle;will-change:transform}
-.tg .tg-l3g0{font-family:"Times New Roman", Times, serif !important;font-size:16px;text-align:left;vertical-align:top}
+.tg .tg-0lax{text-align:left;vertical-align:top}
 @media screen and (max-width: 767px) {.tg {width: auto !important;}.tg col {width: auto !important;}.tg-wrap {overflow-x: auto;-webkit-overflow-scrolling: touch;margin: auto 0px;}}</style>
 <div class="tg-wrap"><table class="tg">
 <thead>
   <tr>
-    <th class="tg-bcyb">IP Name</th>
-    <th class="tg-bcyb">Memory<br>Base Address</th>
-    <th class="tg-bcyb">Memory<br>Map Size</th>
-    <th class="tg-bcyb">Interrupt</th>
+    <th class="tg-rxf2">IP Name</th>
+    <th class="tg-rxf2">Memory<br>Base Address</th>
+    <th class="tg-rxf2">Memory<br>Map Size</th>
+    <th class="tg-rxf2">Interrupt</th>
   </tr>
 </thead>
 <tbody>
   <tr>
-    <td class="tg-l3g0">iRAM</td>
-    <td class="tg-zkuo">0x0000_0000</td>
-    <td class="tg-l3g0">0x0002_0000</td>
-    <td class="tg-zkuo"></td>
+    <td class="tg-ud8r">iRAM</td>
+    <td class="tg-x8j9">0x0000_0000</td>
+    <td class="tg-ud8r">0x0002_0000</td>
+    <td class="tg-x8j9"></td>
   </tr>
   <tr>
-    <td class="tg-l3g0">GICv2</td>
-    <td class="tg-zkuo">0x0044_8000</td>
-    <td class="tg-l3g0">0x0000_8000</td>
-    <td class="tg-zkuo"></td>
+    <td class="tg-ud8r">GICv2</td>
+    <td class="tg-x8j9">0x0044_8000</td>
+    <td class="tg-ud8r">0x0000_8000</td>
+    <td class="tg-x8j9"></td>
   </tr>
   <tr>
-    <td class="tg-l3g0">UART0</td>
-    <td class="tg-zkuo">0x1068_a000</td>
-    <td class="tg-l3g0">0x0000_1000</td>
-    <td class="tg-zkuo">73</td>
+    <td class="tg-ud8r">UART0</td>
+    <td class="tg-x8j9">0x1068_a000</td>
+    <td class="tg-ud8r">0x0000_1000</td>
+    <td class="tg-x8j9">73</td>
   </tr>
   <tr>
-    <td class="tg-l3g0">UART1</td>
-    <td class="tg-zkuo">0x1068_b000</td>
-    <td class="tg-l3g0">0x0000_1000</td>
-    <td class="tg-zkuo">74</td>
+    <td class="tg-ud8r">UART1</td>
+    <td class="tg-x8j9">0x1068_b000</td>
+    <td class="tg-ud8r">0x0000_1000</td>
+    <td class="tg-x8j9">74</td>
   </tr>
   <tr>
-    <td class="tg-l3g0">iRAM safety</td>
-    <td class="tg-zkuo">0x60c0_0000</td>
-    <td class="tg-l3g0">0x0008_0000</td>
-    <td class="tg-zkuo"></td>
+    <td class="tg-0lax">ETH</td>
+    <td class="tg-hmp3">0x6082_4000</td>
+    <td class="tg-0lax">0x0000_4000</td>
+    <td class="tg-hmp3">112</td>
   </tr>
   <tr>
-    <td class="tg-l3g0">DRAM</td>
-    <td class="tg-zkuo">0x4_0000_0000</td>
-    <td class="tg-l3g0">0xC_0000_0000</td>
-    <td class="tg-zkuo"></td>
+    <td class="tg-ud8r">iRAM safety</td>
+    <td class="tg-x8j9">0x60c0_0000</td>
+    <td class="tg-ud8r">0x0008_0000</td>
+    <td class="tg-x8j9"></td>
+  </tr>
+  <tr>
+    <td class="tg-ud8r">DRAM</td>
+    <td class="tg-x8j9">0x4_0000_0000</td>
+    <td class="tg-ud8r">0xC_0000_0000</td>
+    <td class="tg-x8j9"></td>
   </tr>
 </tbody>
 </table></div>
