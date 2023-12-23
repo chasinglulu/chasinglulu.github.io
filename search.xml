@@ -1778,13 +1778,15 @@
   <entry>
     <title>基于Qemu lmt-virt平台的bringup</title>
     <url>/posts/61970ccf/</url>
-    <content><![CDATA[<p>在芯片开发的前期，RTL代码还在开发中，那么FPGA原型验证平台也不能为软件提供验证环境。这时候我们可以根据SoC spec在Qemu中开发一个新的Virtual Platform，那么BSP软件团队就可以提前准备一些软件环境，比如最小系统。这样当RTL0.1释放后，我们可以直接复用这些软件在FPGA验证，从而减小搭建软件环境的压力和缩小验证时间。随着Qemu里面模拟的外设越来越多，我们可以把更多的软件function在Qemu里面完成开发和验证，然后再迁移到FPGA原型平台上进行验证，从而完善软件的时序方面的逻辑。通过这样的验证手段，让我们软件准备提前，缩短FPGA的占用时间，减少验证成本。</p>
+    <content><![CDATA[<p>在芯片开发的前期，RTL代码还在开发中，那么FPGA原型验证平台也不能为软件提供验证环境。这时候我们可以根据SoC spec在Qemu中开发一个新的Virtual Platform，那么BSP软件团队就可以提前完成一些软件环境的准备，比如最小系统。这样当RTL0.1释放后，我们可以直接复用这些软件在FPGA验证，从而减小搭建软件环境的压力和缩小验证时间。随着Qemu里面模拟的外设越来越多，我们可以把更多的软件function在Qemu里面完成开发和验证，然后再迁移到FPGA原型平台上进行验证，从而完善软件的时序方面的逻辑。通过这样的验证手段，让我们软件准备提前，缩短FPGA的占用时间，减少验证成本。</p>
 <span id="more"></span>
 
 
 <h3 id="芯片介绍"><a href="#芯片介绍" class="headerlink" title="芯片介绍"></a>芯片介绍</h3><p><img data-src="/images/29/lmt-arch.png" alt="bootflow1"></p>
 <center>图1 lmt芯片的架构</center>
-如上图所示，展示了芯片产品的框图，左边是基于ARM的主域，右边是基于RISC-V的从域。这样的芯片架构是目前很多自动驾驶芯片的解决方案，通过MCU Domain来实现芯片的故障诊断、甚至承接一部分车规相关规控功能。]]></content>
+如上图所示，展示了芯片产品的框图，左边是基于ARM的主域，右边是基于RISC-V的从域。这样的芯片架构是目前很多自动驾驶ADAS芯片的解决方案，通过MCU Domain来实现芯片的故障诊断、甚至承接一部分车规相关的规控功能。
+
+<h3 id="启动顺序"><a href="#启动顺序" class="headerlink" title="启动顺序"></a>启动顺序</h3>]]></content>
   </entry>
   <entry>
     <title>基于Qemu hobot-sigi-virt平台的bringup</title>
