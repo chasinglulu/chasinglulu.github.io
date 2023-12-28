@@ -1827,15 +1827,21 @@
 
 <p><img data-src="/images/27/uboot.svg" alt="uboot"></p>
 <h4 id="启动U-Boot-Kernel"><a href="#启动U-Boot-Kernel" class="headerlink" title="启动U-Boot+Kernel"></a>启动U-Boot+Kernel</h4><p>将<code>Image</code>、<code>hobot-sigi-virt.dtb</code>和<code>rootfs.cpio.lz4</code>三个镜像先复制到执行qemu-system-aarch64的当前目录<code>$(PWD)</code>下，U-Boot将使用semihosting方式让qemu自动地将这三个镜像加载到hobot-sigi-virt平台模拟的内存中。</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">qemu-system-aarch64 -M hobot-sigi-virt -m 4G -display none -device loader,addr=0x3000200000,file=/home/charleye/24-Xen/u-boot/u-boot.bin,cpu-num=0 -serial stdio -semihosting</span><br></pre></td></tr></table></figure>
-<p><img data-src="/images/27/kernel.svg" alt="kernel"></p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">qemu-system-aarch64 -M hobot-sigi-virt -m 4G -display none -device loader,addr=0x3000200000,file=/path/to/u-boot/u-boot.bin,cpu-num=0 -serial stdio -semihosting</span><br></pre></td></tr></table></figure>
+
+<p>或者直接从eMMC上加载Kernel等镜像</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">qemu-system-aarch64 -M hobot-sigi-virt -m 4G -display none -device loader,addr=0x3000200000,file=/home/charleye/24-Xen/u-boot/u-boot.bin,cpu-num=0 -serial stdio -drive file=/path/to/emmc-aarch64.img,format=raw,<span class="keyword">if</span>=emmc</span><br></pre></td></tr></table></figure>
+<p><img data-src="/images/27/uboot_kernel.gif" alt="kernel"><br>启动日志附件：<a href="/images/27/uboot_kernel.txt">U-Boot -&gt; Kernel Booting</a></p>
 <h4 id="启动ATF-U-Boot"><a href="#启动ATF-U-Boot" class="headerlink" title="启动ATF+U-Boot"></a>启动ATF+U-Boot</h4><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">qemu-system-aarch64 -M hobot-sigi-virt,virt=on,secure=on -m 4G -display none -device loader,addr=0x04001000,file=/path/to/arm-trusted-firmware/build/sigi/release/bl31.bin,cpu-num=0 -device loader,addr=0x3004000000,file=/path/to/u-boot/u-boot-dtb.bin -serial stdio</span><br></pre></td></tr></table></figure>
 
 <p><img data-src="/images/27/atf.svg" alt="atf"></p>
 <h4 id="启动ATF-U-Boot-Kernel"><a href="#启动ATF-U-Boot-Kernel" class="headerlink" title="启动ATF+U-Boot+Kernel"></a>启动ATF+U-Boot+Kernel</h4><p>将<code>Image</code>、<code>hobot-sigi-virt.dtb</code>和<code>rootfs.cpio.lz4</code>三个镜像先复制到执行qemu-system-aarch64的当前目录<code>$(PWD)</code>下</p>
 <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">qemu-system-aarch64 -M hobot-sigi-virt,virt=on,secure=on -m 4G -display none -device loader,addr=0x04001000,file=/path/to/arm-trusted-firmware/build/sigi/release/bl31.bin,cpu-num=0 -device loader,addr=0x3004000000,file=/path/to/u-boot/u-boot-dtb.bin -serial stdio -semihosting</span><br></pre></td></tr></table></figure>
+<p>或者直接从eMMC上加载Kernel等镜像</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">qemu-system-aarch64 -M hobot-sigi-virt,virt=on,secure=on,emmc=on -m 4G -display none -device loader,addr=0x04001000,file=/path/to/arm-trusted-firmware/build/sigi/release/bl31.bin,cpu-num=0 -device loader,addr=0x3004000000,file=/path/to/u-boot/u-boot-dtb.bin -serial stdio -drive file=/path/to/emmc-aarch64.img,format=raw,<span class="keyword">if</span>=emmc</span><br></pre></td></tr></table></figure>
 
-<p><img data-src="/images/27/atf_kernel.svg" alt="atf_kernel"><br><img data-src="/images/27/bootlog.gif" alt="atf_kernel"></p>
+<p><img data-src="/images/27/atf_uboot_kernel.gif" alt="atf_kernel"></p>
+<p>启动日志附件：<a href="/images/27/atf_uboot_kernel.txt">ATF-&gt;U-Boot-&gt;kernel Booting</a></p>
 ]]></content>
       <categories>
         <category>tools</category>
