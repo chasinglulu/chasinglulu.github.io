@@ -1664,11 +1664,11 @@
 <p>将生成的<code>ubuntu.img</code>里面的内容都复制到<code>emmc.img</code>的分区<code>part 8</code>里面，这样U-Boot启动时才能挂载Ubuntu文件系统。</p>
 <h4 id="运行验证-1"><a href="#运行验证-1" class="headerlink" title="运行验证"></a>运行验证</h4><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">qemu-system-aarch64 -M hobot-sigi-virt,emmc=on,virt=on -m 4G -display none -device loader,addr=0x3000200000,file=/path/to/u-boot/u-boot-dtb.bin,cpu-num=0 -drive file=/path/to/emmc.img,format=raw,<span class="keyword">if</span>=emmc -serial stdio</span><br></pre></td></tr></table></figure>
 
-<p><img data-src="/images/28/ubuntu.svg" alt="ubuntu"></p>
+<p><img data-src="/images/28/ubuntu.gif" alt="ubuntu"><br>启动日志附件：<a href="/images/28/ubuntu.txt">U-Boot -&gt; Kernel -&gt; Ubuntu Booting</a></p>
 <h3 id="基于Buildroot文件系统启动"><a href="#基于Buildroot文件系统启动" class="headerlink" title="基于Buildroot文件系统启动"></a>基于Buildroot文件系统启动</h3><p>将buildroot生成的rootfs.cpio.lz4里面的内容展开到<code>emmc.img</code>的分区<code>part 7</code>里面，这样U-Boot启动时才能挂载buildroot根文件系统。</p>
 <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">qemu-system-aarch64 -M hobot-sigi-virt,emmc=on,virt=on -m 4G -display none -device loader,addr=0x3000200000,file=/path/to/u-boot/u-boot-dtb.bin,cpu-num=0 -drive file=/path/to/emmc.img,format=raw,<span class="keyword">if</span>=emmc -serial stdio</span><br></pre></td></tr></table></figure>
 
-<p><img data-src="/images/28/buildroot.svg" alt="buildroot"></p>
+<p><img data-src="/images/28/uboot_kernel.gif" alt="buildroot"><br>启动日志附件：<a href="/images/28/uboot_kernel.txt">U-Boot -&gt; Kernel -&gt; Buildroot Booting</a></p>
 <h3 id="eMMC-RPMB访问"><a href="#eMMC-RPMB访问" class="headerlink" title="eMMC RPMB访问"></a>eMMC RPMB访问</h3><h4 id="RPMB介绍"><a href="#RPMB介绍" class="headerlink" title="RPMB介绍"></a>RPMB介绍</h4><p>RPMB(Replay Protected Memory Block) Partition是eMMC中的一个具有安全特性的分区。<br>eMMC在写入数据到RPMB时，会校验数据的合法性，只有指定的Host才能够写入，同时在读数据时，也提供了签名机制，保证Host读取到的数据是RPMB内部数据，而不是攻击者伪造的数据。</p>
 <p>RPMB在实际应用中，通常用于存储一些有防止非法篡改需求的数据，例如手机上指纹支付相关的公钥、序列号等。RPMB可以对写入操作进行鉴权，但是读取并不需要鉴权，任何人都可以进行读取的操作，因此存储到RPMB的数据通常会进行加密后再存储。</p>
 <h4 id="运行验证-2"><a href="#运行验证-2" class="headerlink" title="运行验证"></a>运行验证</h4><p>上面我们制作的emmc.img镜像里面都没有包含rpmb.img镜像，因此我们要制作一个rpmb.img的空间，和emmc.img拼在一起，这样U-Boot才能够访问RPMB的空间。</p>
