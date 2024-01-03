@@ -24,11 +24,11 @@
     <meta name="description" content="进程管理系列文章将主要关注Linux内核为了描述任务「task」所使用的各种数据结构。除此之外，还会阐述内核是如何管理用于标识任务的PID以及如何创建和终止任务。该系列文章主要涉及如下内容：  任务涉及的三个数据结构：struct task_struct、struct thread_info、struct thread_struct PID分配流程以及用于标识任务的相关数据结构 任务在整个生命周期">
 <meta property="og:type" content="article">
 <meta property="og:title" content="进程管理1「Data structures and PID」">
-<meta property="og:url" content="http://chasinglulu.github.io/posts/413c336a/index.html">
+<meta property="og:url" content="https://chasinglulu.github.io/posts/413c336a/index.html">
 <meta property="og:site_name" content="点滴汇聚">
 <meta property="og:description" content="进程管理系列文章将主要关注Linux内核为了描述任务「task」所使用的各种数据结构。除此之外，还会阐述内核是如何管理用于标识任务的PID以及如何创建和终止任务。该系列文章主要涉及如下内容：  任务涉及的三个数据结构：struct task_struct、struct thread_info、struct thread_struct PID分配流程以及用于标识任务的相关数据结构 任务在整个生命周期">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://chasinglulu.github.io/images/16/difference-between-process-and-thread.svg">
+<meta property="og:image" content="https://chasinglulu.github.io/images/16/difference-between-process-and-thread.svg">
 <meta property="article:published_time" content="2019-11-23T05:39:10.000Z">
 <meta property="article:modified_time" content="2023-11-14T06:05:42.828Z">
 <meta property="article:author" content="Xinlu Wang">
@@ -37,14 +37,14 @@
 <meta property="article:tag" content="management">
 <meta property="article:tag" content="schedule">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http://chasinglulu.github.io/images/16/difference-between-process-and-thread.svg">
+<meta name="twitter:image" content="https://chasinglulu.github.io/images/16/difference-between-process-and-thread.svg">
 
 
-<link rel="canonical" href="http://chasinglulu.github.io/posts/413c336a/">
+<link rel="canonical" href="https://chasinglulu.github.io/posts/413c336a/">
 
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://chasinglulu.github.io/posts/413c336a/","path":"posts/413c336a/","title":"进程管理1「Data structures and PID」"}</script>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://chasinglulu.github.io/posts/413c336a/","path":"posts/413c336a/","title":"进程管理1「Data structures and PID」"}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
 <title>进程管理1「Data structures and PID」 | 点滴汇聚</title>
@@ -252,7 +252,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://chasinglulu.github.io/posts/413c336a/">
+    <link itemprop="mainEntityOfPage" href="https://chasinglulu.github.io/posts/413c336a/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.jpeg">
@@ -415,7 +415,7 @@
   </li>
   <li class="post-copyright-link">
       <strong>本文链接：</strong>
-      <a href="http://chasinglulu.github.io/posts/413c336a/" title="进程管理1「Data structures and PID」">http://chasinglulu.github.io/posts/413c336a/</a>
+      <a href="https://chasinglulu.github.io/posts/413c336a/" title="进程管理1「Data structures and PID」">https://chasinglulu.github.io/posts/413c336a/</a>
   </li>
   <li class="post-copyright-license">
       <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
@@ -462,7 +462,7 @@
 
   <div class="copyright">
     &copy; 2018 – 
-    <span itemprop="copyrightYear">2023</span>
+    <span itemprop="copyrightYear">2024</span>
     <span class="with-love">
       <i class="fa fa-anchor"></i>
     </span>
@@ -533,7 +533,7 @@
 
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/quicklink/2.3.0/quicklink.umd.js" integrity="sha256-yvJQOINiH9fWemHn0vCA5lsHWJaHs6/ZmO+1Ft04SvM=" crossorigin="anonymous"></script>
-  <script class="next-config" data-name="quicklink" type="application/json">{"enable":true,"home":false,"archive":false,"delay":true,"timeout":3000,"priority":true,"url":"http://chasinglulu.github.io/posts/413c336a/"}</script>
+  <script class="next-config" data-name="quicklink" type="application/json">{"enable":true,"home":false,"archive":false,"delay":true,"timeout":3000,"priority":true,"url":"https://chasinglulu.github.io/posts/413c336a/"}</script>
   <script src="/js/third-party/quicklink.js"></script>
 <script class="next-config" data-name="waline" type="application/json">{"lang":"zh-cn","enable":true,"serverURL":"www.chasinglulu.cn","cssUrl":"https://cdn.jsdelivr.net/npm/@waline/client@2.15.8/dist/waline.css","commentCount":true,"pageview":false,"placeholder":"请文明评论呀","avatar":"mm","meta":["nick","mail","link"],"pageSize":10,"visitor":true,"comment_count":true,"requiredFields":[],"libUrl":"https://cdn.jsdelivr.net/npm/@waline/client@2.15.8/dist/waline.js","emoji":["https://cdn.jsdelivr.net/gh/walinejs/emojis@1.1.0/tw-emoji/"],"el":"#waline","comment":true,"path":"/posts/413c336a/"}</script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@waline/client@2.15.8/dist/waline.css">

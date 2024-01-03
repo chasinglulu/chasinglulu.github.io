@@ -24,18 +24,18 @@
     <meta name="description" content="为了更深入地剖析kernel，了解ARMv8体系架构是非常必要的。本文尽量全面地概述ARMv8体系架构涉及的基础知识。Linux内核的绝大部分代码是与体系架构无关的「independent」，但是还存在大量的代码「spinlock、cache管理」都是与体系架构相关的「dependent」，这些代码不仅会在启动时被运行而且在系统正常运行期间也会被经常调用执行。不仅仅Linux内核牵涉了很多的体系架">
 <meta property="og:type" content="article">
 <meta property="og:title" content="ARMv8体系架构概述">
-<meta property="og:url" content="http://chasinglulu.github.io/posts/9e834789/index.html">
+<meta property="og:url" content="https://chasinglulu.github.io/posts/9e834789/index.html">
 <meta property="og:site_name" content="点滴汇聚">
 <meta property="og:description" content="为了更深入地剖析kernel，了解ARMv8体系架构是非常必要的。本文尽量全面地概述ARMv8体系架构涉及的基础知识。Linux内核的绝大部分代码是与体系架构无关的「independent」，但是还存在大量的代码「spinlock、cache管理」都是与体系架构相关的「dependent」，这些代码不仅会在启动时被运行而且在系统正常运行期间也会被经常调用执行。不仅仅Linux内核牵涉了很多的体系架">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://chasinglulu.github.io/images/04/arm_evolution.svg">
-<meta property="og:image" content="http://chasinglulu.github.io/images/04/armv8_exception_model.svg">
-<meta property="og:image" content="http://chasinglulu.github.io/images/04/execution_state_change.svg">
-<meta property="og:image" content="http://chasinglulu.github.io/images/04/aarch64_register_64bit_and_32bit.svg">
-<meta property="og:image" content="http://chasinglulu.github.io/images/04/aarch64_spsr_register.svg">
-<meta property="og:image" content="http://chasinglulu.github.io/images/04/MMU_example.svg">
-<meta property="og:image" content="http://chasinglulu.github.io/images/04/MMU_translation.svg">
-<meta property="og:image" content="http://chasinglulu.github.io/images/04/VA_to_PA.svg">
+<meta property="og:image" content="https://chasinglulu.github.io/images/04/arm_evolution.svg">
+<meta property="og:image" content="https://chasinglulu.github.io/images/04/armv8_exception_model.svg">
+<meta property="og:image" content="https://chasinglulu.github.io/images/04/execution_state_change.svg">
+<meta property="og:image" content="https://chasinglulu.github.io/images/04/aarch64_register_64bit_and_32bit.svg">
+<meta property="og:image" content="https://chasinglulu.github.io/images/04/aarch64_spsr_register.svg">
+<meta property="og:image" content="https://chasinglulu.github.io/images/04/MMU_example.svg">
+<meta property="og:image" content="https://chasinglulu.github.io/images/04/MMU_translation.svg">
+<meta property="og:image" content="https://chasinglulu.github.io/images/04/VA_to_PA.svg">
 <meta property="article:published_time" content="2019-11-13T13:48:30.000Z">
 <meta property="article:modified_time" content="2023-11-14T05:50:25.851Z">
 <meta property="article:author" content="Xinlu Wang">
@@ -44,14 +44,14 @@
 <meta property="article:tag" content="cache">
 <meta property="article:tag" content="MMU">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http://chasinglulu.github.io/images/04/arm_evolution.svg">
+<meta name="twitter:image" content="https://chasinglulu.github.io/images/04/arm_evolution.svg">
 
 
-<link rel="canonical" href="http://chasinglulu.github.io/posts/9e834789/">
+<link rel="canonical" href="https://chasinglulu.github.io/posts/9e834789/">
 
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://chasinglulu.github.io/posts/9e834789/","path":"posts/9e834789/","title":"ARMv8体系架构概述"}</script>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://chasinglulu.github.io/posts/9e834789/","path":"posts/9e834789/","title":"ARMv8体系架构概述"}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
 <title>ARMv8体系架构概述 | 点滴汇聚</title>
@@ -259,7 +259,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://chasinglulu.github.io/posts/9e834789/">
+    <link itemprop="mainEntityOfPage" href="https://chasinglulu.github.io/posts/9e834789/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.jpeg">
@@ -430,7 +430,7 @@
   </li>
   <li class="post-copyright-link">
       <strong>本文链接：</strong>
-      <a href="http://chasinglulu.github.io/posts/9e834789/" title="ARMv8体系架构概述">http://chasinglulu.github.io/posts/9e834789/</a>
+      <a href="https://chasinglulu.github.io/posts/9e834789/" title="ARMv8体系架构概述">https://chasinglulu.github.io/posts/9e834789/</a>
   </li>
   <li class="post-copyright-license">
       <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
@@ -477,7 +477,7 @@
 
   <div class="copyright">
     &copy; 2018 – 
-    <span itemprop="copyrightYear">2023</span>
+    <span itemprop="copyrightYear">2024</span>
     <span class="with-love">
       <i class="fa fa-anchor"></i>
     </span>
@@ -548,7 +548,7 @@
 
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/quicklink/2.3.0/quicklink.umd.js" integrity="sha256-yvJQOINiH9fWemHn0vCA5lsHWJaHs6/ZmO+1Ft04SvM=" crossorigin="anonymous"></script>
-  <script class="next-config" data-name="quicklink" type="application/json">{"enable":true,"home":false,"archive":false,"delay":true,"timeout":3000,"priority":true,"url":"http://chasinglulu.github.io/posts/9e834789/"}</script>
+  <script class="next-config" data-name="quicklink" type="application/json">{"enable":true,"home":false,"archive":false,"delay":true,"timeout":3000,"priority":true,"url":"https://chasinglulu.github.io/posts/9e834789/"}</script>
   <script src="/js/third-party/quicklink.js"></script>
 <script class="next-config" data-name="waline" type="application/json">{"lang":"zh-cn","enable":true,"serverURL":"www.chasinglulu.cn","cssUrl":"https://cdn.jsdelivr.net/npm/@waline/client@2.15.8/dist/waline.css","commentCount":true,"pageview":false,"placeholder":"请文明评论呀","avatar":"mm","meta":["nick","mail","link"],"pageSize":10,"visitor":true,"comment_count":true,"requiredFields":[],"libUrl":"https://cdn.jsdelivr.net/npm/@waline/client@2.15.8/dist/waline.js","emoji":["https://cdn.jsdelivr.net/gh/walinejs/emojis@1.1.0/tw-emoji/"],"el":"#waline","comment":true,"path":"/posts/9e834789/"}</script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@waline/client@2.15.8/dist/waline.css">

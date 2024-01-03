@@ -24,30 +24,30 @@
     <meta name="description" content="本文主要阐述slub分配器的原理和实现细节。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Slub allocator">
-<meta property="og:url" content="http://chasinglulu.github.io/posts/cee2afeb/index.html">
+<meta property="og:url" content="https://chasinglulu.github.io/posts/cee2afeb/index.html">
 <meta property="og:site_name" content="点滴汇聚">
 <meta property="og:description" content="本文主要阐述slub分配器的原理和实现细节。">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://chasinglulu.github.io/images/10/slub-allocator.svg">
-<meta property="og:image" content="http://chasinglulu.github.io/images/10/slab-cache.svg">
-<meta property="og:image" content="http://chasinglulu.github.io/images/10/slab-cache-2.svg">
-<meta property="og:image" content="http://chasinglulu.github.io/images/10/slab-cache-3.svg">
-<meta property="og:image" content="http://chasinglulu.github.io/images/10/slab-cache-4.svg">
-<meta property="og:image" content="http://chasinglulu.github.io/images/10/slab-cache-5.svg">
-<meta property="og:image" content="http://chasinglulu.github.io/images/10/slub-object-layout.svg">
-<meta property="og:image" content="http://chasinglulu.github.io/images/10/slub-object-layout-1.svg">
-<meta property="og:image" content="http://chasinglulu.github.io/images/10/slub-object-layout-2.svg">
-<meta property="og:image" content="http://chasinglulu.github.io/images/10/slub-object-layout-3.svg">
-<meta property="og:image" content="http://chasinglulu.github.io/images/10/slub-object-layout-4.svg">
-<meta property="og:image" content="http://chasinglulu.github.io/images/10/slab-init.svg">
-<meta property="og:image" content="http://chasinglulu.github.io/images/10/slab-init-1.svg">
-<meta property="og:image" content="http://chasinglulu.github.io/images/10/slab-init-2.svg">
-<meta property="og:image" content="http://chasinglulu.github.io/images/10/slab-init-3.svg">
-<meta property="og:image" content="http://chasinglulu.github.io/images/10/slab-init-4.svg">
-<meta property="og:image" content="http://chasinglulu.github.io/images/10/slab-init-5.svg">
-<meta property="og:image" content="http://chasinglulu.github.io/images/10/slab-init-6.svg">
-<meta property="og:image" content="http://chasinglulu.github.io/images/10/slab-create-1.svg">
-<meta property="og:image" content="http://chasinglulu.github.io/images/10/slab-order-calc.svg">
+<meta property="og:image" content="https://chasinglulu.github.io/images/10/slub-allocator.svg">
+<meta property="og:image" content="https://chasinglulu.github.io/images/10/slab-cache.svg">
+<meta property="og:image" content="https://chasinglulu.github.io/images/10/slab-cache-2.svg">
+<meta property="og:image" content="https://chasinglulu.github.io/images/10/slab-cache-3.svg">
+<meta property="og:image" content="https://chasinglulu.github.io/images/10/slab-cache-4.svg">
+<meta property="og:image" content="https://chasinglulu.github.io/images/10/slab-cache-5.svg">
+<meta property="og:image" content="https://chasinglulu.github.io/images/10/slub-object-layout.svg">
+<meta property="og:image" content="https://chasinglulu.github.io/images/10/slub-object-layout-1.svg">
+<meta property="og:image" content="https://chasinglulu.github.io/images/10/slub-object-layout-2.svg">
+<meta property="og:image" content="https://chasinglulu.github.io/images/10/slub-object-layout-3.svg">
+<meta property="og:image" content="https://chasinglulu.github.io/images/10/slub-object-layout-4.svg">
+<meta property="og:image" content="https://chasinglulu.github.io/images/10/slab-init.svg">
+<meta property="og:image" content="https://chasinglulu.github.io/images/10/slab-init-1.svg">
+<meta property="og:image" content="https://chasinglulu.github.io/images/10/slab-init-2.svg">
+<meta property="og:image" content="https://chasinglulu.github.io/images/10/slab-init-3.svg">
+<meta property="og:image" content="https://chasinglulu.github.io/images/10/slab-init-4.svg">
+<meta property="og:image" content="https://chasinglulu.github.io/images/10/slab-init-5.svg">
+<meta property="og:image" content="https://chasinglulu.github.io/images/10/slab-init-6.svg">
+<meta property="og:image" content="https://chasinglulu.github.io/images/10/slab-create-1.svg">
+<meta property="og:image" content="https://chasinglulu.github.io/images/10/slab-order-calc.svg">
 <meta property="article:published_time" content="2019-12-13T13:41:30.000Z">
 <meta property="article:modified_time" content="2023-11-14T06:24:19.765Z">
 <meta property="article:author" content="Xinlu Wang">
@@ -55,14 +55,14 @@
 <meta property="article:tag" content="slab">
 <meta property="article:tag" content="slub">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http://chasinglulu.github.io/images/10/slub-allocator.svg">
+<meta name="twitter:image" content="https://chasinglulu.github.io/images/10/slub-allocator.svg">
 
 
-<link rel="canonical" href="http://chasinglulu.github.io/posts/cee2afeb/">
+<link rel="canonical" href="https://chasinglulu.github.io/posts/cee2afeb/">
 
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://chasinglulu.github.io/posts/cee2afeb/","path":"posts/cee2afeb/","title":"Slub allocator"}</script>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://chasinglulu.github.io/posts/cee2afeb/","path":"posts/cee2afeb/","title":"Slub allocator"}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
 <title>Slub allocator | 点滴汇聚</title>
@@ -269,7 +269,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://chasinglulu.github.io/posts/cee2afeb/">
+    <link itemprop="mainEntityOfPage" href="https://chasinglulu.github.io/posts/cee2afeb/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.jpeg">
@@ -472,7 +472,7 @@
   </li>
   <li class="post-copyright-link">
       <strong>本文链接：</strong>
-      <a href="http://chasinglulu.github.io/posts/cee2afeb/" title="Slub allocator">http://chasinglulu.github.io/posts/cee2afeb/</a>
+      <a href="https://chasinglulu.github.io/posts/cee2afeb/" title="Slub allocator">https://chasinglulu.github.io/posts/cee2afeb/</a>
   </li>
   <li class="post-copyright-license">
       <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
@@ -518,7 +518,7 @@
 
   <div class="copyright">
     &copy; 2018 – 
-    <span itemprop="copyrightYear">2023</span>
+    <span itemprop="copyrightYear">2024</span>
     <span class="with-love">
       <i class="fa fa-anchor"></i>
     </span>
@@ -589,7 +589,7 @@
 
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/quicklink/2.3.0/quicklink.umd.js" integrity="sha256-yvJQOINiH9fWemHn0vCA5lsHWJaHs6/ZmO+1Ft04SvM=" crossorigin="anonymous"></script>
-  <script class="next-config" data-name="quicklink" type="application/json">{"enable":true,"home":false,"archive":false,"delay":true,"timeout":3000,"priority":true,"url":"http://chasinglulu.github.io/posts/cee2afeb/"}</script>
+  <script class="next-config" data-name="quicklink" type="application/json">{"enable":true,"home":false,"archive":false,"delay":true,"timeout":3000,"priority":true,"url":"https://chasinglulu.github.io/posts/cee2afeb/"}</script>
   <script src="/js/third-party/quicklink.js"></script>
 <script class="next-config" data-name="waline" type="application/json">{"lang":"zh-cn","enable":true,"serverURL":"www.chasinglulu.cn","cssUrl":"https://cdn.jsdelivr.net/npm/@waline/client@2.15.8/dist/waline.css","commentCount":true,"pageview":false,"placeholder":"请文明评论呀","avatar":"mm","meta":["nick","mail","link"],"pageSize":10,"visitor":true,"comment_count":true,"requiredFields":[],"libUrl":"https://cdn.jsdelivr.net/npm/@waline/client@2.15.8/dist/waline.js","emoji":["https://cdn.jsdelivr.net/gh/walinejs/emojis@1.1.0/tw-emoji/"],"el":"#waline","comment":true,"path":"/posts/cee2afeb/"}</script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@waline/client@2.15.8/dist/waline.css">

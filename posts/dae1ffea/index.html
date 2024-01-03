@@ -24,31 +24,31 @@
     <meta name="description" content="&ensp;&ensp;&ensp;&ensp;不同Linux内存模型以不同方式管理和组织可用物理内存，具体方式取决于系统物理内存是否不连续且存在空隙。本文讨论Linux支持的三种内存模型以及如何管理每种内存模型的内存映射「memory map」，比如FLATMEM模型的mem_map。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="内存模型「memory model」">
-<meta property="og:url" content="http://chasinglulu.github.io/posts/dae1ffea/index.html">
+<meta property="og:url" content="https://chasinglulu.github.io/posts/dae1ffea/index.html">
 <meta property="og:site_name" content="点滴汇聚">
 <meta property="og:description" content="&ensp;&ensp;&ensp;&ensp;不同Linux内存模型以不同方式管理和组织可用物理内存，具体方式取决于系统物理内存是否不连续且存在空隙。本文讨论Linux支持的三种内存模型以及如何管理每种内存模型的内存映射「memory map」，比如FLATMEM模型的mem_map。">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://chasinglulu.github.io/images/18/memory_model.svg">
-<meta property="og:image" content="http://chasinglulu.github.io/images/18/memory_model_options.svg">
-<meta property="og:image" content="http://chasinglulu.github.io/images/18/memory_model_detail.svg">
-<meta property="og:image" content="http://chasinglulu.github.io/images/18/memory_model_mem_map.svg">
-<meta property="og:image" content="http://chasinglulu.github.io/images/18/memory_model_flat.svg">
-<meta property="og:image" content="http://chasinglulu.github.io/images/18/memory_model_discontiguous.svg">
-<meta property="og:image" content="http://chasinglulu.github.io/images/18/memory_model_sparse_static.svg">
-<meta property="og:image" content="http://chasinglulu.github.io/images/18/memory_model_sparse_dynamic.svg">
+<meta property="og:image" content="https://chasinglulu.github.io/images/18/memory_model.svg">
+<meta property="og:image" content="https://chasinglulu.github.io/images/18/memory_model_options.svg">
+<meta property="og:image" content="https://chasinglulu.github.io/images/18/memory_model_detail.svg">
+<meta property="og:image" content="https://chasinglulu.github.io/images/18/memory_model_mem_map.svg">
+<meta property="og:image" content="https://chasinglulu.github.io/images/18/memory_model_flat.svg">
+<meta property="og:image" content="https://chasinglulu.github.io/images/18/memory_model_discontiguous.svg">
+<meta property="og:image" content="https://chasinglulu.github.io/images/18/memory_model_sparse_static.svg">
+<meta property="og:image" content="https://chasinglulu.github.io/images/18/memory_model_sparse_dynamic.svg">
 <meta property="article:published_time" content="2019-05-29T08:01:14.000Z">
 <meta property="article:modified_time" content="2023-11-14T06:08:22.630Z">
 <meta property="article:author" content="Xinlu Wang">
 <meta property="article:tag" content="memory model">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http://chasinglulu.github.io/images/18/memory_model.svg">
+<meta name="twitter:image" content="https://chasinglulu.github.io/images/18/memory_model.svg">
 
 
-<link rel="canonical" href="http://chasinglulu.github.io/posts/dae1ffea/">
+<link rel="canonical" href="https://chasinglulu.github.io/posts/dae1ffea/">
 
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://chasinglulu.github.io/posts/dae1ffea/","path":"posts/dae1ffea/","title":"内存模型「memory model」"}</script>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://chasinglulu.github.io/posts/dae1ffea/","path":"posts/dae1ffea/","title":"内存模型「memory model」"}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
 <title>内存模型「memory model」 | 点滴汇聚</title>
@@ -256,7 +256,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://chasinglulu.github.io/posts/dae1ffea/">
+    <link itemprop="mainEntityOfPage" href="https://chasinglulu.github.io/posts/dae1ffea/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.jpeg">
@@ -487,7 +487,7 @@
   </li>
   <li class="post-copyright-link">
       <strong>本文链接：</strong>
-      <a href="http://chasinglulu.github.io/posts/dae1ffea/" title="内存模型「memory model」">http://chasinglulu.github.io/posts/dae1ffea/</a>
+      <a href="https://chasinglulu.github.io/posts/dae1ffea/" title="内存模型「memory model」">https://chasinglulu.github.io/posts/dae1ffea/</a>
   </li>
   <li class="post-copyright-license">
       <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
@@ -531,7 +531,7 @@
 
   <div class="copyright">
     &copy; 2018 – 
-    <span itemprop="copyrightYear">2023</span>
+    <span itemprop="copyrightYear">2024</span>
     <span class="with-love">
       <i class="fa fa-anchor"></i>
     </span>
@@ -602,7 +602,7 @@
 
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/quicklink/2.3.0/quicklink.umd.js" integrity="sha256-yvJQOINiH9fWemHn0vCA5lsHWJaHs6/ZmO+1Ft04SvM=" crossorigin="anonymous"></script>
-  <script class="next-config" data-name="quicklink" type="application/json">{"enable":true,"home":false,"archive":false,"delay":true,"timeout":3000,"priority":true,"url":"http://chasinglulu.github.io/posts/dae1ffea/"}</script>
+  <script class="next-config" data-name="quicklink" type="application/json">{"enable":true,"home":false,"archive":false,"delay":true,"timeout":3000,"priority":true,"url":"https://chasinglulu.github.io/posts/dae1ffea/"}</script>
   <script src="/js/third-party/quicklink.js"></script>
 <script class="next-config" data-name="waline" type="application/json">{"lang":"zh-cn","enable":true,"serverURL":"www.chasinglulu.cn","cssUrl":"https://cdn.jsdelivr.net/npm/@waline/client@2.15.8/dist/waline.css","commentCount":true,"pageview":false,"placeholder":"请文明评论呀","avatar":"mm","meta":["nick","mail","link"],"pageSize":10,"visitor":true,"comment_count":true,"requiredFields":[],"libUrl":"https://cdn.jsdelivr.net/npm/@waline/client@2.15.8/dist/waline.js","emoji":["https://cdn.jsdelivr.net/gh/walinejs/emojis@1.1.0/tw-emoji/"],"el":"#waline","comment":true,"path":"/posts/dae1ffea/"}</script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@waline/client@2.15.8/dist/waline.css">

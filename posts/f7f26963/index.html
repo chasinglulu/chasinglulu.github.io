@@ -24,35 +24,35 @@
     <meta name="description" content="percpu变量指的是为每个CPU都创建一个同样的变量，也就是为每个CPU分配一份单独的内存空间，用来保存各自私有的数据。在SMP「Symmetry Multi-Processor」系统中，为了确保多个CPU能够正确地访问同一个资源，同步机制是必不可少的，比如缓存一致性「cache coherence」和自旋锁「spinlock」。但是通过使用percpu变量，内核能够使每个CPU只访问自己私有的">
 <meta property="og:type" content="article">
 <meta property="og:title" content="percpu内存分配器">
-<meta property="og:url" content="http://chasinglulu.github.io/posts/f7f26963/index.html">
+<meta property="og:url" content="https://chasinglulu.github.io/posts/f7f26963/index.html">
 <meta property="og:site_name" content="点滴汇聚">
 <meta property="og:description" content="percpu变量指的是为每个CPU都创建一个同样的变量，也就是为每个CPU分配一份单独的内存空间，用来保存各自私有的数据。在SMP「Symmetry Multi-Processor」系统中，为了确保多个CPU能够正确地访问同一个资源，同步机制是必不可少的，比如缓存一致性「cache coherence」和自旋锁「spinlock」。但是通过使用percpu变量，内核能够使每个CPU只访问自己私有的">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://chasinglulu.github.io/images/09/percpu_count.svg">
-<meta property="og:image" content="http://chasinglulu.github.io/images/09/percpu_unit_size.svg">
-<meta property="og:image" content="http://chasinglulu.github.io/images/09/percpu_chunck_layout.svg">
-<meta property="og:image" content="http://chasinglulu.github.io/images/09/percpu_unit_map.svg">
-<meta property="og:image" content="http://chasinglulu.github.io/images/09/percpu_unit_offset.svg">
-<meta property="og:image" content="http://chasinglulu.github.io/images/09/percpu_alloc_info.jpg">
-<meta property="og:image" content="http://chasinglulu.github.io/images/09/pcpu_cpu_to_unit.svg">
-<meta property="og:image" content="http://chasinglulu.github.io/images/09/pcpu_chunk_config.svg">
-<meta property="og:image" content="http://chasinglulu.github.io/images/09/percpu_base_addr_location.svg">
-<meta property="og:image" content="http://chasinglulu.github.io/images/09/percpu_first_chunk.svg">
-<meta property="og:image" content="http://chasinglulu.github.io/images/09/percpu_mapping_management.svg">
+<meta property="og:image" content="https://chasinglulu.github.io/images/09/percpu_count.svg">
+<meta property="og:image" content="https://chasinglulu.github.io/images/09/percpu_unit_size.svg">
+<meta property="og:image" content="https://chasinglulu.github.io/images/09/percpu_chunck_layout.svg">
+<meta property="og:image" content="https://chasinglulu.github.io/images/09/percpu_unit_map.svg">
+<meta property="og:image" content="https://chasinglulu.github.io/images/09/percpu_unit_offset.svg">
+<meta property="og:image" content="https://chasinglulu.github.io/images/09/percpu_alloc_info.jpg">
+<meta property="og:image" content="https://chasinglulu.github.io/images/09/pcpu_cpu_to_unit.svg">
+<meta property="og:image" content="https://chasinglulu.github.io/images/09/pcpu_chunk_config.svg">
+<meta property="og:image" content="https://chasinglulu.github.io/images/09/percpu_base_addr_location.svg">
+<meta property="og:image" content="https://chasinglulu.github.io/images/09/percpu_first_chunk.svg">
+<meta property="og:image" content="https://chasinglulu.github.io/images/09/percpu_mapping_management.svg">
 <meta property="article:published_time" content="2019-08-10T14:30:55.000Z">
 <meta property="article:modified_time" content="2023-11-14T05:56:40.258Z">
 <meta property="article:author" content="Xinlu Wang">
 <meta property="article:tag" content="memory allocator">
 <meta property="article:tag" content="percpu">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http://chasinglulu.github.io/images/09/percpu_count.svg">
+<meta name="twitter:image" content="https://chasinglulu.github.io/images/09/percpu_count.svg">
 
 
-<link rel="canonical" href="http://chasinglulu.github.io/posts/f7f26963/">
+<link rel="canonical" href="https://chasinglulu.github.io/posts/f7f26963/">
 
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://chasinglulu.github.io/posts/f7f26963/","path":"posts/f7f26963/","title":"percpu内存分配器"}</script>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://chasinglulu.github.io/posts/f7f26963/","path":"posts/f7f26963/","title":"percpu内存分配器"}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
 <title>percpu内存分配器 | 点滴汇聚</title>
@@ -260,7 +260,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://chasinglulu.github.io/posts/f7f26963/">
+    <link itemprop="mainEntityOfPage" href="https://chasinglulu.github.io/posts/f7f26963/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.jpeg">
@@ -437,7 +437,7 @@
   </li>
   <li class="post-copyright-link">
       <strong>本文链接：</strong>
-      <a href="http://chasinglulu.github.io/posts/f7f26963/" title="percpu内存分配器">http://chasinglulu.github.io/posts/f7f26963/</a>
+      <a href="https://chasinglulu.github.io/posts/f7f26963/" title="percpu内存分配器">https://chasinglulu.github.io/posts/f7f26963/</a>
   </li>
   <li class="post-copyright-license">
       <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
@@ -482,7 +482,7 @@
 
   <div class="copyright">
     &copy; 2018 – 
-    <span itemprop="copyrightYear">2023</span>
+    <span itemprop="copyrightYear">2024</span>
     <span class="with-love">
       <i class="fa fa-anchor"></i>
     </span>
@@ -553,7 +553,7 @@
 
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/quicklink/2.3.0/quicklink.umd.js" integrity="sha256-yvJQOINiH9fWemHn0vCA5lsHWJaHs6/ZmO+1Ft04SvM=" crossorigin="anonymous"></script>
-  <script class="next-config" data-name="quicklink" type="application/json">{"enable":true,"home":false,"archive":false,"delay":true,"timeout":3000,"priority":true,"url":"http://chasinglulu.github.io/posts/f7f26963/"}</script>
+  <script class="next-config" data-name="quicklink" type="application/json">{"enable":true,"home":false,"archive":false,"delay":true,"timeout":3000,"priority":true,"url":"https://chasinglulu.github.io/posts/f7f26963/"}</script>
   <script src="/js/third-party/quicklink.js"></script>
 <script class="next-config" data-name="waline" type="application/json">{"lang":"zh-cn","enable":true,"serverURL":"www.chasinglulu.cn","cssUrl":"https://cdn.jsdelivr.net/npm/@waline/client@2.15.8/dist/waline.css","commentCount":true,"pageview":false,"placeholder":"请文明评论呀","avatar":"mm","meta":["nick","mail","link"],"pageSize":10,"visitor":true,"comment_count":true,"requiredFields":[],"libUrl":"https://cdn.jsdelivr.net/npm/@waline/client@2.15.8/dist/waline.js","emoji":["https://cdn.jsdelivr.net/gh/walinejs/emojis@1.1.0/tw-emoji/"],"el":"#waline","comment":true,"path":"/posts/f7f26963/"}</script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@waline/client@2.15.8/dist/waline.css">
