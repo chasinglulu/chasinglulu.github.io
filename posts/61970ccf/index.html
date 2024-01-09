@@ -21,17 +21,18 @@
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"chasinglulu.github.io","root":"/","images":"/images","scheme":"Mist","darkmode":false,"version":"8.18.2","exturl":false,"sidebar":{"position":"right","display":"hide","padding":18,"offset":12},"copycode":{"enable":true,"style":"mac"},"fold":{"enable":true,"height":500},"bookmark":{"enable":true,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
 
-    <meta name="description" content="在芯片开发的前期，RTL代码还在开发中，那么FPGA原型验证平台也不能为软件提供验证环境。这时候我们可以根据SoC spec在Qemu中开发一个新的Virtual Platform，那么BSP软件团队就可以提前完成一些软件环境的准备，比如最小系统。这样当RTL0.1释放后，我们可以直接复用这些软件在FPGA验证，从而减小搭建软件环境的压力和缩小验证时间。随着Qemu里面模拟的外设越来越多，我们可以">
+    <meta name="description" content="在芯片开发的前期，RTL代码还在开发中，FPGA原型验证平台也没有可用的环境。这时候我们可以根据SoC spec在Qemu中开发一个新的Virtual Platform，那么BSP软件团队就可以提前完成一些软件环境的准备，比如最小系统。这样当RTL0.1释放后，我们可以直接复用这些软件在FPGA验证，从而减小搭建软件环境的压力和缩小验证时间。随着Qemu里面模拟的外设越来越多，我们可以把更多的软件">
 <meta property="og:type" content="article">
-<meta property="og:title" content="基于Qemu lmt虚拟平台的bringup">
+<meta property="og:title" content="基于Qemu LMT虚拟平台的bringup">
 <meta property="og:url" content="https://chasinglulu.github.io/posts/61970ccf/index.html">
 <meta property="og:site_name" content="点滴汇聚">
-<meta property="og:description" content="在芯片开发的前期，RTL代码还在开发中，那么FPGA原型验证平台也不能为软件提供验证环境。这时候我们可以根据SoC spec在Qemu中开发一个新的Virtual Platform，那么BSP软件团队就可以提前完成一些软件环境的准备，比如最小系统。这样当RTL0.1释放后，我们可以直接复用这些软件在FPGA验证，从而减小搭建软件环境的压力和缩小验证时间。随着Qemu里面模拟的外设越来越多，我们可以">
+<meta property="og:description" content="在芯片开发的前期，RTL代码还在开发中，FPGA原型验证平台也没有可用的环境。这时候我们可以根据SoC spec在Qemu中开发一个新的Virtual Platform，那么BSP软件团队就可以提前完成一些软件环境的准备，比如最小系统。这样当RTL0.1释放后，我们可以直接复用这些软件在FPGA验证，从而减小搭建软件环境的压力和缩小验证时间。随着Qemu里面模拟的外设越来越多，我们可以把更多的软件">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://chasinglulu.github.io/images/29/lmt-arch.png">
 <meta property="og:image" content="https://chasinglulu.github.io/images/29/mult-process-qemu.png">
+<meta property="og:image" content="https://chasinglulu.github.io/images/29/atf_optee_uboot_kernel.gif">
 <meta property="article:published_time" content="2023-11-24T18:00:28.000Z">
-<meta property="article:modified_time" content="2023-12-23T18:37:27.579Z">
+<meta property="article:modified_time" content="2024-01-09T09:47:47.570Z">
 <meta property="article:author" content="Xinlu Wang">
 <meta property="article:tag" content="IT宅、DIY技术">
 <meta name="twitter:card" content="summary">
@@ -42,10 +43,10 @@
 
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://chasinglulu.github.io/posts/61970ccf/","path":"posts/61970ccf/","title":"基于Qemu lmt虚拟平台的bringup"}</script>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://chasinglulu.github.io/posts/61970ccf/","path":"posts/61970ccf/","title":"基于Qemu LMT虚拟平台的bringup"}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
-<title>基于Qemu lmt虚拟平台的bringup | 点滴汇聚</title>
+<title>基于Qemu LMT虚拟平台的bringup | 点滴汇聚</title>
   
 
 
@@ -171,7 +172,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%8A%AF%E7%89%87%E4%BB%8B%E7%BB%8D"><span class="nav-number">1.</span> <span class="nav-text">芯片介绍</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%90%AF%E5%8A%A8%E4%BB%8B%E7%BB%8D"><span class="nav-number">2.</span> <span class="nav-text">启动介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%90%AF%E5%8A%A8%E9%A1%BA%E5%BA%8F"><span class="nav-number">2.1.</span> <span class="nav-text">启动顺序</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#lmt-virt%E8%BF%90%E8%A1%8C%E9%AA%8C%E8%AF%81"><span class="nav-number">3.</span> <span class="nav-text">lmt-virt运行验证</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#lmt-safety-virt%E8%BF%90%E8%A1%8C%E9%AA%8C%E8%AF%81"><span class="nav-number">4.</span> <span class="nav-text">lmt-safety-virt运行验证</span></a></li></ol></div>
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%8A%AF%E7%89%87%E4%BB%8B%E7%BB%8D"><span class="nav-number">1.</span> <span class="nav-text">芯片介绍</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%90%AF%E5%8A%A8%E4%BB%8B%E7%BB%8D"><span class="nav-number">2.</span> <span class="nav-text">启动介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%90%AF%E5%8A%A8%E9%A1%BA%E5%BA%8F"><span class="nav-number">2.1.</span> <span class="nav-text">启动顺序</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#lmt-virt%E8%BF%90%E8%A1%8C%E9%AA%8C%E8%AF%81"><span class="nav-number">3.</span> <span class="nav-text">lmt-virt运行验证</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%90%AF%E5%8A%A8SPL-U-Boot"><span class="nav-number">3.1.</span> <span class="nav-text">启动SPL+U-Boot</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%90%AF%E5%8A%A8SPL-ATF-U-Boot"><span class="nav-number">3.2.</span> <span class="nav-text">启动SPL+ATF+U-Boot</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%90%AF%E5%8A%A8SPL-ATF-OPTEE-U-Boot"><span class="nav-number">3.3.</span> <span class="nav-text">启动SPL+ATF+OPTEE-U-Boot</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%90%AF%E5%8A%A8ATF-U-Boot"><span class="nav-number">3.4.</span> <span class="nav-text">启动ATF+U-Boot</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%90%AF%E5%8A%A8U-Boot-Kernel"><span class="nav-number">3.5.</span> <span class="nav-text">启动U-Boot+Kernel</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%90%AF%E5%8A%A8SPL-U-Boot-Kernel"><span class="nav-number">3.6.</span> <span class="nav-text">启动SPL+U-Boot+Kernel</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%90%AF%E5%8A%A8ATF-U-Boot-Kernel"><span class="nav-number">3.7.</span> <span class="nav-text">启动ATF+U-Boot+Kernel</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%90%AF%E5%8A%A8SPL-ATF-U-Boot-Kernel"><span class="nav-number">3.8.</span> <span class="nav-text">启动SPL+ATF+U-Boot+Kernel</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%90%AF%E5%8A%A8ATF-OPTEE-U-Boot-Kernel"><span class="nav-number">3.9.</span> <span class="nav-text">启动ATF+OPTEE+U-Boot+Kernel</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%90%AF%E5%8A%A8SPL-ATF-OPTEE-U-Boot-Kernel"><span class="nav-number">3.10.</span> <span class="nav-text">启动SPL+ATF+OPTEE+U-Boot+Kernel</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#lmt-safety-virt%E8%BF%90%E8%A1%8C%E9%AA%8C%E8%AF%81"><span class="nav-number">4.</span> <span class="nav-text">lmt-safety-virt运行验证</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#lmt-virt%E5%92%8Clmt-safety-virt%E8%81%94%E5%90%88%E8%BF%90%E8%A1%8C"><span class="nav-number">5.</span> <span class="nav-text">lmt-virt和lmt-safety-virt联合运行</span></a></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -263,12 +264,12 @@
     </span>
 
     <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="基于Qemu lmt虚拟平台的bringup | 点滴汇聚">
+      <meta itemprop="name" content="基于Qemu LMT虚拟平台的bringup | 点滴汇聚">
       <meta itemprop="description" content="">
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          基于Qemu lmt虚拟平台的bringup
+          基于Qemu LMT虚拟平台的bringup
         </h1>
 
         <div class="post-meta-container">
@@ -286,7 +287,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2023-12-24 02:37:27" itemprop="dateModified" datetime="2023-12-24T02:37:27+08:00">2023-12-24</time>
+      <time title="修改时间：2024-01-09 17:47:47" itemprop="dateModified" datetime="2024-01-09T17:47:47+08:00">2024-01-09</time>
     </span>
 
   
@@ -318,14 +319,14 @@
         <i class="far fa-file-word"></i>
       </span>
       <span class="post-meta-item-text">本文字数：</span>
-      <span>597</span>
+      <span>791</span>
     </span>
     <span class="post-meta-item" title="阅读时长">
       <span class="post-meta-item-icon">
         <i class="far fa-clock"></i>
       </span>
       <span class="post-meta-item-text">阅读时长 &asymp;</span>
-      <span>2 分钟</span>
+      <span>3 分钟</span>
     </span>
 </div>
 
@@ -335,10 +336,19 @@
     
     
     
-    <div class="post-body" itemprop="articleBody"><p>在芯片开发的前期，RTL代码还在开发中，那么FPGA原型验证平台也不能为软件提供验证环境。这时候我们可以根据SoC spec在Qemu中开发一个新的Virtual Platform，那么BSP软件团队就可以提前完成一些软件环境的准备，比如最小系统。这样当RTL0.1释放后，我们可以直接复用这些软件在FPGA验证，从而减小搭建软件环境的压力和缩小验证时间。随着Qemu里面模拟的外设越来越多，我们可以把更多的软件function在Qemu里面完成开发和验证，然后再迁移到FPGA原型平台上进行验证，从而完善软件的时序方面的逻辑。通过这样的验证手段，让我们软件准备提前，缩短FPGA的占用时间，减少验证成本。</p>
+    <div class="post-body" itemprop="articleBody"><p>在芯片开发的前期，RTL代码还在开发中，FPGA原型验证平台也没有可用的环境。这时候我们可以根据SoC spec在Qemu中开发一个新的Virtual Platform，那么BSP软件团队就可以提前完成一些软件环境的准备，比如最小系统。这样当RTL0.1释放后，我们可以直接复用这些软件在FPGA验证，从而减小搭建软件环境的压力和缩小验证时间。随着Qemu里面模拟的外设越来越多，我们可以把更多的软件function在Qemu里面完成开发和验证，然后再迁移到FPGA原型平台上进行验证，从而完善软件的时序方面的逻辑。通过这样的验证手段，让我们软件准备提前，缩短FPGA的占用时间，减少验证成本。</p>
 <span id="more"></span>
 
-
+<hr>
+<ul>
+<li><strong>Qemu:</strong> v7.2.0</li>
+<li><strong>U-Boot:</strong> v2022.10</li>
+<li><strong>ATF:</strong> lts-v2.10</li>
+<li><strong>OPTEE:</strong> v4.0.0</li>
+<li><strong>Linux Kernel:</strong> linux-6.1.12</li>
+<li><strong>aarch64-none-linux-gnu-gcc:</strong> 10.3.1 20210621</li>
+</ul>
+<hr>
 <h3 id="芯片介绍"><a href="#芯片介绍" class="headerlink" title="芯片介绍"></a>芯片介绍</h3><p><img data-src="/images/29/lmt-arch.png" alt="lmt-arch"></p>
 <center>图1 lmt芯片的架构</center>
 如上图所示，展示了芯片产品的框图，左边是基于ARM的主域，右边是基于RISC-V的从域。这样的芯片架构是目前很多自动驾驶ADAS芯片的解决方案，通过MCU Domain来实现芯片的故障诊断、甚至承接一部分车规相关的规控功能。
@@ -359,7 +369,11 @@
 <li>initramfs：最小的文件系统，用作临时跳转</li>
 <li>Ubuntu Rootfs：根文件系统，存放在存储介质上，里面包含很多应用、库和工具</li>
 </ul>
-<h4 id="启动顺序"><a href="#启动顺序" class="headerlink" title="启动顺序"></a>启动顺序</h4><h3 id="lmt-virt运行验证"><a href="#lmt-virt运行验证" class="headerlink" title="lmt-virt运行验证"></a>lmt-virt运行验证</h3><h3 id="lmt-safety-virt运行验证"><a href="#lmt-safety-virt运行验证" class="headerlink" title="lmt-safety-virt运行验证"></a>lmt-safety-virt运行验证</h3>
+<h4 id="启动顺序"><a href="#启动顺序" class="headerlink" title="启动顺序"></a>启动顺序</h4><h3 id="lmt-virt运行验证"><a href="#lmt-virt运行验证" class="headerlink" title="lmt-virt运行验证"></a>lmt-virt运行验证</h3><h4 id="启动SPL-U-Boot"><a href="#启动SPL-U-Boot" class="headerlink" title="启动SPL+U-Boot"></a>启动SPL+U-Boot</h4><h4 id="启动SPL-ATF-U-Boot"><a href="#启动SPL-ATF-U-Boot" class="headerlink" title="启动SPL+ATF+U-Boot"></a>启动SPL+ATF+U-Boot</h4><h4 id="启动SPL-ATF-OPTEE-U-Boot"><a href="#启动SPL-ATF-OPTEE-U-Boot" class="headerlink" title="启动SPL+ATF+OPTEE-U-Boot"></a>启动SPL+ATF+OPTEE-U-Boot</h4><h4 id="启动ATF-U-Boot"><a href="#启动ATF-U-Boot" class="headerlink" title="启动ATF+U-Boot"></a>启动ATF+U-Boot</h4><h4 id="启动U-Boot-Kernel"><a href="#启动U-Boot-Kernel" class="headerlink" title="启动U-Boot+Kernel"></a>启动U-Boot+Kernel</h4><h4 id="启动SPL-U-Boot-Kernel"><a href="#启动SPL-U-Boot-Kernel" class="headerlink" title="启动SPL+U-Boot+Kernel"></a>启动SPL+U-Boot+Kernel</h4><h4 id="启动ATF-U-Boot-Kernel"><a href="#启动ATF-U-Boot-Kernel" class="headerlink" title="启动ATF+U-Boot+Kernel"></a>启动ATF+U-Boot+Kernel</h4><h4 id="启动SPL-ATF-U-Boot-Kernel"><a href="#启动SPL-ATF-U-Boot-Kernel" class="headerlink" title="启动SPL+ATF+U-Boot+Kernel"></a>启动SPL+ATF+U-Boot+Kernel</h4><h4 id="启动ATF-OPTEE-U-Boot-Kernel"><a href="#启动ATF-OPTEE-U-Boot-Kernel" class="headerlink" title="启动ATF+OPTEE+U-Boot+Kernel"></a>启动ATF+OPTEE+U-Boot+Kernel</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">qemu-system-aarch64 -M lmt-virt,virt=on,secure=on,emmc=on -m 4G -display none -device loader,addr=0x400104000,file=/path/to/arm-trusted-firmware/build/lmt/release/bl31.bin,cpu-num=0 -device loader,addr=0x400200000,file=/path/to/u-boot/u-boot.bin -device loader,addr=0x404000000,file=/path/to/optee_os/out/arm-plat-ax/core/tee-pager_v2.bin -drive file=/path/to/emmc.img,format=raw,<span class="keyword">if</span>=emmc</span><br></pre></td></tr></table></figure>
+<p><code>virt=on</code>：使能CPU的EL2<br><code>secure=on</code>：使能CPU的EL3<br><code>emmc=on</code>：使能eMMC模拟支持</p>
+<p><img data-src="/images/29/atf_optee_uboot_kernel.gif" alt="atf_optee_uboot_kernel"></p>
+<p>启动日志附件：<a href="/images/29/atf_optee_uboot_kernel.txt">ATF-&gt;OPTEE-&gt;U-Boot-&gt;kernel Booting</a></p>
+<h4 id="启动SPL-ATF-OPTEE-U-Boot-Kernel"><a href="#启动SPL-ATF-OPTEE-U-Boot-Kernel" class="headerlink" title="启动SPL+ATF+OPTEE+U-Boot+Kernel"></a>启动SPL+ATF+OPTEE+U-Boot+Kernel</h4><h3 id="lmt-safety-virt运行验证"><a href="#lmt-safety-virt运行验证" class="headerlink" title="lmt-safety-virt运行验证"></a>lmt-safety-virt运行验证</h3><h3 id="lmt-virt和lmt-safety-virt联合运行"><a href="#lmt-virt和lmt-safety-virt联合运行" class="headerlink" title="lmt-virt和lmt-safety-virt联合运行"></a>lmt-virt和lmt-safety-virt联合运行</h3>
     </div>
 
     
@@ -400,7 +414,7 @@
   </li>
   <li class="post-copyright-link">
       <strong>本文链接：</strong>
-      <a href="https://chasinglulu.github.io/posts/61970ccf/" title="基于Qemu lmt虚拟平台的bringup">https://chasinglulu.github.io/posts/61970ccf/</a>
+      <a href="https://chasinglulu.github.io/posts/61970ccf/" title="基于Qemu LMT虚拟平台的bringup">https://chasinglulu.github.io/posts/61970ccf/</a>
   </li>
   <li class="post-copyright-license">
       <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
@@ -457,7 +471,7 @@
       <i class="fa fa-coffee"></i>
     </span>
       <span>站点阅读时长 &asymp;</span>
-    <span title="站点阅读时长">4:50</span>
+    <span title="站点阅读时长">4:51</span>
   </span>
 </div>
 <div class="busuanzi-count">
