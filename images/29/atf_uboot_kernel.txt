@@ -1,0 +1,351 @@
+NOTICE:  ATF running on lambert virt platform
+NOTICE:  BL31: Secure code at 0x404000000
+NOTICE:  BL31: Non secure code at 0x400200000
+NOTICE:  BL31: v2.10.0	(release):v2.10.0-3-g60c6247f6
+NOTICE:  BL31: Built : 15:30:08, Jan 11 2024
+
+
+U-Boot 2022.10-00022-ga347a060ca (Jan 04 2024 - 10:15:35 +0800)
+
+Reset cause: unknown reset
+Model: Lambert SoC Virtual Development Board
+DRAM:  4 GiB
+EL Level:	EL2
+Core:  8 devices, 6 uclasses, devicetree: board
+Flash: 0 Bytes
+MMC:   sdhci@10620000: 0, sdhci@10621000: 1
+Loading Environment from nowhere... OK
+In:    serial
+Out:   serial
+Err:   serial
+Net:   No ethernet found.
+Hit any key to stop autoboot:  2  1  0 
+Failed to load 'boot.img'
+Failed to load 'Image'
+## Executing script at 40f000000
+Wrong image format for "source" command
+## Warning: Input data exceeds 1048576 bytes - truncated
+## Info: input data size = 1048578 = 0x100002
+switch to partitions #0, OK
+mmc0(part 0) is current device
+Scanning mmc 0:5...
+Found /extlinux/extlinux.conf
+Retrieving file: /extlinux/extlinux.conf
+U-Boot menu
+1:	sigi-kernel-buildroot
+2:	sigi-kernel-ubuntu
+3:	sigi-kernel-nvme
+Enter choice: 1:	sigi-kernel-buildroot
+Retrieving file: /Image
+append: earlycon=uart8250,mmio32,0x1068a000,115200n8 console=ttyS0,115200n8 irqchip.gicv3_pseudo_nmi=Y loglevel=10 root=/dev/mmcblk0p7 rootwait init=/init rw
+Retrieving file: /lambert-virt.dtb
+## Flattened Device Tree blob at 418000000
+   Booting using the fdt blob at 0x418000000
+   Loading Device Tree to 00000004ff9f6000, end 00000004ff9f9fff ... OK
+   Updating MTD partitions...
+
+Starting kernel ...
+
+[    0.000000] Booting Linux on physical CPU 0x0000000000 [0x414fd0b1]
+[    0.000000] Linux version 6.1.12-rt7-02742-gd8b25e7cd362-dirty (charleye@charleye-VB) (aarch64-none-linux-gnu-gcc (GNU Toolchain for the A-profile Architecture 10.3-2021.07 (arm-10.29)) 10.3.1 20210621, GNU ld (GNU Toolchain for the A-profile Architecture 10.3-2021.07 (arm-10.29)) 2.36.1.20210621) #5 SMP PREEMPT_DYNAMIC Mon Jan  8 15:55:44 CST 2024
+[    0.000000] Machine model: Axera Lambert Virtual Development Platform
+[    0.000000] earlycon: uart8250 at MMIO32 0x000000001068a000 (options '115200n8')
+[    0.000000] printk: bootconsole [uart8250] enabled
+[    0.000000] Zone ranges:
+[    0.000000]   DMA      [mem 0x0000000400000000-0x00000004ffffffff]
+[    0.000000]   DMA32    empty
+[    0.000000]   Normal   empty
+[    0.000000] Movable zone start for each node
+[    0.000000] Early memory node ranges
+[    0.000000]   node   0: [mem 0x0000000400000000-0x0000000400103fff]
+[    0.000000]   node   0: [mem 0x0000000400104000-0x0000000400303fff]
+[    0.000000]   node   0: [mem 0x0000000400304000-0x0000000403ffffff]
+[    0.000000]   node   0: [mem 0x0000000404000000-0x0000000407ffffff]
+[    0.000000]   node   0: [mem 0x0000000408000000-0x00000004ffffffff]
+[    0.000000] Initmem setup node 0 [mem 0x0000000400000000-0x00000004ffffffff]
+[    0.000000] cma: Reserved 32 MiB at 0x0000000400400000
+[    0.000000] psci: probing for conduit method from DT.
+[    0.000000] psci: PSCIv1.1 detected in firmware.
+[    0.000000] psci: Using standard PSCI v0.2 function IDs
+[    0.000000] psci: MIGRATE_INFO_TYPE not supported.
+[    0.000000] psci: SMC Calling Convention v1.4
+[    0.000000] percpu: Embedded 19 pages/cpu s37288 r8192 d32344 u77824
+[    0.000000] pcpu-alloc: s37288 r8192 d32344 u77824 alloc=19*4096
+[    0.000000] pcpu-alloc: [0] 0 [0] 1 [0] 2 [0] 3 [0] 4 [0] 5 [0] 6 [0] 7 
+[    0.000000] Detected PIPT I-cache on CPU0
+[    0.000000] CPU features: detected: Virtualization Host Extensions
+[    0.000000] CPU features: detected: Hardware dirty bit management
+[    0.000000] CPU features: detected: Spectre-v4
+[    0.000000] CPU features: detected: Spectre-BHB
+[    0.000000] alternatives: applying boot alternatives
+[    0.000000] Built 1 zonelists, mobility grouping on.  Total pages: 1032192
+[    0.000000] Kernel command line: earlycon=uart8250,mmio32,0x1068a000,115200n8 console=ttyS0,115200n8 irqchip.gicv3_pseudo_nmi=Y loglevel=10 root=/dev/mmcblk0p7 rootwait init=/init rw
+[    0.000000] Dentry cache hash table entries: 524288 (order: 10, 4194304 bytes, linear)
+[    0.000000] Inode-cache hash table entries: 262144 (order: 9, 2097152 bytes, linear)
+[    0.000000] mem auto-init: stack:off, heap alloc:off, heap free:off
+[    0.000000] Memory: 4002052K/4194304K available (6656K kernel code, 846K rwdata, 2156K rodata, 1216K init, 411K bss, 159484K reserved, 32768K cma-reserved)
+[    0.000000] SLUB: HWalign=64, Order=0-3, MinObjects=0, CPUs=8, Nodes=1
+[    0.000000] Dynamic Preempt: full
+[    0.000000] rcu: Preemptible hierarchical RCU implementation.
+[    0.000000] rcu: 	RCU event tracing is enabled.
+[    0.000000] rcu: 	RCU restricting CPUs from NR_CPUS=256 to nr_cpu_ids=8.
+[    0.000000] 	Trampoline variant of Tasks RCU enabled.
+[    0.000000] 	Tracing variant of Tasks RCU enabled.
+[    0.000000] rcu: RCU calculated value of scheduler-enlistment delay is 25 jiffies.
+[    0.000000] rcu: Adjusting geometry for rcu_fanout_leaf=16, nr_cpu_ids=8
+[    0.000000] NR_IRQS: 64, nr_irqs: 64, preallocated irqs: 0
+[    0.000000] Root IRQ handler: gic_handle_irq
+[    0.000000] GIC: Using split EOI/Deactivate mode
+[    0.000000] rcu: srcu_init: Setting srcu_struct sizes based on contention.
+[    0.000000] arch_timer: cp15 timer(s) running at 24.00MHz (phys).
+[    0.000000] clocksource: arch_sys_counter: mask: 0xffffffffffffff max_cycles: 0x588fe9dc0, max_idle_ns: 440795202592 ns
+[    0.009164] sched_clock: 56 bits at 24MHz, resolution 41ns, wraps every 4398046511097ns
+[    0.062264] Console: colour dummy device 80x25
+[    0.079187] Calibrating delay loop (skipped), value calculated using timer frequency.. 48.00 BogoMIPS (lpj=96000)
+[    0.092291] pid_max: default: 32768 minimum: 301
+[    0.101321] LSM: Security Framework initializing
+[    0.112695] Mount-cache hash table entries: 8192 (order: 4, 65536 bytes, linear)
+[    0.117198] Mountpoint-cache hash table entries: 8192 (order: 4, 65536 bytes, linear)
+[    0.240987] cacheinfo: Unable to detect cache hierarchy for CPU 0
+[    0.265539] cblist_init_generic: Setting adjustable number of callback queues.
+[    0.267191] cblist_init_generic: Setting shift to 3 and lim to 1.
+[    0.270383] cblist_init_generic: Setting shift to 3 and lim to 1.
+[    0.278420] rcu: Hierarchical SRCU implementation.
+[    0.278506] rcu: 	Max phase no-delay instances is 1000.
+[    0.279667] printk: bootconsole [uart8250] printing thread started
+[    0.298805] smp: Bringing up secondary CPUs ...
+[    0.321340] Detected PIPT I-cache on CPU1
+[    0.323904] cacheinfo: Unable to detect cache hierarchy for CPU 1
+[    0.325456] CPU1: Booted secondary processor 0x0000000100 [0x414fd0b1]
+[    0.400288] Detected PIPT I-cache on CPU2
+[    0.400782] cacheinfo: Unable to detect cache hierarchy for CPU 2
+[    0.401226] CPU2: Booted secondary processor 0x0000000200 [0x414fd0b1]
+[    0.465935] Detected PIPT I-cache on CPU3
+[    0.466776] cacheinfo: Unable to detect cache hierarchy for CPU 3
+[    0.467698] CPU3: Booted secondary processor 0x0000000300 [0x414fd0b1]
+[    0.498780] Detected PIPT I-cache on CPU4
+[    0.499305] cacheinfo: Unable to detect cache hierarchy for CPU 4
+[    0.499782] CPU4: Booted secondary processor 0x0000010000 [0x414fd0b1]
+[    0.552094] Detected PIPT I-cache on CPU5
+[    0.552169] cacheinfo: Unable to detect cache hierarchy for CPU 5
+[    0.553163] CPU5: Booted secondary processor 0x0000010100 [0x414fd0b1]
+[    0.599150] Detected PIPT I-cache on CPU6
+[    0.599437] cacheinfo: Unable to detect cache hierarchy for CPU 6
+[    0.600328] CPU6: Booted secondary processor 0x0000010200 [0x414fd0b1]
+[    0.684799] Detected PIPT I-cache on CPU7
+[    0.685984] cacheinfo: Unable to detect cache hierarchy for CPU 7
+[    0.686684] CPU7: Booted secondary processor 0x0000010300 [0x414fd0b1]
+[    0.721231] smp: Brought up 1 node, 8 CPUs
+[    0.721375] SMP: Total of 8 processors activated.
+[    0.721564] CPU features: detected: 32-bit EL0 Support
+[    0.721935] CPU features: detected: Data cache clean to the PoU not required for I/D coherence
+[    0.722016] CPU features: detected: Common not Private translations
+[    0.722035] CPU features: detected: CRC32 instructions
+[    0.722161] CPU features: detected: RCpc load-acquire (LDAPR)
+[    0.722180] CPU features: detected: LSE atomic instructions
+[    0.722198] CPU features: detected: Privileged Access Never
+[    0.722214] CPU features: detected: RAS Extension Support
+[    0.722236] CPU features: detected: Speculative Store Bypassing Safe (SSBS)
+[    0.773648] CPU: All CPU(s) started at EL2
+[    0.908076] alternatives: applying system-wide alternatives
+[    1.271488] devtmpfs: initialized
+[    1.424922] clocksource: jiffies: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 7645041785100000 ns
+[    1.427537] futex hash table entries: 2048 (order: 5, 131072 bytes, linear)
+[    1.455291] pinctrl core: initialized pinctrl subsystem
+[    1.649780] NET: Registered PF_NETLINK/PF_ROUTE protocol family
+[    1.710468] DMA: preallocated 512 KiB GFP_KERNEL pool for atomic allocations
+[    1.711572] DMA: preallocated 512 KiB GFP_KERNEL|GFP_DMA pool for atomic allocations
+[    1.711888] DMA: preallocated 512 KiB GFP_KERNEL|GFP_DMA32 pool for atomic allocations
+[    1.715815] audit: initializing netlink subsys (disabled)
+[    1.751697] audit: type=2000 audit(0.812:1): state=initialized audit_enabled=0 res=1
+[    1.814406] thermal_sys: Registered thermal governor 'step_wise'
+[    1.818778] thermal_sys: Registered thermal governor 'power_allocator'
+[    1.843143] cpuidle: using governor menu
+[    1.845048] hw-breakpoint: found 6 breakpoint and 4 watchpoint registers.
+[    1.917188] ASID allocator initialised with 65536 entries
+[    2.081207] HugeTLB: registered 1.00 GiB page size, pre-allocated 0 pages
+[    2.081309] HugeTLB: 16380 KiB vmemmap can be freed for a 1.00 GiB page
+[    2.081339] HugeTLB: registered 32.0 MiB page size, pre-allocated 0 pages
+[    2.081357] HugeTLB: 508 KiB vmemmap can be freed for a 32.0 MiB page
+[    2.081379] HugeTLB: registered 2.00 MiB page size, pre-allocated 0 pages
+[    2.081396] HugeTLB: 28 KiB vmemmap can be freed for a 2.00 MiB page
+[    2.081417] HugeTLB: registered 64.0 KiB page size, pre-allocated 0 pages
+[    2.081433] HugeTLB: 0 KiB vmemmap can be freed for a 64.0 KiB page
+[    2.137341] pps_core: LinuxPPS API ver. 1 registered
+[    2.137554] pps_core: Software ver. 5.3.6 - Copyright 2005-2007 Rodolfo Giometti <giometti@linux.it>
+[    2.137774] PTP clock support registered
+[    2.318191] clocksource: Switched to clocksource arch_sys_counter
+[    2.342670] VFS: Disk quotas dquot_6.6.0
+[    2.346050] VFS: Dquot-cache hash table entries: 512 (order 0, 4096 bytes)
+[    2.720679] NET: Registered PF_INET protocol family
+[    2.735696] IP idents hash table entries: 65536 (order: 7, 524288 bytes, linear)
+[    2.817699] tcp_listen_portaddr_hash hash table entries: 2048 (order: 3, 32768 bytes, linear)
+[    2.818116] Table-perturb hash table entries: 65536 (order: 6, 262144 bytes, linear)
+[    2.818291] TCP established hash table entries: 32768 (order: 6, 262144 bytes, linear)
+[    2.818872] TCP bind hash table entries: 32768 (order: 8, 1048576 bytes, linear)
+[    2.825169] TCP: Hash tables configured (established 32768 bind 32768)
+[    2.858594] UDP hash table entries: 2048 (order: 4, 65536 bytes, linear)
+[    2.860187] UDP-Lite hash table entries: 2048 (order: 4, 65536 bytes, linear)
+[    2.877862] NET: Registered PF_UNIX/PF_LOCAL protocol family
+[    2.992392] RPC: Registered named UNIX socket transport module.
+[    2.992622] RPC: Registered udp transport module.
+[    2.992699] RPC: Registered tcp transport module.
+[    2.992730] RPC: Registered tcp NFSv4.1 backchannel transport module.
+[    2.993397] PCI: CLS 0 bytes, default 64
+[    3.057943] hrtimer: interrupt took 16365583 ns
+[    3.173191] Initialise system trusted keyrings
+[    3.224317] workingset: timestamp_bits=62 max_order=20 bucket_order=0
+[    3.361971] NFS: Registering the id_resolver key type
+[    3.362674] Key type id_resolver registered
+[    3.362750] Key type id_legacy registered
+[    3.365314] nfs4filelayout_init: NFSv4 File Layout Driver Registering...
+[    3.366707] nfs4flexfilelayout_init: NFSv4 Flexfile Layout Driver Registering...
+[    3.522684] Key type asymmetric registered
+[    3.523149] Asymmetric key parser 'x509' registered
+[    3.525129] Block layer SCSI generic (bsg) driver version 0.4 loaded (major 248)
+[    3.525396] io scheduler mq-deadline registered
+[    3.525574] io scheduler kyber registered
+[    3.526350] io scheduler bfq registered
+[    3.791012] Serial: 8250/16550 driver, 4 ports, IRQ sharing enabled
+[    3.835188] printk: console [ttyS0] disabled
+[    3.882237] 1068a000.serial: ttyS0 at MMIO 0x1068a000 (irq = 14, base_baud = 12000000) is a 16550A
+[    3.898660] printk: console [ttyS0] printing thread started
+[    3.898660] printk: console [ttyS0] printing thread start[    3.899032] prientkd
+[: console [ttyS0] enabled
+   [ 3.899032] printk: console [ttyS0] enabled
+[     3.899167] printk: bootco   3.899167] printk: bootconsole [uart8250] disabled
+nsole [uart8250] disabled
+[    3.955821] printk: bootconsole [uart8250] printing thread stopped
+[    4.137548] 1068b000.serial: ttyS1 at MMIO 0x1068b000 (irq = 15, base_baud = 12000000) is a 16550A
+[    4.206170] cacheinfo: Unable to detect cache hierarchy for CPU 0
+[    4.311888] loop: module loaded
+[    4.333535] i2c_dev: i2c /dev entries driver
+[    4.337942] sdhci: Secure Digital Host Controller Interface driver
+[    4.338006] sdhci: Copyright(c) Pierre Ossman
+[    4.338048] sdhci-pltfm: SDHCI platform and OF driver helper
+[    4.342171] optee: probing for conduit method.
+[    4.347015] optee: api uid mismatch
+[    4.347216] optee: probe of firmware:optee failed with error -22
+[    4.369526] NET: Registered PF_PACKET protocol family
+[    4.372478] Key type dns_resolver registered
+[    4.407396] registered taskstats version 1
+[    4.408367] Loading compiled-in X.509 certificates
+[    4.632218] mmc0: SDHCI controller on 10620000.mmc [10620000.mmc] using ADMA 64-bit
+[    4.975761] mmc0: 1.8V regulator output did not become stable
+[    5.026508] mmc0: new DDR MMC card at address 0001
+[    5.122854] mmcblk0: mmc0:0001 QEMU! 2.00 GiB 
+[    5.632841]  mmcblk0: p1 p2 p3 p4 p5 p6 p7 p8
+[    6.870784] EXT4-fs (mmcblk0p7): recovery complete
+[    6.919219] EXT4-fs (mmcblk0p7): mounted filesystem with ordered data mode. Quota mode: none.
+[    6.922622] VFS: Mounted root (ext4 filesystem) on device 179:7.
+[    6.953538] devtmpfs: mounted
+[    7.228307] Freeing unused kernel memory: 1216K
+[    7.394787] Run /init as init process
+[    7.394912]   with arguments:
+[    7.394954]     /init
+[    7.394983]   with environment:
+[    7.395024]     HOME=/
+[    7.395042]     TERM=linux
+mount: /dev: devtmpfs already mounted or mount point busy.
+       dmesg(1) may have more information after failed mount system call.
+[   10.280427] EXT4-fs (mmcblk0p7): re-mounted. Quota mode: none.
+Starting syslogd: OK
+Starting klogd: OK
+Running sysctl: OK
+Starting mdev... OK
+modprobe: can't change directory to '/lib/modules': No such file or directory
+Initializing random number generator: OK
+Saving random seed: [   23.420359] random: crng init done
+OK
+Starting network: OK
+Starting DHCP server: FAIL
+
+Welcome to Buildroot
+buildroot login: root
+# 
+# 
+# cat /pro# cat /proc/cp# cat /proc/cpuinfo 
+processor	: 0
+BogoMIPS	: 48.00
+Features	: fp asimd evtstrm aes pmull sha1 sha2 crc32 atomics fphp asimdhp cpuid asimdrdm lrcpc dcpop asimddp
+CPU implementer	: 0x41
+CPU architecture: 8
+CPU variant	: 0x4
+CPU part	: 0xd0b
+CPU revision	: 1
+
+processor	: 1
+BogoMIPS	: 48.00
+Features	: fp asimd evtstrm aes pmull sha1 sha2 crc32 atomics fphp asimdhp cpuid asimdrdm lrcpc dcpop asimddp
+CPU implementer	: 0x41
+CPU architecture: 8
+CPU variant	: 0x4
+CPU part	: 0xd0b
+CPU revision	: 1
+
+processor	: 2
+BogoMIPS	: 48.00
+Features	: fp asimd evtstrm aes pmull sha1 sha2 crc32 atomics fphp asimdhp cpuid asimdrdm lrcpc dcpop asimddp
+CPU implementer	: 0x41
+CPU architecture: 8
+CPU variant	: 0x4
+CPU part	: 0xd0b
+CPU revision	: 1
+
+processor	: 3
+BogoMIPS	: 48.00
+Features	: fp asimd evtstrm aes pmull sha1 sha2 crc32 atomics fphp asimdhp cpuid asimdrdm lrcpc dcpop asimddp
+CPU implementer	: 0x41
+CPU architecture: 8
+CPU variant	: 0x4
+CPU part	: 0xd0b
+CPU revision	: 1
+
+processor	: 4
+BogoMIPS	: 48.00
+Features	: fp asimd evtstrm aes pmull sha1 sha2 crc32 atomics fphp asimdhp cpuid asimdrdm lrcpc dcpop asimddp
+CPU implementer	: 0x41
+CPU architecture: 8
+CPU variant	: 0x4
+CPU part	: 0xd0b
+CPU revision	: 1
+
+processor	: 5
+BogoMIPS	: 48.00
+Features	: fp asimd evtstrm aes pmull sha1 sha2 crc32 atomics fphp asimdhp cpuid asimdrdm lrcpc dcpop asimddp
+CPU implementer	: 0x41
+CPU architecture: 8
+CPU variant	: 0x4
+CPU part	: 0xd0b
+CPU revision	: 1
+
+processor	: 6
+BogoMIPS	: 48.00
+Features	: fp asimd evtstrm aes pmull sha1 sha2 crc32 atomics fphp asimdhp cpuid asimdrdm lrcpc dcpop asimddp
+CPU implementer	: 0x41
+CPU architecture: 8
+CPU variant	: 0x4
+CPU part	: 0xd0b
+CPU revision	: 1
+
+processor	: 7
+BogoMIPS	: 48.00
+Features	: fp asimd evtstrm aes pmull sha1 sha2 crc32 atomics fphp asimdhp cpuid asimdrdm lrcpc dcpop asimddp
+CPU implementer	: 0x41
+CPU architecture: 8
+CPU variant	: 0x4
+CPU part	: 0xd0b
+CPU revision	: 1
+
+# 
+# 
+# cat /pro# cat /proc/ve# cat /proc/version 
+Linux version 6.1.12-rt7-02742-gd8b25e7cd362-dirty (charleye@charleye-VB) (aarch64-none-linux-gnu-gcc (GNU Toolchain for the A-profile Architecture 10.3-2021.07 (arm-10.29)) 10.3.1 20210621, GNU ld (GNU Toolchain for the A-profile Architecture 10.3-2021.07 (arm-10.29)) 2.36.1.20210621) #5 SMP PREEMPT_DYNAMIC Mon Jan  8 15:55:44 CST 2024
+# 
+# upt# uptime 
+ 00:01:17 up 1 min,  load average: 0.17, 0.08, 0.02
+# 
+# cat /e# cat /etc/iss# cat /etc/issue 
+Welcome to Buildroot
+# 
+# 

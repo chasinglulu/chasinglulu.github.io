@@ -30,9 +30,13 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://chasinglulu.github.io/images/29/lmt-arch.png">
 <meta property="og:image" content="https://chasinglulu.github.io/images/29/mult-process-qemu.png">
+<meta property="og:image" content="https://chasinglulu.github.io/images/29/spl_uboot_kernel.gif">
+<meta property="og:image" content="https://chasinglulu.github.io/images/29/atf_uboot_kernel.gif">
+<meta property="og:image" content="https://chasinglulu.github.io/images/29/spl_atf_uboot_kernel.gif">
 <meta property="og:image" content="https://chasinglulu.github.io/images/29/atf_optee_uboot_kernel.gif">
+<meta property="og:image" content="https://chasinglulu.github.io/images/29/spl_atf_optee_uboot_kernel.gif">
 <meta property="article:published_time" content="2023-11-24T18:00:28.000Z">
-<meta property="article:modified_time" content="2024-01-09T09:47:47.570Z">
+<meta property="article:modified_time" content="2024-01-11T07:48:18.229Z">
 <meta property="article:author" content="Xinlu Wang">
 <meta property="article:tag" content="IT宅、DIY技术">
 <meta name="twitter:card" content="summary">
@@ -287,7 +291,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2024-01-09 17:47:47" itemprop="dateModified" datetime="2024-01-09T17:47:47+08:00">2024-01-09</time>
+      <time title="修改时间：2024-01-11 15:48:18" itemprop="dateModified" datetime="2024-01-11T15:48:18+08:00">2024-01-11</time>
     </span>
 
   
@@ -319,14 +323,14 @@
         <i class="far fa-file-word"></i>
       </span>
       <span class="post-meta-item-text">本文字数：</span>
-      <span>791</span>
+      <span>1.3k</span>
     </span>
     <span class="post-meta-item" title="阅读时长">
       <span class="post-meta-item-icon">
         <i class="far fa-clock"></i>
       </span>
       <span class="post-meta-item-text">阅读时长 &asymp;</span>
-      <span>3 分钟</span>
+      <span>5 分钟</span>
     </span>
 </div>
 
@@ -343,7 +347,7 @@
 <ul>
 <li><strong>Qemu:</strong> v7.2.0</li>
 <li><strong>U-Boot:</strong> v2022.10</li>
-<li><strong>ATF:</strong> lts-v2.10</li>
+<li><strong>ATF:</strong> v2.10</li>
 <li><strong>OPTEE:</strong> v4.0.0</li>
 <li><strong>Linux Kernel:</strong> linux-6.1.12</li>
 <li><strong>aarch64-none-linux-gnu-gcc:</strong> 10.3.1 20210621</li>
@@ -369,11 +373,30 @@
 <li>initramfs：最小的文件系统，用作临时跳转</li>
 <li>Ubuntu Rootfs：根文件系统，存放在存储介质上，里面包含很多应用、库和工具</li>
 </ul>
-<h4 id="启动顺序"><a href="#启动顺序" class="headerlink" title="启动顺序"></a>启动顺序</h4><h3 id="lmt-virt运行验证"><a href="#lmt-virt运行验证" class="headerlink" title="lmt-virt运行验证"></a>lmt-virt运行验证</h3><h4 id="启动SPL-U-Boot"><a href="#启动SPL-U-Boot" class="headerlink" title="启动SPL+U-Boot"></a>启动SPL+U-Boot</h4><h4 id="启动SPL-ATF-U-Boot"><a href="#启动SPL-ATF-U-Boot" class="headerlink" title="启动SPL+ATF+U-Boot"></a>启动SPL+ATF+U-Boot</h4><h4 id="启动SPL-ATF-OPTEE-U-Boot"><a href="#启动SPL-ATF-OPTEE-U-Boot" class="headerlink" title="启动SPL+ATF+OPTEE-U-Boot"></a>启动SPL+ATF+OPTEE-U-Boot</h4><h4 id="启动ATF-U-Boot"><a href="#启动ATF-U-Boot" class="headerlink" title="启动ATF+U-Boot"></a>启动ATF+U-Boot</h4><h4 id="启动U-Boot-Kernel"><a href="#启动U-Boot-Kernel" class="headerlink" title="启动U-Boot+Kernel"></a>启动U-Boot+Kernel</h4><h4 id="启动SPL-U-Boot-Kernel"><a href="#启动SPL-U-Boot-Kernel" class="headerlink" title="启动SPL+U-Boot+Kernel"></a>启动SPL+U-Boot+Kernel</h4><h4 id="启动ATF-U-Boot-Kernel"><a href="#启动ATF-U-Boot-Kernel" class="headerlink" title="启动ATF+U-Boot+Kernel"></a>启动ATF+U-Boot+Kernel</h4><h4 id="启动SPL-ATF-U-Boot-Kernel"><a href="#启动SPL-ATF-U-Boot-Kernel" class="headerlink" title="启动SPL+ATF+U-Boot+Kernel"></a>启动SPL+ATF+U-Boot+Kernel</h4><h4 id="启动ATF-OPTEE-U-Boot-Kernel"><a href="#启动ATF-OPTEE-U-Boot-Kernel" class="headerlink" title="启动ATF+OPTEE+U-Boot+Kernel"></a>启动ATF+OPTEE+U-Boot+Kernel</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">qemu-system-aarch64 -M lmt-virt,virt=on,secure=on,emmc=on -m 4G -display none -device loader,addr=0x400104000,file=/path/to/arm-trusted-firmware/build/lmt/release/bl31.bin,cpu-num=0 -device loader,addr=0x400200000,file=/path/to/u-boot/u-boot.bin -device loader,addr=0x404000000,file=/path/to/optee_os/out/arm-plat-ax/core/tee-pager_v2.bin -drive file=/path/to/emmc.img,format=raw,<span class="keyword">if</span>=emmc</span><br></pre></td></tr></table></figure>
+<h4 id="启动顺序"><a href="#启动顺序" class="headerlink" title="启动顺序"></a>启动顺序</h4><h3 id="lmt-virt运行验证"><a href="#lmt-virt运行验证" class="headerlink" title="lmt-virt运行验证"></a>lmt-virt运行验证</h3><h4 id="启动SPL-U-Boot"><a href="#启动SPL-U-Boot" class="headerlink" title="启动SPL+U-Boot"></a>启动SPL+U-Boot</h4><h4 id="启动SPL-ATF-U-Boot"><a href="#启动SPL-ATF-U-Boot" class="headerlink" title="启动SPL+ATF+U-Boot"></a>启动SPL+ATF+U-Boot</h4><h4 id="启动SPL-ATF-OPTEE-U-Boot"><a href="#启动SPL-ATF-OPTEE-U-Boot" class="headerlink" title="启动SPL+ATF+OPTEE-U-Boot"></a>启动SPL+ATF+OPTEE-U-Boot</h4><h4 id="启动ATF-U-Boot"><a href="#启动ATF-U-Boot" class="headerlink" title="启动ATF+U-Boot"></a>启动ATF+U-Boot</h4><h4 id="启动U-Boot-Kernel"><a href="#启动U-Boot-Kernel" class="headerlink" title="启动U-Boot+Kernel"></a>启动U-Boot+Kernel</h4><h4 id="启动SPL-U-Boot-Kernel"><a href="#启动SPL-U-Boot-Kernel" class="headerlink" title="启动SPL+U-Boot+Kernel"></a>启动SPL+U-Boot+Kernel</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">qemu-system-aarch64 -M lmt-virt,virt=on,secure=on,emmc=on -m 4G -display none -device loader,addr=0x400104000,file=/path/to/arm-trusted-firmware/build/lmt/release/bl31.bin,cpu-num=0 -device loader,addr=0x400200000,file=/path/to/u-boot/u-boot.bin -drive file=/path/to/emmc.img,format=raw,<span class="keyword">if</span>=emmc</span><br></pre></td></tr></table></figure>
+<p><code>virt=on</code>：使能CPU的EL2<br><code>secure=on</code>：使能CPU的EL3<br><code>emmc=on</code>：使能eMMC模拟支持</p>
+<p>因为SPL和U-Boot既可以运行在EL2也可以运行在EL3，因此<code>virt=</code>和<code>secure=</code>两个选项既可以<code>on</code>也可以<code>off</code>，两个选项可以随意组合，用于验证不同的使用场景。</p>
+<p><img data-src="/images/29/spl_uboot_kernel.gif" alt="spl_uboot_kernel"></p>
+<p>启动日志附件：<a href="/images/29/spl_uboot_kernel.txt">ATF-&gt;U-Boot-&gt;kernel Booting</a></p>
+<h4 id="启动ATF-U-Boot-Kernel"><a href="#启动ATF-U-Boot-Kernel" class="headerlink" title="启动ATF+U-Boot+Kernel"></a>启动ATF+U-Boot+Kernel</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">qemu-system-aarch64 -M lmt-virt,virt=on,secure=on,emmc=on -m 4G -display none -device loader,addr=0x400104000,file=/path/to/arm-trusted-firmware/build/lmt/release/bl31.bin,cpu-num=0 -device loader,addr=0x400200000,file=/path/to/u-boot/u-boot.bin -drive file=/path/to/emmc.img,format=raw,<span class="keyword">if</span>=emmc -serial stdio</span><br></pre></td></tr></table></figure>
+<p><code>virt=on</code>：使能CPU的EL2<br><code>secure=on</code>：使能CPU的EL3<br><code>emmc=on</code>：使能eMMC模拟支持</p>
+<p><img data-src="/images/29/atf_uboot_kernel.gif" alt="atf_uboot_kernel"></p>
+<p>启动日志附件：<a href="/images/29/atf_uboot_kernel.txt">ATF-&gt;U-Boot-&gt;kernel Booting</a></p>
+<h4 id="启动SPL-ATF-U-Boot-Kernel"><a href="#启动SPL-ATF-U-Boot-Kernel" class="headerlink" title="启动SPL+ATF+U-Boot+Kernel"></a>启动SPL+ATF+U-Boot+Kernel</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">qemu-system-aarch64 -M lmt-virt,virt=on,secure=on,emmc=on -m 4G -display none -device loader,addr=0x0,file=/path/to/u-boot/spl/u-boot-spl.bin,cpu-num=0 -device loader,addr=0x400104000,file=/path/to/arm-trusted-firmware/build/lmt/release/bl31.bin -device loader,addr=0x400200000,file=/path/to/u-boot/u-boot.bin -drive file=/path/to/emmc.img,format=raw,<span class="keyword">if</span>=emmc -serial stdio</span><br></pre></td></tr></table></figure>
+
+<p><code>virt=on</code>：使能CPU的EL2<br><code>secure=on</code>：使能CPU的EL3<br><code>emmc=on</code>：使能eMMC模拟支持</p>
+<p><img data-src="/images/29/spl_atf_uboot_kernel.gif" alt="spl_atf_uboot_kernel"></p>
+<p>启动日志附件：<a href="/images/29/spl_atf_uboot_kernel.txt">SPL-&gt;ATF-&gt;U-Boot-&gt;kernel Booting</a></p>
+<h4 id="启动ATF-OPTEE-U-Boot-Kernel"><a href="#启动ATF-OPTEE-U-Boot-Kernel" class="headerlink" title="启动ATF+OPTEE+U-Boot+Kernel"></a>启动ATF+OPTEE+U-Boot+Kernel</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">qemu-system-aarch64 -M lmt-virt,virt=on,secure=on,emmc=on -m 4G -display none -device loader,addr=0x400104000,file=/path/to/arm-trusted-firmware/build/lmt/release/bl31.bin,cpu-num=0 -device loader,addr=0x400200000,file=/path/to/u-boot/u-boot.bin -device loader,addr=0x404000000,file=/path/to/optee_os/out/arm-plat-ax/core/tee-pager_v2.bin -drive file=/path/to/emmc.img,format=raw,<span class="keyword">if</span>=emmc -serial stdio</span><br></pre></td></tr></table></figure>
 <p><code>virt=on</code>：使能CPU的EL2<br><code>secure=on</code>：使能CPU的EL3<br><code>emmc=on</code>：使能eMMC模拟支持</p>
 <p><img data-src="/images/29/atf_optee_uboot_kernel.gif" alt="atf_optee_uboot_kernel"></p>
 <p>启动日志附件：<a href="/images/29/atf_optee_uboot_kernel.txt">ATF-&gt;OPTEE-&gt;U-Boot-&gt;kernel Booting</a></p>
-<h4 id="启动SPL-ATF-OPTEE-U-Boot-Kernel"><a href="#启动SPL-ATF-OPTEE-U-Boot-Kernel" class="headerlink" title="启动SPL+ATF+OPTEE+U-Boot+Kernel"></a>启动SPL+ATF+OPTEE+U-Boot+Kernel</h4><h3 id="lmt-safety-virt运行验证"><a href="#lmt-safety-virt运行验证" class="headerlink" title="lmt-safety-virt运行验证"></a>lmt-safety-virt运行验证</h3><h3 id="lmt-virt和lmt-safety-virt联合运行"><a href="#lmt-virt和lmt-safety-virt联合运行" class="headerlink" title="lmt-virt和lmt-safety-virt联合运行"></a>lmt-virt和lmt-safety-virt联合运行</h3>
+<h4 id="启动SPL-ATF-OPTEE-U-Boot-Kernel"><a href="#启动SPL-ATF-OPTEE-U-Boot-Kernel" class="headerlink" title="启动SPL+ATF+OPTEE+U-Boot+Kernel"></a>启动SPL+ATF+OPTEE+U-Boot+Kernel</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">qemu-system-aarch64 -M lmt-virt,virt=on,secure=on,emmc=on -m 4G -display none -device loader,addr=0x0,file=/path/to/u-boot/spl/u-boot-spl.bin,cpu-num=0 -device loader,addr=0x400104000,file=/path/to/arm-trusted-firmware/build/lmt/release/bl31.bin -device loader,addr=0x400200000,file=/path/to/u-boot/u-boot.bin -device loader,addr=0x404000000,file=/path/to/optee_os/out/arm-plat-ax/core/tee-pager_v2.bin -drive file=/path/to/emmc.img,format=raw,<span class="keyword">if</span>=emmc -serial stdio</span><br></pre></td></tr></table></figure>
+
+<p><code>virt=on</code>：使能CPU的EL2<br><code>secure=on</code>：使能CPU的EL3<br><code>emmc=on</code>：使能eMMC模拟支持</p>
+<p><img data-src="/images/29/spl_atf_optee_uboot_kernel.gif" alt="spl_atf_optee_uboot_kernel"></p>
+<p>启动日志附件：<a href="/images/29/spl_atf_optee_uboot_kernel.txt">SPL-&gt;ATF-&gt;OPTEE-&gt;U-Boot-&gt;kernel Booting</a></p>
+<h3 id="lmt-safety-virt运行验证"><a href="#lmt-safety-virt运行验证" class="headerlink" title="lmt-safety-virt运行验证"></a>lmt-safety-virt运行验证</h3><h3 id="lmt-virt和lmt-safety-virt联合运行"><a href="#lmt-virt和lmt-safety-virt联合运行" class="headerlink" title="lmt-virt和lmt-safety-virt联合运行"></a>lmt-virt和lmt-safety-virt联合运行</h3>
     </div>
 
     
@@ -464,14 +487,14 @@
       <i class="fa fa-chart-line"></i>
     </span>
       <span>站点总字数：</span>
-    <span title="站点总字数">80k</span>
+    <span title="站点总字数">81k</span>
   </span>
   <span class="post-meta-item">
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
       <span>站点阅读时长 &asymp;</span>
-    <span title="站点阅读时长">4:51</span>
+    <span title="站点阅读时长">4:53</span>
   </span>
 </div>
 <div class="busuanzi-count">
