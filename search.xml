@@ -1804,7 +1804,7 @@
 
 <p>芯片是异构系统架构的，包含两种指令集CPU（ARM和RISC-V），因此我们在Qemu里面添加了两个machine：lmt-virt和lmt-safety-virt，前者用于模拟ARM系统部分，后面用于模拟RISC-V系统部分，最后通过Qemu里面的共享内存和chardev socket实现两个machine的联动（multi-process Qemu的交互）。</p>
 <p><img data-src="/images/29/mult-process-qemu.png" alt="mult-process-qemu"></p>
-<center>图1 multi-process QEMU的架构</center>
+<center>图2 multi-process QEMU的架构</center>
 
 
 <h3 id="启动介绍"><a href="#启动介绍" class="headerlink" title="启动介绍"></a>启动介绍</h3><p>在运行起来之前，我们先明确最小系统涉及的组件以及它们的启动顺序</p>
@@ -1817,7 +1817,17 @@
 <li>initramfs：最小的文件系统，用作临时跳转</li>
 <li>Ubuntu Rootfs：根文件系统，存放在存储介质上，里面包含很多应用、库和工具</li>
 </ul>
-<h4 id="启动顺序"><a href="#启动顺序" class="headerlink" title="启动顺序"></a>启动顺序</h4><h3 id="镜像构建"><a href="#镜像构建" class="headerlink" title="镜像构建"></a>镜像构建</h3><h4 id="ATF"><a href="#ATF" class="headerlink" title="ATF"></a>ATF</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">git clone -b atf-v2.10 https://github.com/chasinglulu/arm-trusted-firmware.git</span><br><span class="line">cd arm-trusted-firmware</span><br><span class="line">make PLAT=lmt CROSS_COMPILE=aarch64-none-linux-gnu-</span><br><span class="line"></span><br><span class="line">or</span><br><span class="line">make PLAT=lmt CROSS_COMPILE=aarch64-none-linux-gnu- DEBUG=1 #debug</span><br><span class="line"></span><br><span class="line">or</span><br><span class="line">make PLAT=lmt CROSS_COMPILE=aarch64-none-linux-gnu- DEBUG=1 LOG_LEVEL=50 #verbose mode</span><br><span class="line"></span><br><span class="line">or</span><br><span class="line">make PLAT=lmt CROSS_COMPILE=aarch64-none-linux-gnu- SPD=opteed #with BL32 optee</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<h4 id="启动顺序"><a href="#启动顺序" class="headerlink" title="启动顺序"></a>启动顺序</h4><p><img data-src="/images/29/lmt-bootflow.png" alt="lmt-bootflow"></p>
+<center>图3 启动流程</center>
+
+<ul>
+<li>SPL将BL31 ATF、BL32 OPTEE和BL33 U-Boot三个镜像加载到DDR，将RISC-V Firmware加载到Safety SRAM中，然后跳转到BL31 ATF执行</li>
+<li>ATF完成基本的初始化，然后跳转到BL32 OPTEE执行</li>
+<li>OPTEE完成基本的初始化，然后返回到ATF的执行环境中，最后ATF直接跳转到U-Boot执行</li>
+<li>U-Boot完成初始化，外设的初始化，从eMMC&#x2F;Nor Flash等媒介中加载Kernel、initramfs和dtb等镜像文件，然后跳转到Kernel开始执行</li>
+<li>Kernel完成启动初始化，拉起应用程序</li>
+</ul>
+<h3 id="镜像构建"><a href="#镜像构建" class="headerlink" title="镜像构建"></a>镜像构建</h3><h4 id="ATF"><a href="#ATF" class="headerlink" title="ATF"></a>ATF</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">git clone -b atf-v2.10 https://github.com/chasinglulu/arm-trusted-firmware.git</span><br><span class="line">cd arm-trusted-firmware</span><br><span class="line">make PLAT=lmt CROSS_COMPILE=aarch64-none-linux-gnu-</span><br><span class="line"></span><br><span class="line">or</span><br><span class="line">make PLAT=lmt CROSS_COMPILE=aarch64-none-linux-gnu- DEBUG=1 #debug</span><br><span class="line"></span><br><span class="line">or</span><br><span class="line">make PLAT=lmt CROSS_COMPILE=aarch64-none-linux-gnu- DEBUG=1 LOG_LEVEL=50 #verbose mode</span><br><span class="line"></span><br><span class="line">or</span><br><span class="line">make PLAT=lmt CROSS_COMPILE=aarch64-none-linux-gnu- SPD=opteed #with BL32 optee</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
 <h4 id="OPTEE"><a href="#OPTEE" class="headerlink" title="OPTEE"></a>OPTEE</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">git clone -b optee_os-4.0.0 https://github.com/chasinglulu/optee_os.git</span><br><span class="line">cd optee_os</span><br><span class="line">export ARCH=arm</span><br><span class="line"></span><br><span class="line">make CROSS_COMPILE64=aarch64-none-linux-gnu- CROSS_COMPILE_ta_arm64=aarch64-none-linux-gnu- CROSS_COMPILE_ta_arm32=arm-linux-gnueabi- PLATFORM=ax-lmt</span><br><span class="line"></span><br><span class="line">or</span><br><span class="line">make CROSS_COMPILE64=aarch64-none-linux-gnu- CROSS_COMPILE_ta_arm64=aarch64-none-linux-gnu- CROSS_COMPILE_ta_arm32=arm-linux-gnueabi- PLATFORM=ax-lmt DEBUG=1  #debug</span><br></pre></td></tr></table></figure>
 
