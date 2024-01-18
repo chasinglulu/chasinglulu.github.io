@@ -1794,6 +1794,7 @@
 <li><strong>OPTEE:</strong> v4.0.0</li>
 <li><strong>Linux Kernel:</strong> linux-6.1.12</li>
 <li><strong>aarch64-none-linux-gnu-gcc:</strong> 10.3.1 20210621</li>
+<li><strong>riscv32-unknown-linux-gnu-gcc:</strong> 12.2.0</li>
 </ul>
 <hr>
 <h3 id="芯片介绍"><a href="#芯片介绍" class="headerlink" title="芯片介绍"></a>芯片介绍</h3><p><img data-src="/images/29/lmt-arch.png" alt="lmt-arch"></p>
@@ -1816,7 +1817,16 @@
 <li>initramfs：最小的文件系统，用作临时跳转</li>
 <li>Ubuntu Rootfs：根文件系统，存放在存储介质上，里面包含很多应用、库和工具</li>
 </ul>
-<h4 id="启动顺序"><a href="#启动顺序" class="headerlink" title="启动顺序"></a>启动顺序</h4><h3 id="lmt-virt运行验证"><a href="#lmt-virt运行验证" class="headerlink" title="lmt-virt运行验证"></a>lmt-virt运行验证</h3><h4 id="启动U-Boot-Kernel"><a href="#启动U-Boot-Kernel" class="headerlink" title="启动U-Boot+Kernel"></a>启动U-Boot+Kernel</h4><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">qemu-system-aarch64 -M lmt-virt,virt=on,emmc=on -m 4G -display none -device loader,addr=0x400200000,file=/path/to/u-boot/u-boot.bin,cpu-num=0 -drive file=/path/to/emmc.img,format=raw,<span class="keyword">if</span>=emmc -serial stdio</span><br></pre></td></tr></table></figure>
+<h4 id="启动顺序"><a href="#启动顺序" class="headerlink" title="启动顺序"></a>启动顺序</h4><h3 id="镜像构建"><a href="#镜像构建" class="headerlink" title="镜像构建"></a>镜像构建</h3><h4 id="ATF"><a href="#ATF" class="headerlink" title="ATF"></a>ATF</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">git clone -b atf-v2.10 https://github.com/chasinglulu/arm-trusted-firmware.git</span><br><span class="line">cd arm-trusted-firmware</span><br><span class="line">make PLAT=lmt CROSS_COMPILE=aarch64-none-linux-gnu-</span><br><span class="line"></span><br><span class="line">or</span><br><span class="line">make PLAT=lmt CROSS_COMPILE=aarch64-none-linux-gnu- DEBUG=1 #debug</span><br><span class="line"></span><br><span class="line">or</span><br><span class="line">make PLAT=lmt CROSS_COMPILE=aarch64-none-linux-gnu- DEBUG=1 LOG_LEVEL=50 #verbose mode</span><br><span class="line"></span><br><span class="line">or</span><br><span class="line">make PLAT=lmt CROSS_COMPILE=aarch64-none-linux-gnu- SPD=opteed #with BL32 optee</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h4 id="OPTEE"><a href="#OPTEE" class="headerlink" title="OPTEE"></a>OPTEE</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">git clone -b optee_os-4.0.0 https://github.com/chasinglulu/optee_os.git</span><br><span class="line">cd optee_os</span><br><span class="line">export ARCH=arm</span><br><span class="line"></span><br><span class="line">make CROSS_COMPILE64=aarch64-none-linux-gnu- CROSS_COMPILE_ta_arm64=aarch64-none-linux-gnu- CROSS_COMPILE_ta_arm32=arm-linux-gnueabi- PLATFORM=ax-lmt</span><br><span class="line"></span><br><span class="line">or</span><br><span class="line">make CROSS_COMPILE64=aarch64-none-linux-gnu- CROSS_COMPILE_ta_arm64=aarch64-none-linux-gnu- CROSS_COMPILE_ta_arm32=arm-linux-gnueabi- PLATFORM=ax-lmt DEBUG=1  #debug</span><br></pre></td></tr></table></figure>
+
+<h4 id="U-Boot"><a href="#U-Boot" class="headerlink" title="U-Boot"></a>U-Boot</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">git clone -b uboot-2022.10 https://github.com/chasinglulu/u-boot.git</span><br><span class="line">cd u-boot</span><br><span class="line">make CROSS_COMPILE=aarch64-none-linux-gnu- ARCH=arm64 lmt-qemu-virt_defconfig</span><br><span class="line">make -j4</span><br></pre></td></tr></table></figure>
+
+<h4 id="Linux-Kernel"><a href="#Linux-Kernel" class="headerlink" title="Linux Kernel"></a>Linux Kernel</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">git clone -b linux-v6.1-rt https://github.com/chasinglulu/linux.git</span><br><span class="line">cd linux</span><br><span class="line">make CROSS_COMPILE=aarch64-none-linux-gnu- ARCH=arm64 lmt-tiny_defconfig</span><br><span class="line">make -j64</span><br></pre></td></tr></table></figure>
+
+
+<h3 id="lmt-virt运行验证"><a href="#lmt-virt运行验证" class="headerlink" title="lmt-virt运行验证"></a>lmt-virt运行验证</h3><h4 id="启动U-Boot-Kernel"><a href="#启动U-Boot-Kernel" class="headerlink" title="启动U-Boot+Kernel"></a>启动U-Boot+Kernel</h4><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">qemu-system-aarch64 -M lmt-virt,virt=on,emmc=on -m 4G -display none -device loader,addr=0x400200000,file=/path/to/u-boot/u-boot.bin,cpu-num=0 -drive file=/path/to/emmc.img,format=raw,<span class="keyword">if</span>=emmc -serial stdio</span><br></pre></td></tr></table></figure>
 
 <p><code>virt=on</code>：使能CPU的EL2<br><code>secure=off</code>：关闭CPU的EL3<br><code>emmc=on</code>：使能eMMC模拟支持</p>
 <p>U-Boot既可以运行在EL2也可以运行在EL3上，但是打开EL3的时候，需要运行ATF，不然Kernel发起PSCI访问会触发panic。</p>
@@ -1847,7 +1857,7 @@
 <p><img data-src="/images/29/spl_atf_optee_uboot_kernel.gif" alt="spl_atf_optee_uboot_kernel"></p>
 <p>启动日志附件：<a href="/images/29/spl_atf_optee_uboot_kernel.txt">SPL-&gt;ATF-&gt;OPTEE-&gt;U-Boot-&gt;kernel Booting</a></p>
 <h3 id="lmt-safety-virt运行验证"><a href="#lmt-safety-virt运行验证" class="headerlink" title="lmt-safety-virt运行验证"></a>lmt-safety-virt运行验证</h3><p>lmt-safety-virt虚拟平台是基于RISC-V 32-bit架构开发的，在U-Boot里面添加了lmt-safety-virt平台的支持。下面是U-Boot编译构建命令：</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">cd</span> u-boot</span><br><span class="line">make ARCH=riscv CROSS_COMPILE=riscv32-unknown-linux-gnu- lambert-qemu-riscv-without-dram_defconfig</span><br><span class="line">make ARCH=riscv CROSS_COMPILE=riscv32-unknown-linux-gnu- -j4</span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">cd</span> u-boot</span><br><span class="line">make ARCH=riscv CROSS_COMPILE=riscv32-unknown-linux-gnu- lmt-qemu-riscv-without-dram_defconfig</span><br><span class="line">make ARCH=riscv CROSS_COMPILE=riscv32-unknown-linux-gnu- -j4</span><br></pre></td></tr></table></figure>
 
 <p>下面是运行验证命令：</p>
 <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">qemu-system-riscv32 -M lmt-safety-virt -m 1M -display none -device loader,file=/path/to/u-boot/u-boot-with-spl.bin,addr=0x60c00000,cpu-num=0 -serial stdio</span><br></pre></td></tr></table></figure>
