@@ -1853,7 +1853,20 @@
 <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">qemu-system-riscv32 -M lmt-safety-virt -m 1M -display none -device loader,file=/path/to/u-boot/u-boot-with-spl.bin,addr=0x60c00000,cpu-num=0 -serial stdio</span><br></pre></td></tr></table></figure>
 
 <p><img data-src="/images/29/safety-virt.png" alt="lmt-safety-virt"></p>
-<h3 id="lmt-virt和lmt-safety-virt联合运行"><a href="#lmt-virt和lmt-safety-virt联合运行" class="headerlink" title="lmt-virt和lmt-safety-virt联合运行"></a>lmt-virt和lmt-safety-virt联合运行</h3>]]></content>
+<h3 id="lmt-virt和lmt-safety-virt联合运行"><a href="#lmt-virt和lmt-safety-virt联合运行" class="headerlink" title="lmt-virt和lmt-safety-virt联合运行"></a>lmt-virt和lmt-safety-virt联合运行</h3><p>SoC是异构的，里面即集成了ARM Cortex-A系列的CPU，也集成了RISC-V系列的CPU。因此一种架构的CPU开发一个对应的虚拟平台，两个及以上的虚拟平台对应多个Qemu进程，就涉及到多个Qemu之间的联动，用于仿真异构核之间的交互和控制逻辑。</p>
+<p>下面是启动lmt-virt的命令：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">qemu-system-aarch64 -M lmt-virt,riscv-memdev=iram-safety -m 4G -display none -device loader,addr=0x400200000,file=/path/to/u-boot/u-boot.bin,cpu-num=0 -object memory-backend-file,size=512K,id=iram-safety,share=on,mem-path=/path/to/qemu-shm,discard-data=on -rp-path /tmp/coemu -serial stdio -semihosting</span><br></pre></td></tr></table></figure>
+
+<p><code>/tmp/coemu</code>：如果目录不存在，<em>mkdir</em>创建<br><code>riscv-memdev</code>：指定IRAM的内存后端ID，由machine使用</p>
+<p>下面是启动lmt-safety-virt的命令：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">qemu-system-riscv32 -M lmt-safety-virt,standalone=off,memdev=iram-safety -m 2M -display none -chardev socket,id=coemu,path=/tmp/coemu/qemu_rport_machine_lmt_soc_cosim_rp -object memory-backend-file,size=512K,id=iram-safety,share=on,mem-path=/path/to/qemu-shm,discard-data=on -serial stdio</span><br></pre></td></tr></table></figure>
+
+<p><code>standalone=</code>：指定machine的运行模式（单独或者联动）<br><code>memdev=</code>：指定machine所使用内存后端的ID</p>
+<p><img data-src="/images/29/both-virt.gif" alt="both-virt"></p>
+<p>AArch64侧的启动日志附件：<a href="/images/29/aarch64_booting.txt">AArch64 Booting</a></p>
+<p>RISC-V侧的启动日志附件：<a href="/images/29/riscv_booting.txt">RISC-V Booting</a></p>
+<p>目前只是做到了AArch64侧能够控制RISC-V侧的启动，两侧的通信交互还没有开发，比如在Linux内核下AArch64与RISC-V进行交互访问等。</p>
+]]></content>
   </entry>
   <entry>
     <title>排序算法学习总结</title>
