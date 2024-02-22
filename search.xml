@@ -357,13 +357,14 @@
     <title>Qemu新增的芯片平台</title>
     <url>/posts/27c3d8a8/</url>
     <content><![CDATA[<p>随着芯片开发的规模越来越大，验证无处不在，在整个开发流程中能够将系统软件的开发尽量向左前移，那么我们开发的芯片就能够更早地推向市场，甚至抢占先机。</p>
-<p>使用Qemu来模拟替代我们开发的芯片，从而能够让软件开发人员提前进行BSP相关软件的开发，但是Qemu里面是没有我们芯片对应的machine，因此我们要根据芯片手册，新增一个芯片machine或者芯片平台，也就是说基于Qemu现有的代码，我们新开发一个自有芯片的machine，基于这个新开发的machine，我们就可以开发我们的U-Boot、Linux BSP相关的代码了，从而缩小BSP相关代码在FPAG上的验证时间。</p>
+<p>使用Qemu来模拟仿真我们开发的芯片，从而能够让软件开发人员与芯片设计人员并行开发，但是Qemu通常是没有我们自研芯片的虚拟平台（VP），因此我们要根据芯片手册，新增实现一个虚拟原型或者虚拟芯片平台，也就是说基于Qemu现有的代码，我们新开发一个自研芯片的虚拟原型（VP），基于这个开发的虚拟原型（VP），我们可以开始进行BSP代码开发，不用再等待FPGA原型验证环境准备好，就能够提前推进系统软件代码的开发验证。</p>
 <span id="more"></span>
 
 <hr>
 <ul>
-<li><strong>Qemu:</strong> v7.2.0</li>
-<li><strong>Host OS:</strong> Ubuntu-20.04</li>
+<li><strong>Qemu:</strong> <code>v7.2.0</code></li>
+<li><strong>Host OS:</strong> <code>Ubuntu-20.04</code></li>
+<li><strong>GCC:</strong> <code>9.4.0</code></li>
 </ul>
 <hr>
 <h3 id="Qemu特征"><a href="#Qemu特征" class="headerlink" title="Qemu特征"></a>Qemu特征</h3><ul>
