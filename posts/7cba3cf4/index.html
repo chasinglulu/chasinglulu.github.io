@@ -33,8 +33,9 @@
 <meta property="og:image" content="https://chasinglulu.github.io/images/28/ubuntu.gif">
 <meta property="og:image" content="https://chasinglulu.github.io/images/28/uboot_kernel.gif">
 <meta property="og:image" content="https://chasinglulu.github.io/images/28/emmc-size.svg">
+<meta property="og:image" content="https://chasinglulu.github.io/images/28/rpmb.gif">
 <meta property="article:published_time" content="2023-11-24T17:48:51.000Z">
-<meta property="article:modified_time" content="2023-12-28T06:49:02.531Z">
+<meta property="article:modified_time" content="2024-03-04T12:10:27.588Z">
 <meta property="article:author" content="Xinlu Wang">
 <meta property="article:tag" content="qemu">
 <meta property="article:tag" content="u-boot">
@@ -293,7 +294,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2023-12-28 14:49:02" itemprop="dateModified" datetime="2023-12-28T14:49:02+08:00">2023-12-28</time>
+      <time title="修改时间：2024-03-04 20:10:27" itemprop="dateModified" datetime="2024-03-04T20:10:27+08:00">2024-03-04</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -334,14 +335,14 @@
         <i class="far fa-file-word"></i>
       </span>
       <span class="post-meta-item-text">本文字数：</span>
-      <span>1.4k</span>
+      <span>1.6k</span>
     </span>
     <span class="post-meta-item" title="阅读时长">
       <span class="post-meta-item-icon">
         <i class="far fa-clock"></i>
       </span>
       <span class="post-meta-item-text">阅读时长 &asymp;</span>
-      <span>5 分钟</span>
+      <span>6 分钟</span>
     </span>
 </div>
 
@@ -391,6 +392,9 @@
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">dd</span> <span class="keyword">if</span>=/dev/zero of=rpmb.img bs=1M count=2</span><br><span class="line"><span class="built_in">dd</span> <span class="keyword">if</span>=/dev/zero of=emmc.img bs=1M count=2046</span><br><span class="line"><span class="comment">#emmc.img按照上面制作方法进行分区和复制内容</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">cat</span> rpmb.img emmc.img &gt;emmc-with-rpmb.img</span><br></pre></td></tr></table></figure>
 <p><strong>emmc.img大小必须是1G、2G、4G等（要满足2的N次方形式）</strong><br>否者，就会报如下的错误信息：<br><img data-src="/images/28/emmc-size.svg" alt="emmc-size"></p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">qemu-system-aarch64 -M hobot-sigi-virt,emmc=on,part-config=0x20,virt=on -m 4G -display none -device loader,addr=0x3000200000,file=/path/to/u-boot/u-boot-dtb.bin,cpu-num=0 -drive file=/path/to/emmc-with-rpmb.img,format=raw,<span class="keyword">if</span>=emmc -serial stdio</span><br></pre></td></tr></table></figure>
+
+<p><img data-src="/images/28/rpmb.gif" alt="rpmb"></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 烧写rpmb key，每个eMMC只能烧写一次</span></span><br><span class="line">load mmc 0:5 0x3090000000 /rpmb-key.txt;mmc rpmb key 0x3090000000</span><br><span class="line"></span><br><span class="line"><span class="comment"># 使用这个key，把data写入到RPMB分区内</span></span><br><span class="line">fatload mmc 0:5 0x3091000000 Image;load mmc 0:5 0x3090000000 /rpmb-key.txt;mmc rpmb write 0x3091000000 0x0 0x10 0x3090000000</span><br><span class="line"></span><br><span class="line">md 0x3092000000 0x10</span><br><span class="line"><span class="comment"># 读取RPMB分区里面的data，可以不用key校验</span></span><br><span class="line">mmc rpmb <span class="built_in">read</span> 0x3092000000 0x0 0x10</span><br><span class="line"></span><br><span class="line"><span class="comment"># 显示两次，做对比，看看数据有没有正确读出来</span></span><br><span class="line">md  0x3092000000 0x10</span><br></pre></td></tr></table></figure>
     </div>
 
     
@@ -491,14 +495,14 @@
       <i class="fa fa-chart-line"></i>
     </span>
       <span>站点总字数：</span>
-    <span title="站点总字数">81k</span>
+    <span title="站点总字数">82k</span>
   </span>
   <span class="post-meta-item">
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
       <span>站点阅读时长 &asymp;</span>
-    <span title="站点阅读时长">4:56</span>
+    <span title="站点阅读时长">4:57</span>
   </span>
 </div>
 <div class="busuanzi-count">
