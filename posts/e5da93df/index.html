@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.0.0">
+<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+<link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/blog.svg">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/blog.svg">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="google-site-verification" content="vuSkRYPVceK1DXhqZWm7wVxYV4YmmnI1Dv_C1M8rJJM">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Georgia:300,300italic,400,400italic,700,700italic%7CCourier+New:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha256-CTSx/A06dm1B063156EVh15m6Y67pAjZZaQc89LLSrU=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"chasinglulu.github.io","root":"/","images":"/images","scheme":"Mist","darkmode":false,"version":"8.18.2","exturl":false,"sidebar":{"position":"right","display":"hide","padding":18,"offset":12},"copycode":{"enable":true,"style":"mac"},"fold":{"enable":true,"height":500},"bookmark":{"enable":true,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="&ensp;&ensp;&ensp;&ensp;通常所谓的U-Boot升级不过是在芯片原厂提供的BSP基础上增添部分外设适配代码，尽管这样做法能减少移植的难度，但芯片原厂提供的U-Boot版本一般较陈旧，极可能未实现新功能和新需求，比如设备树。通常，启动加载程序的移植是嵌入式Linux系统移植中首要面临的挑战。由于移植过程常涉及源代码的分析和修改，甚至添加新代码，因此需要在移植过程中逐渐提高三种基">
+<meta property="og:type" content="article">
+<meta property="og:title" content="关于Exynos4412 SoC的启动分析">
+<meta property="og:url" content="https://chasinglulu.github.io/posts/e5da93df/index.html">
+<meta property="og:site_name" content="点滴汇聚">
+<meta property="og:description" content="&ensp;&ensp;&ensp;&ensp;通常所谓的U-Boot升级不过是在芯片原厂提供的BSP基础上增添部分外设适配代码，尽管这样做法能减少移植的难度，但芯片原厂提供的U-Boot版本一般较陈旧，极可能未实现新功能和新需求，比如设备树。通常，启动加载程序的移植是嵌入式Linux系统移植中首要面临的挑战。由于移植过程常涉及源代码的分析和修改，甚至添加新代码，因此需要在移植过程中逐渐提高三种基">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://chasinglulu.github.io/images/12/exynos_boot_order.svg">
+<meta property="og:image" content="https://chasinglulu.github.io/images/12/memory_map.jpg">
+<meta property="og:image" content="https://chasinglulu.github.io/images/12/exynos_internal_RAM.svg">
+<meta property="og:image" content="https://chasinglulu.github.io/images/12/exynos_sd_layout.svg">
+<meta property="og:image" content="https://chasinglulu.github.io/images/12/exynos_emmc_layout.svg">
+<meta property="article:published_time" content="2019-05-28T10:01:38.000Z">
+<meta property="article:modified_time" content="2024-09-24T07:39:19.294Z">
+<meta property="article:author" content="Xinlu Wang">
+<meta property="article:tag" content="uboot">
+<meta property="article:tag" content="arm-linux-gnueabihf-gcc">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://chasinglulu.github.io/images/12/exynos_boot_order.svg">
+
+
+<link rel="canonical" href="https://chasinglulu.github.io/posts/e5da93df/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://chasinglulu.github.io/posts/e5da93df/","path":"posts/e5da93df/","title":"关于Exynos4412 SoC的启动分析"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>关于Exynos4412 SoC的启动分析 | 点滴汇聚</title>
+  
+
+
+
+
+
+
+
+<link rel="dns-prefetch" href="www.chasinglulu.cn"><link rel="stylesheet" href="//cdn.jsdelivr.net/gh/theme-next/theme-next-needmoreshare2@1/needsharebutton.min.css"><style>
+#needsharebutton-postbottom {
+  cursor: pointer;
+  height: 26px;
+  margin-top: 10px;
+  position: relative;
+}
+#needsharebutton-postbottom .btn {
+  border: 1px solid $btn-default-border-color;
+  border-radius: 3px;
+  display: initial;
+  padding: 1px 4px;
+}
+</style><style>
+#needsharebutton-float {
+  bottom: 88px;
+  cursor: pointer;
+  left: -8px;
+  position: fixed;
+  z-index: 9999;
+}
+#needsharebutton-float .btn {
+  border: 1px solid $btn-default-border-color;
+  border-radius: 4px;
+  padding: 0 10px 0 14px;
+}
+</style>
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">点滴汇聚</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">不积跬步无以至千里，不积小流无以成江海</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-address-card fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">70</span></a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">9</span></a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">43</span></a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83"><span class="nav-number">1.</span> <span class="nav-text">开发环境</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A6%82%E8%BF%B0"><span class="nav-number">2.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%90%AF%E5%8A%A8%E8%BF%87%E7%A8%8B"><span class="nav-number">3.</span> <span class="nav-text">启动过程</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E5%9C%A8%E5%90%AF%E5%8A%A8%E7%9A%84%E7%AC%AC%E4%B8%80%E9%98%B6%E6%AE%B5%EF%BC%88BL1%EF%BC%89%E9%9C%80%E8%A6%81%E5%8D%95%E7%8B%AC%E5%88%86%E7%A6%BB%E5%87%BAfwbl-bin%E5%92%8Cu-boot-spl-bin%E4%B8%A4%E4%B8%AA%E6%96%87%E4%BB%B6%EF%BC%9F"><span class="nav-number">3.1.</span> <span class="nav-text">为什么在启动的第一阶段（BL1）需要单独分离出fwbl.bin和u-boot-spl.bin两个文件？</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9C%B0%E5%9D%80%E7%A9%BA%E9%97%B4%E6%98%A0%E5%B0%84"><span class="nav-number">4.</span> <span class="nav-text">地址空间映射</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%98%A0%E5%83%8F%E5%B8%83%E5%B1%80"><span class="nav-number">5.</span> <span class="nav-text">映像布局</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="nav-number">6.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Xinlu Wang"
+      src="/images/avatar.jpeg">
+  <p class="site-author-name" itemprop="name">Xinlu Wang</p>
+  <div class="site-description" itemprop="description">不积跬步无以至千里 不积小流无以成江海</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">43</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">70</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/chasinglulu" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;chasinglulu" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:wangkart@aliyun.com" title="E-Mail → mailto:wangkart@aliyun.com" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://weibo.com/5052275150" title="Weibo → https:&#x2F;&#x2F;weibo.com&#x2F;5052275150" rel="noopener me" target="_blank"><i class="fab fa-weibo fa-fw"></i>Weibo</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+    <div class="sidebar-inner sidebar-blogroll">
+      <div class="links-of-blogroll animated">
+        <div class="links-of-blogroll-title"><i class="fa fa-globe fa-fw"></i>
+          链接
+        </div>
+        <ul class="links-of-blogroll-list">
+            <li class="links-of-blogroll-item">
+              <a href="https://lore.kernel.org/qemu-devel/" title="https:&#x2F;&#x2F;lore.kernel.org&#x2F;qemu-devel&#x2F;" rel="noopener" target="_blank">Qemu</a>
+            </li>
+            <li class="links-of-blogroll-item">
+              <a href="https://wiki.linuxfoundation.org/realtime/documentation/start" title="https:&#x2F;&#x2F;wiki.linuxfoundation.org&#x2F;realtime&#x2F;documentation&#x2F;start" rel="noopener" target="_blank">RT_Linux</a>
+            </li>
+        </ul>
+      </div>
+    </div>
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://chasinglulu.github.io/posts/e5da93df/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpeg">
+      <meta itemprop="name" content="Xinlu Wang">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="点滴汇聚">
+      <meta itemprop="description" content="不积跬步无以至千里 不积小流无以成江海">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="关于Exynos4412 SoC的启动分析 | 点滴汇聚">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          关于Exynos4412 SoC的启动分析
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2019-05-28 18:01:38" itemprop="dateCreated datePublished" datetime="2019-05-28T18:01:38+08:00">2019-05-28</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-09-24 15:39:19" itemprop="dateModified" datetime="2024-09-24T15:39:19+08:00">2024-09-24</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/u-boot/" itemprop="url" rel="index"><span itemprop="name">u-boot</span></a>
+        </span>
+    </span>
+
+  
+  
+  <span class="post-meta-item">
+    
+    <span class="post-meta-item-icon">
+      <i class="far fa-comment"></i>
+    </span>
+    <span class="post-meta-item-text">Waline：</span>
+  
+    <a title="waline" href="/posts/e5da93df/#waline" itemprop="discussionUrl">
+      <span class="post-comments-count waline-comment-count" data-path="/posts/e5da93df/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+    <span class="post-meta-item" title="阅读次数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span class="waline-pageview-count" data-path="/posts/e5da93df/"></span>
+    </span>
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>3.5k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>13 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>&ensp;&ensp;&ensp;&ensp;通常所谓的U-Boot升级不过是在芯片原厂提供的BSP基础上增添部分外设适配代码，尽管这样做法能减少移植的难度，但芯片原厂提供的U-Boot版本一般较陈旧，极可能未实现新功能和新需求，比如设备树。通常，启动加载程序的移植是嵌入式Linux系统移植中首要面临的挑战。由于移植过程常涉及源代码的分析和修改，甚至添加新代码，因此需要在移植过程中逐渐提高三种基本能力：阅读芯片手册的能力、阅读规范文档的能力及阅读源代码的能力。</p>
+<span id="more"></span>
+
+<h3 id="开发环境"><a href="#开发环境" class="headerlink" title="开发环境"></a>开发环境</h3><ul>
+<li><strong>Host OS:</strong> ubuntu-16.04-desktop</li>
+<li><strong>Target Development Board:</strong> Single Board Computer「SBC」 based on Exynos4412 SoC<ul>
+<li>9tripod X4412「深圳九鼎创展有限公司」</li>
+<li>TOPEET iTOP4412「讯为」</li>
+</ul>
+</li>
+<li><strong>Cross Compiler Toolchain:</strong> arm-linux-gnueabihf-<ul>
+<li>gcc version 6.4.1 20171012 (Linaro GCC 6.4-2017.11)</li>
+</ul>
+</li>
+<li><strong>u-boot:</strong> u-boot-2019.07</li>
+</ul>
+<h3 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h3><p>&ensp;&ensp;&ensp;&ensp;在移植之前，先从官方地址下载特定的U-Boot源代码，如本文使用的u-boot-2019.07。深入理解芯片的启动过程、地址空间映射「memory map」和映像布局对移植来说是至关重要的。本文重点分析了Exynos4412 SoC的启动，为后续的移植做好铺垫。Exynos4412 SoC支持以下启动设备：</p>
+<ul>
+<li>NAND flash</li>
+<li>SD&#x2F;MMC</li>
+<li>eMMC</li>
+<li>USB</li>
+</ul>
+<h3 id="启动过程"><a href="#启动过程" class="headerlink" title="启动过程"></a>启动过程</h3><p>&ensp;&ensp;&ensp;&ensp;Exynos4412 芯片内部包含一个64KiB ROM和一个256KiB SRAM，并且在ROM中固化了一份bootrom程序，也被称为iROM。内部SRAM用来存储iROM执行时的临时变量、数据及后续加载的fwbl.bin和u-boot-spl.bin代码。Exynos4412芯片的启动过程主要包含BL1、BL2和Kernel三个阶段，其中映像文件的加载执行顺序如图1所示。</p>
+<p><img data-src="/images/12/exynos_boot_order.svg" alt="exynos_boot_order.svg"></p>
+<center>图1 映像加载执行的顺序</center>
+
+<ol>
+<li>iROM被固化在内部ROM中，其主要完成功能包括：关闭看门狗、禁止中断及关闭MMU和数据缓存、打开指令缓存、刷新TLB和清除L2缓存。除此之外，使其他CPU核心进入idle模式，只保留CPU0继续执行后面的代码。接着获取reset状态、设置系统时钟分频系数和PLLs。最后根据读到的OM引脚配置来决定启动媒介设备「boot media device」，并从此启动设备将固件fwbl.bin加载到内部SRAM并跳转执行。</li>
+<li>固件fwbl.bin初始化IRQ和SVC模式的栈位置，若是从LPA「low power 」状态唤醒，将直接跳转执行u-boot-spl.bin，否则从启动媒介设备中加载u-boot-spl.bin至内部SRAM中。接着判断是不是安全启动，若是就对u-boot-spl.bin映像进行签名校验，若不是就只对u-boot-spl.bin映像进行CRC校验，验证之后跳转执行u-boot-spl.bin代码，**更详细的过程参考[1]**。</li>
+<li>u-boot-spl.bin也要初始化IRQ和SVC模式的栈位置，并且关闭MMU和D-Cache，不过其主要功能是配置系统时钟（clock）和初始化动态内存控制器（dynamic random-access memory controller，DRAMC）。如果需要早期的串口调试功能，那么也是由它实现。若是从LPA或睡眠状态唤醒，将直接执行内存中的u-boot.bin映像，否则从启动设备中加载u-boot.bin映像至内存中并直接跳转执行。由于不同开发板针对不同需求而采用不同的DDR SDRAM芯片，所以芯片的系统时钟和动态内存控制器的配置也要依据开发板或单板的不同做适当的调整，这也正是单独分离出这样一个映像文件的原因。</li>
+<li>u-boot.bin设置MMC、UART、USB、LCD、Network等外设实现各种高级的启动引导功能，比如TFTP升级、启动显示等，然后进入命令菜单等待用户输入命令或执行bootcmd环境变量指定的命令实现自动加载Linux kernel及设备树文件到内存，之后移交控制权给kernel。</li>
+<li>zImage、dtb等文件完成Linux操作系统的启动和设置，为应用程序提供一个执行环境。内核启动流程超出本文的讨论范围，故不做深入探讨。</li>
+</ol>
+<p>&ensp;&ensp;&ensp;&ensp;综上所述，启动引导过程「BoardLoader」分为两个阶段：BL1和BL2，在启动第一阶段涉及fwbl.bin和u-boot-spl.bin两个映像文件，其中fwbl.bin是由三星半导体提供的，而且没有源代码，只能通过文档大致了解它完成了哪些事情。与之相反，u-boot-spl.bin是通过开源U-Boot工程生成的，我们能够掌控代码的执行内容，便于定制化。在启动第二阶段只涉及u-boot.bin映像文件，也是使用U-Boot工程创建的，根据需求能够灵活地修改扩展。</p>
+<h4 id="为什么在启动的第一阶段（BL1）需要单独分离出fwbl-bin和u-boot-spl-bin两个文件？"><a href="#为什么在启动的第一阶段（BL1）需要单独分离出fwbl-bin和u-boot-spl-bin两个文件？" class="headerlink" title="为什么在启动的第一阶段（BL1）需要单独分离出fwbl.bin和u-boot-spl.bin两个文件？"></a>为什么在启动的第一阶段（BL1）需要单独分离出fwbl.bin和u-boot-spl.bin两个文件？</h4><p>&ensp;&ensp;&ensp;&ensp;这样设计的目的其实就是为了使芯片相关的配置过程与平台相关的配置过程完全解耦。无论芯片被使用在什么平台上，芯片配置固件都要具有将平台配置代码加载到内部SRAM并跳转执行的功能，fwbl.bin都由芯片制造商实现，但集成制造商通常都要求能够简单方便地修改平台配置以致于定制出差异化的产品，比如系统时钟的修改、内存芯片的改变等，这些设置都需要能在u-boot-spl.bin中实现。这样做的好处就使集成制造商能够根据具体需求灵活地使用自己定制的启动映像，从而不需要每次硬件选型变更后寻找芯片制造商的协助与授权。</p>
+<h3 id="地址空间映射"><a href="#地址空间映射" class="headerlink" title="地址空间映射"></a>地址空间映射</h3><p><img data-src="/images/12/memory_map.jpg" alt="memory_map.jpg"></p>
+<center>图2 Exynos4412 SoC的地址空间映射</center>
+&ensp;&ensp;&ensp;&ensp;如图2所示，可看出芯片将物理地址空间划分成多个内存区间「region」，分别有不同的用途。比如该芯片最大只能支持3GiB的内存。
+
+<p><img data-src="/images/12/exynos_internal_RAM.svg" alt="exynos_internal_RAM.svg"></p>
+<center>图3 关于内部SRAM的内存映射</center>
+
+<p>&ensp;&ensp;&ensp;&ensp;由图 3所示，可看出iROM、fwbl.bin与u-boot-spl.bin各自占用的地址空间。内部SRAM的地址空间是从0x02020000 开始到0x02060000结束。由于内部ROM是只读存储器，因此需要将 0x02020000 ~ 0x02021400的地址空间保留给iROM程序所使用，预留大小为5KiB，用于存放iROM的全局变量（ZI&#x2F;ZW即全局未初始化变量与全局已初始化变量）、局部变量（stack）等。接下来从0x02021400处开始到0x02025000结束属于fwbl.bin所占用的地址空间，由此可认为fwbl.bin的第一条指令在执行期间是存放在0x02021400地址处，这段地址空间的大小为15KiB。紧接着从0x02025000开始到0x02029000结束的这段空间属于u-boot-spl.bin所占用的地址空间，其大小为16KiB，因此可认为在运行过程中u-boot-spl.bin的第一条指令将存放在0x02025000地址处。<br>&ensp;&ensp;&ensp;&ensp;牵涉位置无关代码（Position-independent code，缩写PIC）的问题是移植U-Boot的难点，即运行地址与加载地址的区别。u-boot-spl.bin的运行地址在编译时是一个很重要的信息，决定得到的u-boot-spl.bin代码能否在芯片上正确运行。运行地址也叫链接地址，是程序指令定位所用的绝对地址，是在编译链接时必须指定的地址。加载地址指的是程序代码放置的位置，大多数情况下运行地址等于加载地址。通常用于生成u-boot-spl.bin的源代码包含非PIC的代码，并且在编译时指定的运行地址与存放映像用的加载地址不一致，当执行到u-boot-spl.bin的位置有关代码时其实际存放地址与依据运行地址计算的地址不吻合，此时u-boot-spl.bin代码将不能顺利执行下去。实际上，u-boot-spl.bin是由fwbl.bin加载到内部SRAM的0x02025000地址处，又由于fwbl.bin是芯片原厂提供的不开源的二进制程序，暂时无法修改fwbl.bin程序的执行行为，因此在编译生成u-boot-spl.bin时必须正确指定u-boot-spl.bin的链接地址为0x02025000，只有这样含有非PIC的u-boot-spl.bin代码才能顺利运行。<br>&ensp;&ensp;&ensp;&ensp;在配置编译生成u-boot映像时，若打开了SPL相关配置选项，则在编译完成后会在映像构建目录build下创建spl子目录，并在此子目录下创建与SPL相关的各种格式的映像文件和符号表，如表1所示。</p>
+<div align="center">表1 编译生成的SPL相关文件
+<table style="border-collapse:collapse;border-spacing:0;border-color:#9ABAD9;margin:0px auto" class="tg"><tr><th style="font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#fff;background-color:#409cff;text-align:center">映像名称</th><th style="font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#fff;background-color:#409cff;text-align:center">含义解释</th></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:center">u-boot-spl.map<br></td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#D2E4FC;text-align:left">映像符号表<br></td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:center">u-boot-spl<br></td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#D2E4FC;text-align:left">ELF格式映像<br></td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:center">u-boot-spl.lds<br></td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#D2E4FC;text-align:left">ld链接脚本<br></td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:center">x4412-spl.bin<br></td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#D2E4FC;text-align:left">特定芯片识别的二进制格式映像<br></td></tr></table></div>
+
+<p>&ensp;&ensp;&ensp;&ensp;按理论说，得到的ELF格式u-boot-spl映像也可以被加载执行，但由于fwbl.bin代码的行为限制，fwbl.bin不能加载执行其他格式的映像，所以一般常用<board_name>-spl.bin，其中<board_name>使用开发板的特定名称代替，例如用x4412代替后即是x4412-spl.bin，<strong>注意：启动第一阶段涉及的u-boot-spl.bin可以指的是这里的x4412-spl.bin</strong>。</p>
+<h3 id="映像布局"><a href="#映像布局" class="headerlink" title="映像布局"></a>映像布局</h3><p>&ensp;&ensp;&ensp;&ensp;在运行时，启动加载程序确切知道各种映像在存储设备SD或eMMC中的放置位置才能正确地从启动设备中获取启动映像并执行，并顺利将控制权转交给Linux内核。</p>
+<p><img data-src="/images/12/exynos_sd_layout.svg" alt="exynos_sd_layout.svg"></p>
+<center>图4 在SD卡上的映像布局</center>
+
+<p>&ensp;&ensp;&ensp;&ensp;SD卡的扇区大小为512B，编号0扇区为保留扇区，用来存放分区表的数据（MBR）。接下来的15KiB的空间存放fwbl.bin，比如X4412的BSP所提供fwbl.bin是15KiB，但iTOP4412的BSP所提供的fwbl.bin为8KiB。fwbl.bin后面要紧跟着存放u-boot-spl.bin（或x4412-spl.bin），两者之间不能存在空隙，其实u-boot-spl.bin的实际大小只有14KiB，因此u-boot-spl.bin与u-boot.bin之间存在2KiB的间隙，建议将此存储空间置零，后面几个映像文件可以根据实际情况自己安排适当调整位置。如图4所示，显示了X4412开发板所用的映像布局。这些映像文件是直接使用dd命令烧录至裸金属的物理存储空间，并不是存放在SD卡上的基于文件系统的逻辑分区内，但后面的kernel和dtb文件任然需要放入文件系统vfat32格式化的分区内，根文件系统映像存放入ext4格式化的分区内。</p>
+<p><img data-src="/images/12/exynos_emmc_layout.svg" alt="exynos_emmc_layout.svg"></p>
+<center>图5 在eMMC上的映像布局</center>
+
+<p>&ensp;&ensp;&ensp;&ensp;eMMC存储设备一般拥有多个独立的物理存储空间，每个硬件分区都是独立编址的。通常情况下，Boot Area Patitions存放启动加载程序，User Data Area存储内核映像、设备树和根文件系统等数据。从eMMC启动时，X4412开发板采用的映像布局如图5所示。<strong>更详细的关于eMMC的工作原理及分区，请参考[6]和[7]。</strong><br>&ensp;&ensp;&ensp;&ensp;不管选择从哪个启动设备启动，同样的映像只是在不同启动设备上的存放位置有变化。若设置启动设备为SD卡，则映像需要按照SD卡的存放布局放置。若eMMC被设置为启动设备，则映像就按照eMMC的空间布局存放。尽管图片中显示的内容都是与X4412相关的，但是原理和思想都是相似的，同样适用于iTOP4412开发板。</p>
+<h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><ol>
+<li><a href="/downloads/Android_Exynos4412_iROM_Secure_Booting_Guide_Ver.1.00.00.pdf">Exynos4212 iROM Booting Guide</a></li>
+<li><a href="/downloads/SEC_Exynos4412_Users_Manual_Ver.1.00.00.pdf">Exynos 4412 RISC Microprocessor User’s Manual</a></li>
+<li><a target="_blank" rel="noopener" href="http://www.techbulo.com/1335.html">Exynos 4412的启动过程分析</a></li>
+<li><a href="/downloads/ARM_DEN0028B_SMC_Calling_Convention.pdf">SMC CALLING CONVENTION System Software on ARM® Platforms</a></li>
+<li><a target="_blank" rel="noopener" href="http://www.cnblogs.com/pengdonglin137/p/5080309.html">基于tiny4412的u-boot移植（一）</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.jedec.org/sites/default/files/docs/JESD84-A44.pdf">eMMC (Embedded MMC) Standard MMCA 4.4 (JESD84-A44)(March 2009)</a></li>
+<li><a target="_blank" rel="noopener" href="https://linux.codingbelief.com/zh/storage/flash_memory/emmc/">eMMC详解</a></li>
+</ol>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer"><div class="post-widgets">
+      <div id="needsharebutton-postbottom">
+        <span class="btn">
+          <i class="fa fa-share-alt" aria-hidden="true"></i>
+        </span>
+      </div>
+    </div>
+          <div class="reward-container">
+  <div>请我一杯咖啡吧！</div>
+  <button>
+    赞赏
+  </button>
+  <div class="post-reward">
+      <div>
+        <img src="/images/wechatpay.png" alt="Xinlu Wang 微信">
+        <span>微信</span>
+      </div>
+      <div>
+        <img src="/images/alipay.jpg" alt="Xinlu Wang 支付宝">
+        <span>支付宝</span>
+      </div>
+
+  </div>
+</div>
+
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>本文作者： </strong>Xinlu Wang
+  </li>
+  <li class="post-copyright-link">
+      <strong>本文链接：</strong>
+      <a href="https://chasinglulu.github.io/posts/e5da93df/" title="关于Exynos4412 SoC的启动分析">https://chasinglulu.github.io/posts/e5da93df/</a>
+  </li>
+  <li class="post-copyright-license">
+      <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/uboot/" rel="tag"><i class="fa fa-tag"></i> uboot</a>
+              <a href="/tags/arm-linux-gnueabihf-gcc/" rel="tag"><i class="fa fa-tag"></i> arm-linux-gnueabihf-gcc</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/fc2b9b27/" rel="prev" title="排序算法学习总结">
+                  <i class="fa fa-angle-left"></i> 排序算法学习总结
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/posts/6c782175/" rel="next" title="早期内存分配器：memblock">
+                  早期内存分配器：memblock <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments" id="waline"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2018 – 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-anchor"></i>
+    </span><a href="http://abitacc.com/about" rel="noopener" target="_blank">Xinlu Wang</a>
+    <!-- annotation
+    <span class="author" itemprop="copyrightHolder">Xinlu Wang</span>
+    -->
+  </div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+      <span>站点总字数：</span>
+    <span title="站点总字数">82k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span>站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">4:57</span>
+  </span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+  <a href="https://github.com/chasinglulu" class="github-corner" title="在 GitHub 上关注我" aria-label="在 GitHub 上关注我" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script size="300" alpha="0.6" zIndex="-1" src="https://cdnjs.cloudflare.com/ajax/libs/ribbon.js/1.0.2/ribbon.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lozad.js/1.16.0/lozad.min.js" integrity="sha256-mOFREFhqmHeQbXpK2lp4nA3qooVgACfh88fpJftLBbc=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script><script src="/js/bookmark.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/quicklink/2.3.0/quicklink.umd.js" integrity="sha256-yvJQOINiH9fWemHn0vCA5lsHWJaHs6/ZmO+1Ft04SvM=" crossorigin="anonymous"></script>
+  <script class="next-config" data-name="quicklink" type="application/json">{"enable":true,"home":false,"archive":false,"delay":true,"timeout":3000,"priority":true,"url":"https://chasinglulu.github.io/posts/e5da93df/"}</script>
+  <script src="/js/third-party/quicklink.js"></script>
+<script class="next-config" data-name="waline" type="application/json">{"lang":"zh-CN","enable":true,"serverURL":"www.chasinglulu.cn","cssUrl":"https://unpkg.com/@waline/client@v2/dist/waline.css","commentCount":true,"pageview":true,"placeholder":"请文明评论呀","avatar":"mm","meta":["nick","mail"],"pageSize":10,"comment_count":true,"requiredFields":["mail"],"libUrl":"https://cdn.jsdelivr.net/npm/@waline/client@2.15.8/dist/waline.js","emoji":["https://cdn.jsdelivr.net/gh/walinejs/emojis@1.1.0/tw-emoji/"],"el":"#waline","comment":true,"path":"/posts/e5da93df/"}</script>
+<link rel="stylesheet" href="https://unpkg.com/@waline/client@v2/dist/waline.css">
+<script>
+document.addEventListener('page:loaded', () => {
+  NexT.utils.loadComments(CONFIG.waline.el).then(() =>
+    NexT.utils.getScript(CONFIG.waline.libUrl, { condition: window.Waline })
+  ).then(() => 
+    Waline.init(Object.assign({}, CONFIG.waline,{ el: document.querySelector(CONFIG.waline.el) }))
+  );
+});
+</script>
+<div id="needsharebutton-float">
+      <span class="btn">
+        <i class="fa fa-share-alt" aria-hidden="true"></i>
+      </span>
+    </div>
+  <script src="//cdn.jsdelivr.net/gh/theme-next/theme-next-needmoreshare2@1/needsharebutton.min.js"></script>
+  <script>
+      pbOptions = {};
+        pbOptions.iconStyle = "default";
+        pbOptions.boxForm = "horizontal";
+        pbOptions.position = "bottomCenter";
+        pbOptions.networks = "Weibo,Wechat,Douban,QQZone,Mailto";
+      new needShareButton('#needsharebutton-postbottom', pbOptions);
+      flOptions = {};
+        flOptions.iconStyle = "box";
+        flOptions.boxForm = "vertical";
+        flOptions.position = "topRight";
+        flOptions.networks = "Weibo,Wechat,Douban,QQZone,Mailto";
+      new needShareButton('#needsharebutton-float', flOptions);
+  </script>
+</body>
+</html>

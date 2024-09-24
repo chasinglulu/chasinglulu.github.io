@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.0.0">
+<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+<link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/blog.svg">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/blog.svg">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="google-site-verification" content="vuSkRYPVceK1DXhqZWm7wVxYV4YmmnI1Dv_C1M8rJJM">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Georgia:300,300italic,400,400italic,700,700italic%7CCourier+New:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha256-CTSx/A06dm1B063156EVh15m6Y67pAjZZaQc89LLSrU=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"chasinglulu.github.io","root":"/","images":"/images","scheme":"Mist","darkmode":false,"version":"8.18.2","exturl":false,"sidebar":{"position":"right","display":"hide","padding":18,"offset":12},"copycode":{"enable":true,"style":"mac"},"fold":{"enable":true,"height":500},"bookmark":{"enable":true,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="本文主要关注内核中用于调度进程的各种机制，以及为了实现这些机制而引入的各种概念和数据结构。首先了解调度器「scheduler」的如下关键概念，有了这些基础才能深入理解调度器的各种不同活动和行为。  刻画进程重要性的负载权重「load weight」 进程的虚拟运行时间「virtual runtime」 进程时间片「time slice」和CFS运行队列的调度延迟「scheduling latenc">
+<meta property="og:type" content="article">
+<meta property="og:title" content="进程调度1「Key Concepts」">
+<meta property="og:url" content="https://chasinglulu.github.io/posts/4a123606/index.html">
+<meta property="og:site_name" content="点滴汇聚">
+<meta property="og:description" content="本文主要关注内核中用于调度进程的各种机制，以及为了实现这些机制而引入的各种概念和数据结构。首先了解调度器「scheduler」的如下关键概念，有了这些基础才能深入理解调度器的各种不同活动和行为。  刻画进程重要性的负载权重「load weight」 进程的虚拟运行时间「virtual runtime」 进程时间片「time slice」和CFS运行队列的调度延迟「scheduling latenc">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://chasinglulu.github.io/images/13/priority_and_load_weight_relationship.svg">
+<meta property="og:image" content="https://chasinglulu.github.io/images/13/cpu_share_I.svg">
+<meta property="og:image" content="https://chasinglulu.github.io/images/13/cpu_share_II.svg">
+<meta property="og:image" content="https://chasinglulu.github.io/images/13/vruntime_load_weight.svg">
+<meta property="og:image" content="https://chasinglulu.github.io/images/13/real_runtime_to_virtual_runtime.svg">
+<meta property="og:image" content="https://chasinglulu.github.io/images/13/execution_time_task.svg">
+<meta property="og:image" content="https://chasinglulu.github.io/images/13/scheduling_latency.svg">
+<meta property="og:image" content="https://chasinglulu.github.io/images/13/scheduling_latency_divided.svg">
+<meta property="og:image" content="https://chasinglulu.github.io/images/13/task_timeslice.svg">
+<meta property="og:image" content="https://chasinglulu.github.io/images/13/sched_nr_latency.svg">
+<meta property="og:image" content="https://chasinglulu.github.io/images/13/scheduling_latency_calculation.svg">
+<meta property="og:image" content="https://chasinglulu.github.io/images/13/scheduling_latency_task.svg">
+<meta property="og:image" content="https://chasinglulu.github.io/images/13/per_cpu_run_queue_and_sub_run_queue.svg">
+<meta property="og:image" content="https://chasinglulu.github.io/images/13/redblack_tree_sched_entity.svg">
+<meta property="og:image" content="https://chasinglulu.github.io/images/13/CFS_fairness_process.svg">
+<meta property="og:image" content="https://chasinglulu.github.io/images/13/CFS_fairness_user.svg">
+<meta property="og:image" content="https://chasinglulu.github.io/images/13/task_group_and_sub-task_group.svg">
+<meta property="og:image" content="https://chasinglulu.github.io/images/13/task_and_task_group_entity.svg">
+<meta property="og:image" content="https://chasinglulu.github.io/images/13/entity_enqueued_CFS.svg">
+<meta property="og:image" content="https://chasinglulu.github.io/images/13/sched_entity_hierarchy.svg">
+<meta property="og:image" content="https://chasinglulu.github.io/images/13/root_task_group.svg">
+<meta property="og:image" content="https://chasinglulu.github.io/images/13/scheduling_policy_and_class.svg">
+<meta property="og:image" content="https://chasinglulu.github.io/images/13/all_shceduling_class.svg">
+<meta property="og:image" content="https://chasinglulu.github.io/images/13/init_root_task_group.svg">
+<meta property="article:published_time" content="2019-11-22T14:53:56.000Z">
+<meta property="article:modified_time" content="2024-09-24T07:39:19.298Z">
+<meta property="article:author" content="Xinlu Wang">
+<meta property="article:tag" content="task">
+<meta property="article:tag" content="process">
+<meta property="article:tag" content="management">
+<meta property="article:tag" content="schedule">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://chasinglulu.github.io/images/13/priority_and_load_weight_relationship.svg">
+
+
+<link rel="canonical" href="https://chasinglulu.github.io/posts/4a123606/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://chasinglulu.github.io/posts/4a123606/","path":"posts/4a123606/","title":"进程调度1「Key Concepts」"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>进程调度1「Key Concepts」 | 点滴汇聚</title>
+  
+
+
+
+
+
+
+
+<link rel="dns-prefetch" href="www.chasinglulu.cn"><link rel="stylesheet" href="//cdn.jsdelivr.net/gh/theme-next/theme-next-needmoreshare2@1/needsharebutton.min.css"><style>
+#needsharebutton-postbottom {
+  cursor: pointer;
+  height: 26px;
+  margin-top: 10px;
+  position: relative;
+}
+#needsharebutton-postbottom .btn {
+  border: 1px solid $btn-default-border-color;
+  border-radius: 3px;
+  display: initial;
+  padding: 1px 4px;
+}
+</style><style>
+#needsharebutton-float {
+  bottom: 88px;
+  cursor: pointer;
+  left: -8px;
+  position: fixed;
+  z-index: 9999;
+}
+#needsharebutton-float .btn {
+  border: 1px solid $btn-default-border-color;
+  border-radius: 4px;
+  padding: 0 10px 0 14px;
+}
+</style>
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">点滴汇聚</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">不积跬步无以至千里，不积小流无以成江海</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-address-card fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">70</span></a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">9</span></a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">43</span></a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B4%9F%E8%BD%BD%E6%9D%83%E9%87%8D%E3%80%8Cload-weight%E3%80%8D%E5%92%8C%E8%99%9A%E6%8B%9F%E8%BF%90%E8%A1%8C%E6%97%B6%E9%97%B4%E3%80%8Cvirtual-runtime%E3%80%8D"><span class="nav-number">1.</span> <span class="nav-text">负载权重「load weight」和虚拟运行时间「virtual runtime」</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%B4%9F%E8%BD%BD%E6%9D%83%E9%87%8D%E3%80%8Cload-weight%E3%80%8D%EF%BC%9A%E6%8F%8F%E8%BF%B0%E8%BF%9B%E7%A8%8B%E7%9A%84%E9%87%8D%E8%A6%81%E6%80%A7"><span class="nav-number">1.1.</span> <span class="nav-text">负载权重「load weight」：描述进程的重要性</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#vruntime-virtual-runtime"><span class="nav-number">1.2.</span> <span class="nav-text">vruntime(virtual runtime)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#min-vruntime"><span class="nav-number">1.3.</span> <span class="nav-text">min_vruntime</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B0%83%E5%BA%A6%E5%BB%B6%E8%BF%9F%E3%80%8Cscheduling-latency%E3%80%8D%E5%92%8C%E6%97%B6%E9%97%B4%E7%89%87%E3%80%8Ctime-slice%E3%80%8D"><span class="nav-number">2.</span> <span class="nav-text">调度延迟「scheduling latency」和时间片「time slice」</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%97%B6%E9%97%B4%E7%89%87%E7%9B%B8%E5%85%B3%E7%9A%84%E5%8F%98%E9%87%8F"><span class="nav-number">2.1.</span> <span class="nav-text">时间片相关的变量</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%90%E8%A1%8C%E9%98%9F%E5%88%97%E3%80%8Crun-queue%E3%80%8D%E3%80%81CFS%E8%BF%90%E8%A1%8C%E9%98%9F%E5%88%97%E5%92%8C%E7%BA%A2%E9%BB%91%E6%A0%91%E3%80%8CRed-Black-tree%E3%80%8D"><span class="nav-number">3.</span> <span class="nav-text">运行队列「run queue」、CFS运行队列和红黑树「Red-Black tree」</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%8F%8F%E8%BF%B0%E8%BF%90%E8%A1%8C%E9%98%9F%E5%88%97%E7%9A%84%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%EF%BC%9Astruct-rq"><span class="nav-number">3.1.</span> <span class="nav-text">描述运行队列的数据结构：struct rq</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%8F%8F%E8%BF%B0CFS%E8%BF%90%E8%A1%8C%E9%98%9F%E5%88%97%E7%9A%84%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%EF%BC%9Astruct-cfs-rq"><span class="nav-number">3.2.</span> <span class="nav-text">描述CFS运行队列的数据结构：struct cfs_rq</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%BB%E5%8A%A1%E7%BB%84%E3%80%8Ctask-group%E3%80%8D%E5%92%8C%E8%B0%83%E5%BA%A6%E5%AE%9E%E4%BD%93%E3%80%8Cscheduling-entity%E3%80%8D"><span class="nav-number">4.</span> <span class="nav-text">任务组「task group」和调度实体「scheduling entity」</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%9C%80%E9%A1%B6%E5%B1%82%E7%9A%84%E4%BB%BB%E5%8A%A1%E7%BB%84%EF%BC%9Aroot-task-group"><span class="nav-number">4.1.</span> <span class="nav-text">最顶层的任务组：root_task_group</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%8F%8F%E8%BF%B0%E4%BB%BB%E5%8A%A1%E7%BB%84%E7%9A%84%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%EF%BC%9Astruct-task-group"><span class="nav-number">4.2.</span> <span class="nav-text">描述任务组的数据结构：struct task_group</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%8F%8F%E8%BF%B0%E8%B0%83%E5%BA%A6%E5%AE%9E%E4%BD%93%E7%9A%84%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%EF%BC%9Astruct-sched-entity"><span class="nav-number">4.3.</span> <span class="nav-text">描述调度实体的数据结构：struct sched_entity</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B0%83%E5%BA%A6%E7%B1%BB%E5%88%AB%E3%80%8Cscheduling-class%E3%80%8D%E5%92%8C%E8%B0%83%E5%BA%A6%E7%AD%96%E7%95%A5%E3%80%8Cscheduling-policy%E3%80%8D"><span class="nav-number">5.</span> <span class="nav-text">调度类别「scheduling class」和调度策略「scheduling policy」</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B0%83%E5%BA%A6%E5%99%A8%E3%80%8Cscheduler%E3%80%8D%E7%9A%84%E5%88%9D%E5%A7%8B%E5%8C%96"><span class="nav-number">6.</span> <span class="nav-text">调度器「scheduler」的初始化</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#sched-init-%EF%BC%9A%E5%88%9D%E5%A7%8B%E5%8C%96%E8%B0%83%E5%BA%A6%E5%99%A8"><span class="nav-number">6.1.</span> <span class="nav-text">sched_init()：初始化调度器</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%88%9D%E5%A7%8B%E5%8C%96%E6%9C%80%E9%A1%B6%E5%B1%82%E7%9A%84%E4%BB%BB%E5%8A%A1%E7%BB%84%EF%BC%88root-task-group%EF%BC%89"><span class="nav-number">6.1.1.</span> <span class="nav-text">初始化最顶层的任务组（root_task_group）</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%88%9D%E5%A7%8B%E5%8C%96CFS%E8%BF%90%E8%A1%8C%E9%98%9F%E5%88%97%E7%9A%84%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84"><span class="nav-number">6.1.2.</span> <span class="nav-text">初始化CFS运行队列的数据结构</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%88%9D%E5%A7%8B%E5%8C%96swapper%E5%92%8C%E6%B3%A8%E5%86%8C%E7%94%A8%E4%BA%8E%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1%E3%80%8Cload-balancing%E3%80%8D%E7%9A%84softirq%E5%A4%84%E7%90%86%E5%87%BD%E6%95%B0"><span class="nav-number">6.1.3.</span> <span class="nav-text">初始化swapper和注册用于负载均衡「load balancing」的softirq处理函数</span></a></li></ol></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Xinlu Wang"
+      src="/images/avatar.jpeg">
+  <p class="site-author-name" itemprop="name">Xinlu Wang</p>
+  <div class="site-description" itemprop="description">不积跬步无以至千里 不积小流无以成江海</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">43</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">70</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/chasinglulu" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;chasinglulu" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:wangkart@aliyun.com" title="E-Mail → mailto:wangkart@aliyun.com" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://weibo.com/5052275150" title="Weibo → https:&#x2F;&#x2F;weibo.com&#x2F;5052275150" rel="noopener me" target="_blank"><i class="fab fa-weibo fa-fw"></i>Weibo</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+    <div class="sidebar-inner sidebar-blogroll">
+      <div class="links-of-blogroll animated">
+        <div class="links-of-blogroll-title"><i class="fa fa-globe fa-fw"></i>
+          链接
+        </div>
+        <ul class="links-of-blogroll-list">
+            <li class="links-of-blogroll-item">
+              <a href="https://lore.kernel.org/qemu-devel/" title="https:&#x2F;&#x2F;lore.kernel.org&#x2F;qemu-devel&#x2F;" rel="noopener" target="_blank">Qemu</a>
+            </li>
+            <li class="links-of-blogroll-item">
+              <a href="https://wiki.linuxfoundation.org/realtime/documentation/start" title="https:&#x2F;&#x2F;wiki.linuxfoundation.org&#x2F;realtime&#x2F;documentation&#x2F;start" rel="noopener" target="_blank">RT_Linux</a>
+            </li>
+        </ul>
+      </div>
+    </div>
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://chasinglulu.github.io/posts/4a123606/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpeg">
+      <meta itemprop="name" content="Xinlu Wang">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="点滴汇聚">
+      <meta itemprop="description" content="不积跬步无以至千里 不积小流无以成江海">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="进程调度1「Key Concepts」 | 点滴汇聚">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          进程调度1「Key Concepts」
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2019-11-22 22:53:56" itemprop="dateCreated datePublished" datetime="2019-11-22T22:53:56+08:00">2019-11-22</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-09-24 15:39:19" itemprop="dateModified" datetime="2024-09-24T15:39:19+08:00">2024-09-24</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/task-management-and-process-scheduling/" itemprop="url" rel="index"><span itemprop="name">task management and process scheduling</span></a>
+        </span>
+    </span>
+
+  
+  
+  <span class="post-meta-item">
+    
+    <span class="post-meta-item-icon">
+      <i class="far fa-comment"></i>
+    </span>
+    <span class="post-meta-item-text">Waline：</span>
+  
+    <a title="waline" href="/posts/4a123606/#waline" itemprop="discussionUrl">
+      <span class="post-comments-count waline-comment-count" data-path="/posts/4a123606/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+    <span class="post-meta-item" title="阅读次数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span class="waline-pageview-count" data-path="/posts/4a123606/"></span>
+    </span>
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>16k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>57 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>本文主要关注内核中用于调度进程的各种机制，以及为了实现这些机制而引入的各种概念和数据结构。首先了解调度器「scheduler」的如下关键概念，有了这些基础才能深入理解调度器的各种不同活动和行为。</p>
+<ul>
+<li>刻画进程重要性的负载权重「load weight」</li>
+<li>进程的虚拟运行时间「virtual runtime」</li>
+<li>进程时间片「time slice」和CFS运行队列的调度延迟「scheduling latency」</li>
+<li>运行队列「run queue」、CFS运行队列和红黑树「Red Black Tree」</li>
+<li>组调度「group scheduling」涉及的任务组「task group」和调度实体「scheduling entity」</li>
+<li>调度类别「scheduling class」和调度策略「scheduling policy」</li>
+</ul>
+<p>后续第二篇文章会分析调度器的核心部分，也就是常用的调度代码。涉及的知识点如下：</p>
+<ul>
+<li>基于定时器「timer」中断的周期调度「periodic scheduling 」</li>
+<li>非周期调度「aperiodic scheduling」</li>
+<li>触发任务切换的调度点「scheduling points」</li>
+<li>设置need_resched标志的调度请求「scheduling request」</li>
+<li>调度核心函数__schedule()</li>
+<li>进程唤醒函数</li>
+</ul>
+<p>在研究完调度器核心之后，最后一篇文章将分析CFS「Completely Fair Scheduling)」调度器，它负责处理SCHED_NORMAL、SCHED_BATCH和SCHED_IDLE三种调度策略。涉及的内容如下：</p>
+<ul>
+<li>将一个进程插入运行队列</li>
+<li>从运行队列中挑选一个合适的进程</li>
+<li>从运行队列中移除一个进程</li>
+<li>处理周期滴答「periodic ticks」</li>
+<li>管理调度实体「scheduling entities」的运行时间</li>
+<li>管理时间片「time slices」</li>
+</ul>
+<p>本文在最后会分析sched_init()函数，它会完成调度器正常工作所要求的初始化任务。</p>
+<span id="more"></span>
+
+<hr>
+<ul>
+<li><strong>Target Platform:</strong> <a target="_blank" rel="noopener" href="https://www.96boards.org/product/rock960c/">Rock960c</a> </li>
+<li><strong>ARCH:</strong> arm64</li>
+<li><strong>Linux Kernel:</strong> linux-4.19.27</li>
+</ul>
+<hr>
+<h3 id="负载权重「load-weight」和虚拟运行时间「virtual-runtime」"><a href="#负载权重「load-weight」和虚拟运行时间「virtual-runtime」" class="headerlink" title="负载权重「load weight」和虚拟运行时间「virtual runtime」"></a>负载权重「load weight」和虚拟运行时间「virtual runtime」</h3><h4 id="负载权重「load-weight」：描述进程的重要性"><a href="#负载权重「load-weight」：描述进程的重要性" class="headerlink" title="负载权重「load weight」：描述进程的重要性"></a>负载权重「load weight」：描述进程的重要性</h4><p>CFS一个重要任务是公平地分配CPU运行时间给每个进程，但是这儿的公平并不是意味每个进程都花费相同的CPU运行时间。相反地，它更多的是说根据进程的重要性为每个进程分配相对应的CPU运行时间。浅显地说，一个重要的进程将获得更多的CPU执行时间，而一个不重要的进程将获得更少的CPU执行时间。尽管在引入CFS之前使用优先级「priority」的概念能够很好地表达进程的重要性，但是使用完全公平分配机制能够更完美地表达进程的重要性。为了公平分配CPU时间引入了负载权重的概念，其是由进程优先级「priority」决定的。负载权重不仅能够决定进程的虚拟运行时间，而且还能够确定进程占用的CPU份额和可用的时间片。<br>CFS调度器不仅会使具有较大负载权重的进程获得更少的运行时间，而且还会使它们更频繁地被运行。除此之外，进程可用的时间片「time slice」也将增大。进程优先级越高，负载权重也就越大，反之，进程优先级越低，负载权重也就越小。在内核中结构体<code>struct load_weight</code>用于表示和记录负载权重，因此当前进程的负载权重由结构体<code>struct sched_entity</code>的<code>load</code>字段表示。</p>
+<p><img data-src="/images/13/priority_and_load_weight_relationship.svg" alt="priority_and_load_weight_relationship"></p>
+<center>图1 负载权重和进程优先级的关系</center>
+
+<p>由图可推知，进程优先级增加一级，那么进程负载权重则增大约25%，相反进程优先级减少一级，那么进程负载权重则减少约20%。尽管进程的负载权重是由其优先级决定的，但是进程获得的CPU运行时间并不是恒定不变的。进程获得的CPU运行时间是根据当前进程的负载权重占总负载权重的比例确定的，总负载权重等于CFS运行队列中所有进程的负载权重之和。图2是CPU占用比例的示意图，占用比例会随着进程负载权重的不同而变化。</p>
+<p><img data-src="/images/13/cpu_share_I.svg" alt="cpu_share_I"></p>
+<center>图2 进程的负载权重与CPU份额的关系 I</center>
+
+<p>一个特定进程能够享用的CPU份额不仅取决于其自身的负载权重「load weight」，而且还依赖于CFS运行队列的总负载权重。假设进程A的负载权重是1024且始终不变，如果CFS运行队列的总负载权重增大了（有新的进程C加入队列），那么进程A占用的CPU份额自然就会降低，如图3 所示。</p>
+<p><img data-src="/images/13/cpu_share_II.svg" alt="cpu_share_II"></p>
+<center>图3 进程的负载权重与CPU份额的关系 II</center>
+
+<p>如果CFS运行队列存在两个进程，那么较高优先级的进程将能够多占用大约10%的CPU运行时间。</p>
+<h4 id="vruntime-virtual-runtime"><a href="#vruntime-virtual-runtime" class="headerlink" title="vruntime(virtual runtime)"></a>vruntime(virtual runtime)</h4><p>在每次挑选合适的进程时，调度器都会选择虚拟运行时间最小的进程来作为下一个被执行的进程。进程实际花费的CPU执行时间被成为实际运行时间「real runtime」，而由负载权重加权计算得到时间被称为虚拟运行时间「virtual runtime」。如图4所示给出了计算虚拟运行时间的公式。</p>
+<p><img data-src="/images/13/vruntime_load_weight.svg" alt="vruntime_load_weight.svg"></p>
+<center>图4 负载权重「load weight」与虚拟运行时间「virtual runtime」的关系式</center>
+
+<p>从上面计算公式可以算出，进程的负载权重越大，虚拟运行时间就会越小，当负载权重等于1024时，虚拟运行时间与实际运行时间是相等的。实际上在系统运行时，进程的虚拟运行时间是通过不断累加计算得到的，若进程的负载权重越大，那么虚拟运行时间的增涨也就越慢。相反，若负载权重越小，则虚拟运行时间的增涨也就相对更快一些。<br>如图5所示给出了虚拟运行时间的变化速率，三个进程的负载权重之比大约是1:2:3并且每个进程都实际执行了10s，然而三个虚拟运行时间之比大约是1:0.5:0.33，正好是负载权重之比的倒数（1&#x2F;1 : 1&#x2F;2 : 1&#x2F;3）。</p>
+<p><img data-src="/images/13/real_runtime_to_virtual_runtime.svg" alt="real_runtime_to_virtual_runtime"></p>
+<center>图5 虚拟运行时间「virtual runtime」的变化快慢（斜率）</center>
+
+<p>即使消耗了相同的实际时间，但是虚拟运行时间还是会有所不同，因此进程被调度器选中执行的频率也会不相同。对于具有较大负载权重的进程，在运行一段时间后它们的虚拟运行时间会较少地增加，因此它们比负载权重较小的进程会更频繁地被调度执行。如图6所示展示了调度器根据虚拟运行时间挑选下一个进程的过程，三个进程的负载权重之比大约是1:2:3，在一段时间后每个进程所消耗的实际CPU时间之比也是1:2:3。</p>
+<p><img data-src="/images/13/execution_time_task.svg" alt="execution_time_task"></p>
+<center>图6 由负载权重决定的进程实际执行时间</center>
+
+<p>基于调度器的工作机制，我们应该可以根据进程的重要性给不同进程赋予相应的优先级，从而保证不同重要性的进程能够享用不相等的CPU执行时间。在内核代码中进程的虚拟运行时间「virtual runtime」是记录在结构体<code>struct sched_entity</code>的成员<code>vruntime</code>中。</p>
+<h4 id="min-vruntime"><a href="#min-vruntime" class="headerlink" title="min_vruntime"></a>min_vruntime</h4><p>从上述可知，vruntime一般都是单调递增的，这是因为进程总共消耗的CPU执行时间只可能增多不可能减少。但vruntime的单调递增特点却很可能导致一些问题，比如在创建新的进程时会调用__sched_fork()函数将<code>vruntime</code>初始化为0，如下列所示。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&lt;kernel/core.c&gt;</span><br><span class="line"><span class="type">static</span> <span class="type">void</span> __sched_fork(<span class="type">unsigned</span> <span class="type">long</span> clone_flags, <span class="keyword">struct</span> task_struct *p)</span><br><span class="line">&#123;</span><br><span class="line">	...</span><br><span class="line">	p-&gt;se.vruntime = <span class="number">0</span>;</span><br><span class="line">	</span><br><span class="line">	...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>若新进程与已长时间运行的进程被放入到同一个运行队列，那么新进程的vruntime将是最小的，因此该进程将持续地运行直到它的vruntime大于其他进程的vruntime为止，调度器别无选择而只能让新进程长时间独自占用CPU执行时间，究其本质原因是新进程的vruntime只有花很长时间才能增长到与已有进程的vruntime相同。不同时刻上线「online」的两个CPU会产生两个不同步的运行队列，在这样两个运行队列中进行进程迁移「migration」时同样的问题也会发生，这是因为新进程运行在较晚创建的运行队列上，其vruntime也会相对较小一些，因此与较早运行队列的进程相比，它们的vruntime必然存在一定的差距。<br>上述两种情况在一定程度上都存在不公平性。为了解决这种问题，最小的虚拟运行时间被记录在每个<code>struct cfs_rq</code>实例的<code>min_vruntime</code>成员中。这样可以确保新建进程或被迁移的进程能够基于min_vruntime更新自身的vruntime来维持公平性。实际上，内核多处代码会根据min_vruntime更新特定进程的vruntime。此外，一旦有进程从运行队列移出「depueue」或滴答「tick」出现，<code>min_vruntime</code>也将会被更新。</p>
+<h3 id="调度延迟「scheduling-latency」和时间片「time-slice」"><a href="#调度延迟「scheduling-latency」和时间片「time-slice」" class="headerlink" title="调度延迟「scheduling latency」和时间片「time slice」"></a>调度延迟「scheduling latency」和时间片「time slice」</h3><p>调度延迟或调度等待时间「scheduling latency」等于在CFS运行队列内所有进程的时间片之和，时间片意味着进程可用的执行时间。每个CFS运行队列都有各自的调度延迟，CFS运行队列的每个进程会依据自身的负载权重与CFS运行队列的总负载权重之比分割调度延迟「scheduling latency」而得到各自的时间片。</p>
+<p><img data-src="/images/13/scheduling_latency.svg" alt="scheduling_latency"></p>
+<center>图7 调度延迟与时间片的关系</center>
+
+<p>调度延迟的默认大小由内核全局变量<code>sysctl_sched_latency</code>（以下统称为默认调度延迟）指定并初始化设置为6ms，不过在系统启动阶段内核代码会根据CPU数量重新计算来更新它的值，比如系统拥有4个CPU，那么它会被更新为18ms（6ms × 3）。仅当CFS运行队列的进程数量小于sched_nr_latency时才会以默认调度延迟为准，在这样情况下，每个进程都会按比例计算分割默认调度延迟而得到各自能享用的时间片， 如图8所示。</p>
+<p><img data-src="/images/13/scheduling_latency_divided.svg" alt="scheduling_latency_divided"></p>
+<center>图8 调度延迟的分割方法</center>
+
+<p>如图8所示，上面的情况是每个进程都具有相同的负载权重，从而每个进程将获得相同的时间片。然而下面的情况是每个进程具有不同的负载权重，因此每个进程也获得了不同的时间片。如图9所示给出了以默认调度延迟为准时计算进程时间片的公式。</p>
+<p><img data-src="/images/13/task_timeslice.svg" alt="task_timeslice"></p>
+<center>图9 进程负载权重与时间片的关系式</center>
+
+<p><code>sched_nr_latency</code>表示在默认调动等待时间内CFS运行队列能容纳的最大进程数，由另外两个变量决定， 如图10所示。</p>
+<p><img data-src="/images/13/sched_nr_latency.svg" alt="sched_nr_latency.svg"></p>
+<center>图10 schec_nr_latency的计算公式</center>
+
+<p><code>sysctl_sched_min_granularity</code>表示进程的最短执行时间，用于保证进程在极端情况下能够执行的最小时间片。如果在系统运行时改变了<code>sysctl_sched_min_granularity</code>或者<code>sysctl_sched_latency</code>，那么<code>sched_nr_latency</code>也将会自动地被更新。对于4个CPU的硬件系统，<code>sysctl_sched_min_granularity</code>的默认值是2.25ms（075ms × 3），因此<code>sched_nr_latency</code>还是等于8，参考表1。如果CFS运行队列中进程数量大于<code>sched_nr_latency</code>，那么调度延迟需要重新计算以确保进程能够享用最短的执行时间。如图11所示给出了重新计算调度延迟的公式。</p>
+<p><img data-src="/images/13/scheduling_latency_calculation.svg" alt="scheduling_latency_calculation"></p>
+<center>图11 调度延迟的计算公式</center>
+
+<p>如图12所示给出了一个当CFS运行队列中进程数量大于<code>sched_nr_latency</code>时重新计算调度延迟的例子。</p>
+<p><img data-src="/images/13/scheduling_latency_task.svg" alt="scheduling_latency_task"></p>
+<center>图12 重新计算调度延迟的例子</center>
+
+<p>总之，通过上面方法计算得到的时间片指的是进程可消耗的实际CPU运行时间。在内核调度点处会检查当前进程是否已经用完自己的时间片，一旦用完，将进行调度并执行其他的进程。</p>
+<h4 id="时间片相关的变量"><a href="#时间片相关的变量" class="headerlink" title="时间片相关的变量"></a>时间片相关的变量</h4><p>下表给出了用于计算调度延迟和进程时间片的相关变量。</p>
+<div align="center">表1 计算调度延迟和进程时间片的常用变量
+<style type="text/css">.tg-sort-header::-moz-selection{background:0 0}.tg-sort-header::selection{background:0 0}.tg-sort-header{cursor:pointer}.tg-sort-header:after{content:'';float:right;margin-top:7px;border-width:0 5px 5px;border-style:solid;border-color:#404040 transparent;visibility:hidden}.tg-sort-header:hover:after{visibility:visible}.tg-sort-asc:after,.tg-sort-asc:hover:after,.tg-sort-desc:after{visibility:visible;opacity:.4}.tg-sort-desc:after{border-bottom:none;border-width:5px 5px 0}@media screen and (max-width: 767px) {.tg {width: auto !important;}.tg col {width: auto !important;}.tg-wrap {overflow-x: auto;-webkit-overflow-scrolling: touch;margin: auto 0px;}}</style><div class="tg-wrap"><table id="tg-69mDT" style="border-collapse:collapse;border-color:#9ABAD9;border-spacing:0;margin:0px auto;table-layout: fixed; width: 900px" class="tg"><colgroup><col style="width: 230px"><col style="width: 265px"><col style="width: 240px"><col style="width: 165px"></colgroup><thead><tr><th style="background-color:#409cff;border-color:inherit;border-style:solid;border-width:1px;color:#fff;font-family:Arial, sans-serif;font-size:14px;font-weight:normal;overflow:hidden;padding:10px 8px;position:-webkit-sticky;position:sticky;text-align:center;top:-1px;vertical-align:middle;will-change:transform;word-break:normal">变量名</th><th style="background-color:#409cff;border-color:inherit;border-style:solid;border-width:1px;color:#fff;font-family:Arial, sans-serif;font-size:14px;font-weight:normal;overflow:hidden;padding:10px 8px;position:-webkit-sticky;position:sticky;text-align:center;top:-1px;vertical-align:middle;will-change:transform;word-break:normal">含义解释</th><th style="background-color:#409cff;border-color:inherit;border-style:solid;border-width:1px;color:#fff;font-family:Arial, sans-serif;font-size:14px;font-weight:normal;overflow:hidden;padding:10px 8px;position:-webkit-sticky;position:sticky;text-align:center;top:-1px;vertical-align:middle;will-change:transform;word-break:normal">初始值</th><th style="background-color:#409cff;border-color:inherit;border-style:solid;border-width:1px;color:#fff;font-family:Arial, sans-serif;font-size:14px;font-weight:normal;overflow:hidden;padding:10px 8px;position:-webkit-sticky;position:sticky;text-align:center;top:-1px;vertical-align:middle;will-change:transform;word-break:normal">启动后使用的值<br>（前提条件: 4个CPU）</th></tr></thead><tbody><tr><td style="background-color:#EBF5FF;border-color:inherit;border-style:solid;border-width:1px;color:#444;font-family:Arial, sans-serif;font-size:14px;overflow:hidden;padding:10px 8px;text-align:left;vertical-align:middle;word-break:normal">sysctl_sched_latency</td><td style="background-color:#D2E4FC;border-color:inherit;border-style:solid;border-width:1px;color:#444;font-family:Arial, sans-serif;font-size:14px;overflow:hidden;padding:10px 8px;text-align:left;vertical-align:middle;word-break:normal">认的调度延迟（单位：ns）</td><td style="background-color:#EBF5FF;border-color:inherit;border-style:solid;border-width:1px;color:#444;font-family:Arial, sans-serif;font-size:14px;overflow:hidden;padding:10px 8px;text-align:left;vertical-align:middle;word-break:normal">6ms</td><td style="background-color:#D2E4FC;border-color:inherit;border-style:solid;border-width:1px;color:#444;font-family:Arial, sans-serif;font-size:14px;overflow:hidden;padding:10px 8px;text-align:left;vertical-align:middle;word-break:normal">18ms</td></tr><tr><td style="background-color:#EBF5FF;border-color:inherit;border-style:solid;border-width:1px;color:#444;font-family:Arial, sans-serif;font-size:14px;overflow:hidden;padding:10px 8px;text-align:left;vertical-align:middle;word-break:normal">sysctl_sched_min_granularity</td><td style="background-color:#D2E4FC;border-color:inherit;border-style:solid;border-width:1px;color:#444;font-family:Arial, sans-serif;font-size:14px;overflow:hidden;padding:10px 8px;text-align:left;vertical-align:middle;word-break:normal">进程的最小时间片</td><td style="background-color:#EBF5FF;border-color:inherit;border-style:solid;border-width:1px;color:#444;font-family:Arial, sans-serif;font-size:14px;overflow:hidden;padding:10px 8px;text-align:left;vertical-align:middle;word-break:normal">0.75ms</td><td style="background-color:#D2E4FC;border-color:inherit;border-style:solid;border-width:1px;color:#444;font-family:Arial, sans-serif;font-size:14px;overflow:hidden;padding:10px 8px;text-align:left;vertical-align:middle;word-break:normal">2.25ms</td></tr><tr><td style="background-color:#EBF5FF;border-color:inherit;border-style:solid;border-width:1px;color:#444;font-family:Arial, sans-serif;font-size:14px;overflow:hidden;padding:10px 8px;text-align:left;vertical-align:middle;word-break:normal">sysctl_sched_wakeup_granularity</td><td style="background-color:#D2E4FC;border-color:inherit;border-style:solid;border-width:1px;color:#444;font-family:Arial, sans-serif;font-size:14px;overflow:hidden;padding:10px 8px;text-align:left;vertical-align:middle;word-break:normal">唤醒进程能够抢占当前进程的条件，也就是说唤醒进程与当前进程的vruntime之差要大于这个参数才能够抢占，其与唤醒抢占功能息息相关。换句话说，当前进程在指定的时间内不会被唤醒进程抢占</td><td style="background-color:#EBF5FF;border-color:inherit;border-style:solid;border-width:1px;color:#444;font-family:Arial, sans-serif;font-size:14px;overflow:hidden;padding:10px 8px;text-align:left;vertical-align:middle;word-break:normal">1ms</td><td style="background-color:#D2E4FC;border-color:inherit;border-style:solid;border-width:1px;color:#444;font-family:Arial, sans-serif;font-size:14px;overflow:hidden;padding:10px 8px;text-align:left;vertical-align:middle;word-break:normal">3ms</td></tr><tr><td style="background-color:#EBF5FF;border-color:inherit;border-style:solid;border-width:1px;color:#444;font-family:Arial, sans-serif;font-size:14px;overflow:hidden;padding:10px 8px;text-align:left;vertical-align:middle;word-break:normal">sched_nr_latency</td><td style="background-color:#D2E4FC;border-color:inherit;border-style:solid;border-width:1px;color:#444;font-family:Arial, sans-serif;font-size:14px;overflow:hidden;padding:10px 8px;text-align:left;vertical-align:middle;word-break:normal">在默认调度等待时间内能够调度的最大进程数</td><td style="background-color:#EBF5FF;border-color:inherit;border-style:solid;border-width:1px;color:#444;font-family:Arial, sans-serif;font-size:14px;overflow:hidden;padding:10px 8px;text-align:left;vertical-align:middle;word-break:normal">8<br>(sysctl_sched_latency /<br>sysctl_sched_min_granularity)</td><td style="background-color:#D2E4FC;border-color:inherit;border-style:solid;border-width:1px;color:#444;font-family:Arial, sans-serif;font-size:14px;overflow:hidden;padding:10px 8px;text-align:left;vertical-align:middle;word-break:normal">与左边相同</td></tr><tr><td style="background-color:#EBF5FF;border-color:inherit;border-style:solid;border-width:1px;color:#444;font-family:Arial, sans-serif;font-size:14px;overflow:hidden;padding:10px 8px;text-align:left;vertical-align:middle;word-break:normal">sysctl_sched_tunable_scaling</td><td style="background-color:#D2E4FC;border-color:inherit;border-style:solid;border-width:1px;color:#444;font-family:Arial, sans-serif;font-size:14px;overflow:hidden;padding:10px 8px;text-align:left;vertical-align:middle;word-break:normal">根据CPU数量缩放相关变量值的方法</td><td style="background-color:#EBF5FF;border-color:inherit;border-style:solid;border-width:1px;color:#444;font-family:Arial, sans-serif;font-size:14px;overflow:hidden;padding:10px 8px;text-align:left;vertical-align:middle;word-break:normal">SCHED_TUNABLESCALING_LOG</td><td style="background-color:#D2E4FC;border-color:inherit;border-style:solid;border-width:1px;color:#444;font-family:Arial, sans-serif;font-size:14px;overflow:hidden;padding:10px 8px;text-align:left;vertical-align:middle;word-break:normal">与左边相同</td></tr></tbody></table></div><script charset="utf-8">var TGSort=window.TGSort||function(n){"use strict";function r(n){return n?n.length:0}function t(n,t,e,o=0){for(e=r(n);o<e;++o)t(n[o],o)}function e(n){return n.split("").reverse().join("")}function o(n){var e=n[0];return t(n,function(n){for(;!n.startsWith(e);)e=e.substring(0,r(e)-1)}),r(e)}function u(n,r,e=[]){return t(n,function(n){r(n)&&e.push(n)}),e}var a=parseFloat;function i(n,r){return function(t){var e="";return t.replace(n,function(n,t,o){return e=t.replace(r,"")+"."+(o||"").substring(1)}),a(e)}}var s=i(/^(?:\s*)([+-]?(?:\d+)(?:,\d{3})*)(\.\d*)?$/g,/,/g),c=i(/^(?:\s*)([+-]?(?:\d+)(?:\.\d{3})*)(,\d*)?$/g,/\./g);function f(n){var t=a(n);return!isNaN(t)&&r(""+t)+1>=r(n)?t:NaN}function d(n){var e=[],o=n;return t([f,s,c],function(u){var a=[],i=[];t(n,function(n,r){r=u(n),a.push(r),r||i.push(n)}),r(i)<r(o)&&(o=i,e=a)}),r(u(o,function(n){return n==o[0]}))==r(o)?e:[]}function v(n){if("TABLE"==n.nodeName){for(var a=function(r){var e,o,u=[],a=[];return function n(r,e){e(r),t(r.childNodes,function(r){n(r,e)})}(n,function(n){"TR"==(o=n.nodeName)?(e=[],u.push(e),a.push(n)):"TD"!=o&&"TH"!=o||e.push(n)}),[u,a]}(),i=a[0],s=a[1],c=r(i),f=c>1&&r(i[0])<r(i[1])?1:0,v=f+1,p=i[f],h=r(p),l=[],g=[],N=[],m=v;m<c;++m){for(var T=0;T<h;++T){r(g)<h&&g.push([]);var C=i[m][T],L=C.textContent||C.innerText||"";g[T].push(L.trim())}N.push(m-v)}t(p,function(n,t){l[t]=0;var a=n.classList;a.add("tg-sort-header"),n.addEventListener("click",function(){var n=l[t];!function(){for(var n=0;n<h;++n){var r=p[n].classList;r.remove("tg-sort-asc"),r.remove("tg-sort-desc"),l[n]=0}}(),(n=1==n?-1:+!n)&&a.add(n>0?"tg-sort-asc":"tg-sort-desc"),l[t]=n;var i,f=g[t],m=function(r,t){return n*f[r].localeCompare(f[t])||n*(r-t)},T=function(n){var t=d(n);if(!r(t)){var u=o(n),a=o(n.map(e));t=d(n.map(function(n){return n.substring(u,r(n)-a)}))}return t}(f);(r(T)||r(T=r(u(i=f.map(Date.parse),isNaN))?[]:i))&&(m=function(r,t){var e=T[r],o=T[t],u=isNaN(e),a=isNaN(o);return u&&a?0:u?-n:a?n:e>o?n:e<o?-n:n*(r-t)});var C,L=N.slice();L.sort(m);for(var E=v;E<c;++E)(C=s[E].parentNode).removeChild(s[E]);for(E=v;E<c;++E)C.appendChild(s[v+L[E-v]])})})}}n.addEventListener("DOMContentLoaded",function(){for(var t=n.getElementsByClassName("tg"),e=0;e<r(t);++e)try{v(t[e])}catch(n){}})}(document)</script></div>
+
+
+<h3 id="运行队列「run-queue」、CFS运行队列和红黑树「Red-Black-tree」"><a href="#运行队列「run-queue」、CFS运行队列和红黑树「Red-Black-tree」" class="headerlink" title="运行队列「run queue」、CFS运行队列和红黑树「Red-Black tree」"></a>运行队列「run queue」、CFS运行队列和红黑树「Red-Black tree」</h3><p>为了让进程执行起来，须先将进程加入运行队列，然后内核才有机会调度执行它。内核会为每个CPU都创建了一个运行队列（<code>struct rq</code>），它包含三个子运行队列：CFS、RT和DeadLine，不过每个子运行队列都根据各自调度策略进行单独管理。一旦确定进程将在哪个CPU上执行，就会将它加入CPU对应的运行队列中。实际上，进程是被加入了CPU运行队列中的一个子运行队列。</p>
+<p><img data-src="/images/13/per_cpu_run_queue_and_sub_run_queue.svg" alt="per_cpu_run_queue_and_sub_run_queue"></p>
+<center>图13 每个CPU的运行队列和包含的子运行队列</center>
+
+<p>尽管这里不会详细分析代码细节，但事实是采用<code>SCHED_RR</code>和<code>SCHED_FIFO</code>调度策略的实时进程将会被加入RT运行队列，采用<code>SCHED_DEADLINE</code>调度策略的进程将会被加入DeadLine运行队列，采用<code>SCHED_NORMAL</code>、<code>SCHED_BATCH</code>和<code>SCHED_IDLE</code>调度策略的进程将会被加入CFS运行队列。</p>
+<p>CFS运行队列通过使用红黑树「Red-Black tree」管理加入运行队列的进程。实际上并不是直接将一个进程（任务）或任务组加入CFS运行队列，而是将一个进程（任务）或任务组抽象成一个调度实体「<code>struct sched_entity</code>」，并将调度实体用作一个节点按照vruntime的排序插入到红黑树的合适位置。</p>
+<p><img data-src="/images/13/redblack_tree_sched_entity.svg" alt="redblack_tree_sched_entity"></p>
+<center>图14 调度实体「sched_entity」与红黑树</center>
+
+<p>由于调度实体的节点在红黑树中以vruntime的大小排序，因此通过访问最左边的节点就能快速地找出最小vruntime的调度实体。当新调度实体「struct sched_entity」插入红黑树时，会通过比较vruntime的大小从根节点开始遍历直到叶子节点，这样就能找出新调度实体的合适位置。因此为了方便快捷，struct cfs_rq实例包含一个<code>struct rb_root_cached</code>类型的成员变量<code>tasks_timeline</code>，它包含一个<code>struct rb_root</code>类型的成员变量<code>rb_root</code>和一个<code>struct rb_node</code>类型的指针变量<code>rb_leftmost</code>，前者用于追踪红黑树的根节点，后者指向红黑树的最左边节点。</p>
+<h4 id="描述运行队列的数据结构：struct-rq"><a href="#描述运行队列的数据结构：struct-rq" class="headerlink" title="描述运行队列的数据结构：struct rq"></a>描述运行队列的数据结构：<code>struct rq</code></h4><div align="center">表2 数据结构`struct rq`的部分字段
+<style type="text/css">@media screen and (max-width: 767px) {.tg {width: auto !important;}.tg col {width: auto !important;}.tg-wrap {overflow-x: auto;-webkit-overflow-scrolling: touch;margin: auto 0px;}}</style><div class="tg-wrap"><table style="border-collapse:collapse;border-spacing:0;border-color:#9ABAD9;margin:0px auto" class="tg"><tr><th style="font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#fff;background-color:#409cff;text-align:center;vertical-align:middle">数据类型</th><th style="font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#fff;background-color:#409cff;text-align:center;vertical-align:middle">字段名称</th><th style="font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#fff;background-color:#409cff;text-align:center;vertical-align:middle">含义解释</th></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:middle">raw_spinlock_t</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#D2E4FC;text-align:left;vertical-align:middle">lock</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:middle">自旋锁，用于防止并发修改数据结构struct rq</td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:middle">unsigned int</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#D2E4FC;text-align:left;vertical-align:middle">nr_running</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:middle">所有子运行队列中已经插入的进程数</td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:middle">unsigned long</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#D2E4FC;text-align:left;vertical-align:middle">cpu_load[CPU_LOAD_IDX_MAX]</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:middle">指示运行队列的负载</td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:middle">unsigned long</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#D2E4FC;text-align:left;vertical-align:middle">last_load_update_tick</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:middle">指示更新cpu_load的时间，单位为jiffies</td></tr><tr><td style="font-family:Arial, Helvetica, sans-serif !important;;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:middle">struct load_weight</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#D2E4FC;text-align:left;vertical-align:middle">load</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:middle">刻画运行队列的总体负载</td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:top">unsigned long</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#D2E4FC;text-align:left;vertical-align:top">nr_load_updates</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:top">指示cpu_load的更新次数</td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:top">u64</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#D2E4FC;text-align:left;vertical-align:top">nr_switches</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:top">指示上下文切换的次数</td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:top">struct cfs_rq</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#D2E4FC;text-align:left;vertical-align:top">rq</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:top">描述当前运行队列中的CFS子运行队列</td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:top">struct rt_rq</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#D2E4FC;text-align:left;vertical-align:top">rt</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:top">描述RT子运行队列</td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:top">struct dl_rq</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#D2E4FC;text-align:left;vertical-align:top">dl</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:top">描述Deadline子运行队列</td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:middle">unsigned long</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#D2E4FC;text-align:left;vertical-align:middle">nr_uninterruptible</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:top">统计运行队列中同时满足下列情形的进程数：<br>1. 处在TASK_UNINTERRUPTIBLE状态<br>2. 不处在TASK_NOLOAD状态<br>3. PT_FROZEN标志位未设置</td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:top">struct task_struct &#42;</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#D2E4FC;text-align:left;vertical-align:top">curr</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:top">指向运行队列绑定CPU上正在运行进程的struct task_struct实例</td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:top">struct task_struct &#42;</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#D2E4FC;text-align:left;vertical-align:top">idle</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:top">指向idle线程的struct task_struct实例</td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:top">struct task_struct &#42;</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#D2E4FC;text-align:left;vertical-align:top">stop</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:top">指向stopper线程的struct task_struct实例</td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:top">unsigned long</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#D2E4FC;text-align:left;vertical-align:top">next_balance</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:top">记录下一次尝试负载均衡的时间，单位是jiffies</td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:top">struct mm_struct &#42;</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#D2E4FC;text-align:left;vertical-align:top">prev_mm</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:top">指向上一个内核线程所用的struct mm_struct实例</td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:top">struct sched_domain &#42;</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#D2E4FC;text-align:left;vertical-align:top">sd</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:top">指向struct sched_domain实例，用于描述运行队列绑定CPU所属的调度域</td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:top">unsigned long</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#D2E4FC;text-align:left;vertical-align:top">cpu_capacity</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:top">记录运行队列绑定CPU的能力值</td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:top">unsigned long</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#D2E4FC;text-align:left;vertical-align:top">cpu_capacity_orig</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:top">更新能力值之前保存运行队列绑定CPU的原始能力值</td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:top">int</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#D2E4FC;text-align:left;vertical-align:top">cpu</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:top">保存运行队列绑定CPU的ID</td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:top">int</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#D2E4FC;text-align:left;vertical-align:top">online</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:top">追踪运行队列的就绪状态</td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:top">struct list_head</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#D2E4FC;text-align:left;vertical-align:top">cfs_tasks</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:top">用于链接所有插入CFS运行队列的进程</td></tr></table></div></div>
+
+<h4 id="描述CFS运行队列的数据结构：struct-cfs-rq"><a href="#描述CFS运行队列的数据结构：struct-cfs-rq" class="headerlink" title="描述CFS运行队列的数据结构：struct cfs_rq"></a>描述CFS运行队列的数据结构：<code>struct cfs_rq</code></h4><div align="center">表3 数据结构`struct cfs_rq`的部分字段
+<style type="text/css">@media screen and (max-width: 767px) {.tg {width: auto !important;}.tg col {width: auto !important;}.tg-wrap {overflow-x: auto;-webkit-overflow-scrolling: touch;margin: auto 0px;}}</style><div class="tg-wrap"><table style="border-collapse:collapse;border-spacing:0;border-color:#9ABAD9;margin:0px auto;table-layout: fixed; width: 900px" class="tg"><colgroup><col style="width: 165px"><col style="width: 175px"><col style="width: 560px"></colgroup><tr><th style="font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#fff;background-color:#409cff;text-align:center;vertical-align:middle">数据类型</th><th style="font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#fff;background-color:#409cff;text-align:center;vertical-align:middle">字段名称</th><th style="font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#fff;background-color:#409cff;text-align:center;vertical-align:middle">含义解释</th></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:middle">struct load_weight<br></td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#D2E4FC;text-align:left;vertical-align:middle">load</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:middle">描述CFS运行队列中所有任务的总负载</td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:middle">unsigned int</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#D2E4FC;text-align:left;vertical-align:middle">nr_running</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:middle">只记录当前层级上加入CFS运行队列的调度实体「struct sched_entity」数量</td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:middle">unsigned int</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#D2E4FC;text-align:left;vertical-align:middle">h_nr_running</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:middle">记录各个层的nr_running之和「hierarchical nr_running」。从当前层级开始记录下面所有层级上加入CFS运行队列的调度实体总数，也就是累加上所有子CFS运行队列中的调度实体数量，它仅与组调度「group scheduling」相关</td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:middle">u64</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#D2E4FC;text-align:left;vertical-align:middle">exec_clock</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:middle">记录CFS运行队列中所有调度实体的执行时间之和</td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:middle">u64</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#D2E4FC;text-align:left;vertical-align:middle">min_vruntime</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:middle">追踪CFS运行队列的最小虚拟运行时间</td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:middle">struct rb_root_cached</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#D2E4FC;text-align:left;vertical-align:middle">tasks_timeline</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:middle">用于追踪红黑树的根节点和最左节点</td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:middle">struct sched_entity &#42;</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#D2E4FC;text-align:left;vertical-align:middle">curr</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:middle">指向当前正在运行的调度实体</td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:le[CFS scheduler, -v17](https://lwn.net/Articles/238541/) ft;vertical-align:middle">struct sched_entity &#42;</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#D2E4FC;text-align:left;vertical-align:middle">next</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:middle">指向在唤醒任务「wakeup task」不抢占当前调度实体的情况下下次调度会优先选择的调度实体</td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:middle">struct sched_entity &#42;</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#D2E4FC;text-align:left;vertical-align:middle">last</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:middle">指向被唤醒任务抢占的调度实体「wakeup preemption」 ，以便于在下一次调度时它将首先被选择</td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:middle">struct sched_entity &#42;</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#D2E4FC;text-align:left;vertical-align:middle">skip</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:middle">指向主动出让「yield」CPU的调度实体，在后来调度程序选择下一个调度实体时会把它排除在外</td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:top">struct rq &#42;</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#D2E4FC;text-align:left;vertical-align:middle">rq</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:middle">指向每个CPU所绑定的运行队列「percpu rq」，其包含当前的CFS运行队列</td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:top">struct task_group &#42;</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#D2E4FC;text-align:left;vertical-align:middle">tg</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:middle">当CFS运行队列被抽象成任务组时，也就是启用了组调度功能时它指向一个描述任务组的实例</td></tr></table></div></div>
+
+<h3 id="任务组「task-group」和调度实体「scheduling-entity」"><a href="#任务组「task-group」和调度实体「scheduling-entity」" class="headerlink" title="任务组「task group」和调度实体「scheduling entity」"></a>任务组「task group」和调度实体「scheduling entity」</h3><p>在Ingo Molnart提交<a target="_blank" rel="noopener" href="https://lwn.net/Articles/238541/">CFS scheduler, -v17</a> 补丁时已经存在很多关于调度器公平性的抱怨和讨论，出现这种状况的本质原因是CFS更关注任务（进程）之间的公平性。例如，假设系统存在50个进程，根据CFS的原理每个进程都能够公平地分享2%的CPU运行时间，但是如果其中49个进程属于某一个特定用户，另一个进程属于另外一个用户，那么两个用户占用的CPU时间会有很大差异，从而导致显而易见的用户间的不公平性。如图15所示显示了进程间的公平性和用户间的不公平性。<br><img data-src="/images/13/CFS_fairness_process.svg" alt="CFS_fairness_process.svg"></p>
+<center>图15 CFS调度器只保证任务间的公平性</center>
+
+<p>为了确保CFS调度器能够处理这种不公平性，必须保证每个用户能够获得50%的CPU时间，因此需要将每个用户创建的进程都划分到一个任务组，从而每个用户对应一个任务组。若给图15添加上任务组的概念，那么它正如图16所示。<br><img data-src="/images/13/CFS_fairness_user.svg" alt="CFS_fairness_user"></p>
+<center>图16 基于任务组「task group」的CFS调度器保证用户间的公平性</center>
+
+<p>实现任务组「task group」概念的CFS调度器能够保证用户间的公平性，因此CFS调度器的这个特性被称为组调度「<a target="_blank" rel="noopener" href="https://lwn.net/Articles/240474/">CFS group scheduling</a> 」，并且目前最新的内核中对RT调度器也支持了该功能。目前内核CFS代码早已集成整合了由 Srivatsa Vaddagiri所开发的系列组调度补丁，比如<a target="_blank" rel="noopener" href="https://lwn.net/Articles/239619/">Add group awareness to CFS - v2</a> ，同时该系列补丁还实现了一种用于配置任务组的用户ID机制，不过它已从2.6.35内核中删除了，目前仅支持通过cgroup文件系统进行任务组的设置。<br>任务组不仅可以包含进程，还可以包含其他任务组。如图17所示，进程1和进程2归属于一个任务组，说明任务组既可包含进程也可以包含子任务组。</p>
+<p><img data-src="/images/13/task_group_and_sub-task_group.svg" alt="task_group_and_sub-task_group"></p>
+<center>图17 包含子任务组「subtask group」的任务组</center>
+
+<p>Srivatsa提出了调度实体「scheduling entity」的概念，用于将进程和任务组统一抽象成最小的调度单元，并且引入数据结构struct sched_entity去描述调度实体。因此描述进程的数据结构struct task_struct静态定义了一个描述调度实体的成员变量「struct sched_entity对象」，然而描述任务组的数据结构struct task_group只定义了一个指向调度实体的指针变量，从而在创建任务组对象时将会动态分配调度实体「struct sched_entity对象」。当调度器要调度安排一个进程或任务组时不再是直接地将进程或任务组插入CFS运行队列，而是将调度实体插入CFS运行队列。<br><img data-src="/images/13/task_and_task_group_entity.svg" alt="task_and_task_group_entity"></p>
+<center>图18 抽象成调度实体「scheduling entity」的任务「task」和任务组「task group」</center>
+
+<p>如图18所示，进程「任务(task)」和任务组都被抽象成了最小调度单元的调度实体，一个任务或任务组对应一个调动实体。如图19所示，调度实体被加入每个任务组指向的CFS运行队列，任务组既能包含一个或多个任务，也能其他的子任务组，构成一个任务组的所有任务和子任务组都会被抽象成调度实体并加入该任务组指向的CFS运行队列，最上层的任务组也会被抽象成调度实体并被加入CFS运行队列。<br><img data-src="/images/13/entity_enqueued_CFS.svg" alt="entity_enqueued_CFS"></p>
+<center>图19 任务组的调度实体被加入CFS运行队列「scheduling entity」</center>
+
+<p>在逻辑上，调度实体具有层次关系和结构。如图20所示，在最左边子图中一个任务组包含一个任务，并且那个任务的调度实体通过parent字段指向任务组的调度实体。</p>
+<p><img data-src="/images/13/sched_entity_hierarchy.svg" alt="sched_entity_hierarchy"></p>
+<center>图20 调度实体的层级结构</center>
+
+<p>自从内核开始支持任务组，用于调度的相关字段就从task_struct数据结构转移到描述调度实体的sched_entity数据结构中，并且调度实体被调度器看作最小的调度单元。从最右边的子图可以看出一个任务组对应的调度实体都有一个指向自己的CFS运行队列的指针，并且如果该任务组是另外一个任务组的子任务组，那么它的调度实体将被加入父任务组的CFS运行队列。除此之外，每个调度实体都拥有一个指向父调度实体的指针和一个指向所加入的CFS运行队列的指针。</p>
+<h4 id="最顶层的任务组：root-task-group"><a href="#最顶层的任务组：root-task-group" class="headerlink" title="最顶层的任务组：root_task_group"></a>最顶层的任务组：root_task_group</h4><p>Linux内核至少存在一个根任务组「root task group」，也称为最顶层的任务组「top-level task group」。如果内核不存在其他独立的任务组，那么所有的调度实体对应任务都归属根任务组，而且它们都被加入到根任务组指向的CFS运行队列。和上述的任务组不同的是根任务组直接使用per-cpu运行队列的CFS运行队列，而不会再单独地分配创建自己私有的CFS运行队列。如图21所示包含了根任务组的概念。</p>
+<p><img data-src="/images/13/root_task_group.svg" alt="root_task_group"></p>
+<center>图21 最顶层的任务组「root_task_group」</center>
+
+<p>注意：一个任务组的调度实体会指向一个父调度实体，父调度实体一定是父任务组的调度实体。</p>
+<h4 id="描述任务组的数据结构：struct-task-group"><a href="#描述任务组的数据结构：struct-task-group" class="headerlink" title="描述任务组的数据结构：struct task_group"></a>描述任务组的数据结构：<code>struct task_group</code></h4><div align="center">表4 数据结构`struct task_group`的部分字段
+<style type="text/css">@media screen and (max-width: 767px) {.tg {width: auto !important;}.tg col {width: auto !important;}.tg-wrap {overflow-x: auto;-webkit-overflow-scrolling: touch;margin: auto 0px;}}</style><div class="tg-wrap"><table style="border-collapse:collapse;border-spacing:0;border-color:#9ABAD9;margin:0px auto;table-layout: fixed; width: 900px" class="tg"><colgroup><col style="width: 170px"><col style="width: 170px"><col style="width: 560px"></colgroup><tr><th style="font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#fff;background-color:#409cff;text-align:center;vertical-align:middle">数据类型</th><th style="font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#fff;background-color:#409cff;text-align:center;vertical-align:middle">字段名称</th><th style="font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#fff;background-color:#409cff;text-align:center;vertical-align:middle">含义解释</th></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:middle">struct sched_entity &#42;&#42;<br></td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#D2E4FC;text-align:left;vertical-align:middle">se</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:middle">指针数组，每个元素都是指向调度实体的指针，元素的个数等于系统可能拥有的CPU数量「possible CPUs」。一个任务组对应的进程集合可被调度到多个CPU上运行，这样每个CPU对应的进程子集会被抽象成一个调度实体，并且指向它的指针将被存入这个数组</td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:middle">struct cfs_rq &#42;&#42;</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#D2E4FC;text-align:left;vertical-align:middle">cfs_rq</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:middle">指针数组，每个元素都是指向CFS运行队列的指针，元素的个数等于系统可能拥有的CPU数量「possible CPUs」。一个任务组对应的进程集合可被调度到多个CPU上运行，这样每个CPU对应的进程会被单独加入一个CFS运行队列，而且指向它的指针将被存入这个数组</td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:middle">usingned long</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#D2E4FC;text-align:left;vertical-align:middle">share</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:middle">指定任务组的CFS运行队列「group cfs_rq」能够获得的CPU时间份额</td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:middle">struct list_head</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#D2E4FC;text-align:left;vertical-align:middle">list</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:middle">用于连接描述任务组的实例「struct task_group对象」</td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:middle">struct task_group &#42;</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#D2E4FC;text-align:left;vertical-align:middle">parent</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:middle">指向描述父任务组的实例</td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:middle">struct list_head</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#D2E4FC;text-align:left;vertical-align:middle">siblings</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9abad9;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:middle">父任务组可能还存在其他的子任务组，这些其他的子任务组与当前任务组是兄弟姐妹的关系，因此它用于连接处在同等级的任务组实例，也就是连接父任务组的多个子任务组</td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:top">struct list_head</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#D2E4FC;text-align:left;vertical-align:top">children</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:top">用于连接当前任务组的子任务组</td></tr></table></div></div>
+
+<h4 id="描述调度实体的数据结构：struct-sched-entity"><a href="#描述调度实体的数据结构：struct-sched-entity" class="headerlink" title="描述调度实体的数据结构：struct sched_entity"></a>描述调度实体的数据结构：<code>struct sched_entity</code></h4><div align="center">表5 数据结构`struct sched_entity`的部分字段
+<style type="text/css">.tg-sort-header::-moz-selection{background:0 0}.tg-sort-header::selection{background:0 0}.tg-sort-header{cursor:pointer}.tg-sort-header:after{content:'';float:right;margin-top:7px;border-width:0 5px 5px;border-style:solid;border-color:#404040 transparent;visibility:hidden}.tg-sort-header:hover:after{visibility:visible}.tg-sort-asc:after,.tg-sort-asc:hover:after,.tg-sort-desc:after{visibility:visible;opacity:.4}.tg-sort-desc:after{border-bottom:none;border-width:5px 5px 0}@media screen and (max-width: 767px) {.tg {width: auto !important;}.tg col {width: auto !important;}.tg-wrap {overflow-x: auto;-webkit-overflow-scrolling: touch;margin: auto 0px;}}</style><div class="tg-wrap"><table id="tg-EzR0e" style="border-collapse:collapse;border-color:#9ABAD9;border-spacing:0;margin:0px auto;table-layout: fixed; width: 900px" class="tg"><colgroup><col style="width: 160px"><col style="width: 180px"><col style="width: 560px"></colgroup><thead><tr><th style="background-color:#409cff;border-color:#9abad9;border-style:solid;border-width:1px;color:#fff;font-family:Arial, sans-serif;font-size:14px;font-weight:normal;overflow:hidden;padding:10px 8px;position:-webkit-sticky;position:sticky;text-align:center;top:-1px;vertical-align:middle;will-change:transform;word-break:normal">数据类型</th><th style="background-color:#409cff;border-color:#9abad9;border-style:solid;border-width:1px;color:#fff;font-family:Arial, sans-serif;font-size:14px;font-weight:normal;overflow:hidden;padding:10px 8px;position:-webkit-sticky;position:sticky;text-align:center;top:-1px;vertical-align:middle;will-change:transform;word-break:normal">字段名称</th><th style="background-color:#409cff;border-color:#9abad9;border-style:solid;border-width:1px;color:#fff;font-family:Arial, sans-serif;font-size:14px;font-weight:normal;overflow:hidden;padding:10px 8px;position:-webkit-sticky;position:sticky;text-align:center;top:-1px;vertical-align:middle;will-change:transform;word-break:normal">含义解释</th></tr></thead><tbody><tr><td style="background-color:#EBF5FF;border-color:#9abad9;border-style:solid;border-width:1px;color:#444;font-family:Arial, sans-serif;font-size:14px;overflow:hidden;padding:10px 8px;text-align:left;vertical-align:middle;word-break:normal">struct load_weight</td><td style="background-color:#D2E4FC;border-color:#9abad9;border-style:solid;border-width:1px;color:#444;font-family:Arial, sans-serif;font-size:14px;overflow:hidden;padding:10px 8px;text-align:left;vertical-align:middle;word-break:normal">load</td><td style="background-color:#EBF5FF;border-color:#9abad9;border-style:solid;border-width:1px;color:#444;font-family:Arial, sans-serif;font-size:14px;overflow:hidden;padding:10px 8px;text-align:left;vertical-align:middle;word-break:normal">描述调度实体的负载权重，即使两个调度实体消耗了相同的CPU执行时间，只要它的负载权重比另外一个大，那么它的虚拟运行时间「vruntime」就比另外一个增加的少</td></tr><tr><td style="background-color:#EBF5FF;border-color:#9abad9;border-style:solid;border-width:1px;color:#444;font-family:Arial, sans-serif;font-size:14px;overflow:hidden;padding:10px 8px;text-align:left;vertical-align:middle;word-break:normal">struct rb_node</td><td style="background-color:#D2E4FC;border-color:#9abad9;border-style:solid;border-width:1px;color:#444;font-family:Arial, sans-serif;font-size:14px;overflow:hidden;padding:10px 8px;text-align:left;vertical-align:middle;word-break:normal">run_node</td><td style="background-color:#EBF5FF;border-color:#9abad9;border-style:solid;border-width:1px;color:#444;font-family:Arial, sans-serif;font-size:14px;overflow:hidden;padding:10px 8px;text-align:left;vertical-align:middle;word-break:normal">用于将调度实体插入红黑树「RedBlack tree」</td></tr><tr><td style="background-color:#EBF5FF;border-color:#9abad9;border-style:solid;border-width:1px;color:#444;font-family:Arial, sans-serif;font-size:14px;overflow:hidden;padding:10px 8px;text-align:left;vertical-align:middle;word-break:normal">struct list_head</td><td style="background-color:#D2E4FC;border-color:#9abad9;border-style:solid;border-width:1px;color:#444;font-family:Arial, sans-serif;font-size:14px;overflow:hidden;padding:10px 8px;text-align:left;vertical-align:middle;word-break:normal">group_node</td><td style="background-color:#EBF5FF;border-color:#9abad9;border-style:solid;border-width:1px;color:#444;font-family:Arial, sans-serif;font-size:14px;overflow:hidden;padding:10px 8px;text-align:left;vertical-align:middle;word-break:normal">用于将普通任务「normal task」对应的调度实体插入运行队列「struct rq」管理的cfs_tasks链表</td></tr><tr><td style="background-color:#EBF5FF;border-color:#9abad9;border-style:solid;border-width:1px;color:#444;font-family:Arial, sans-serif;font-size:14px;overflow:hidden;padding:10px 8px;text-align:left;vertical-align:middle;word-break:normal">unsigned int</td><td style="background-color:#D2E4FC;border-color:#9abad9;border-style:solid;border-width:1px;color:#444;font-family:Arial, sans-serif;font-size:14px;overflow:hidden;padding:10px 8px;text-align:left;vertical-align:middle;word-break:normal">on_rq</td><td style="background-color:#EBF5FF;border-color:#9abad9;border-style:solid;border-width:1px;color:#444;font-family:Arial, sans-serif;font-size:14px;overflow:hidden;padding:10px 8px;text-align:left;vertical-align:middle;word-break:normal">指示调度实体是否插入红黑树。如果当前调度实体被插入红黑树，那么其将被设置为1。如果当前调度实体被移出「dequeue」红黑树，那么其会被设置成0</td></tr><tr><td style="background-color:#EBF5FF;border-color:#9abad9;border-style:solid;border-width:1px;color:#444;font-family:Arial, sans-serif;font-size:14px;overflow:hidden;padding:10px 8px;text-align:left;vertical-align:middle;word-break:normal">u64</td><td style="background-color:#D2E4FC;border-color:#9abad9;border-style:solid;border-width:1px;color:#444;font-family:Arial, sans-serif;font-size:14px;overflow:hidden;padding:10px 8px;text-align:left;vertical-align:middle;word-break:normal">exec_start</td><td style="background-color:#EBF5FF;border-color:#9abad9;border-style:solid;border-width:1px;color:#444;font-family:Arial, sans-serif;font-size:14px;overflow:hidden;padding:10px 8px;text-align:left;vertical-align:middle;word-break:normal">记录当前调度实体在这次被调度执行的起始时刻</td></tr><tr><td style="background-color:#EBF5FF;border-color:#9abad9;border-style:solid;border-width:1px;color:#444;font-family:Arial, sans-serif;font-size:14px;overflow:hidden;padding:10px 8px;text-align:left;vertical-align:middle;word-break:normal">u64</td><td style="background-color:#D2E4FC;border-color:#9abad9;border-style:solid;border-width:1px;color:#444;font-family:Arial, sans-serif;font-size:14px;overflow:hidden;padding:10px 8px;text-align:left;vertical-align:middle;word-break:normal">sum_exec_runtime</td><td style="background-color:#EBF5FF;border-color:#9abad9;border-style:solid;border-width:1px;color:#444;font-family:Arial, sans-serif;font-size:14px;overflow:hidden;padding:10px 8px;text-align:left;vertical-align:middle;word-break:normal">记录调度实体总共占用的CPU运行时间</td></tr><tr><td style="background-color:#EBF5FF;border-color:#9abad9;border-style:solid;border-width:1px;color:#444;font-family:Arial, sans-serif;font-size:14px;overflow:hidden;padding:10px 8px;text-align:left;vertical-align:middle;word-break:normal">u64</td><td style="background-color:#D2E4FC;border-color:#9abad9;border-style:solid;border-width:1px;color:#444;font-family:Arial, sans-serif;font-size:14px;overflow:hidden;padding:10px 8px;text-align:left;vertical-align:middle;word-break:normal">vruntime</td><td style="background-color:#EBF5FF;border-color:#9abad9;border-style:solid;border-width:1px;color:#444;font-family:Arial, sans-serif;font-size:14px;overflow:hidden;padding:10px 8px;text-align:left;vertical-align:middle;word-break:normal">根据消耗掉的总CPU运行时间和负载权重计算其虚拟执行时间。该值越小，调度实体就越靠近红黑树的最左侧，因此其被调度运行的频率就越高</td></tr><tr><td style="background-color:#EBF5FF;border-color:#9abad9;border-style:solid;border-width:1px;color:#444;font-family:Arial, sans-serif;font-size:14px;overflow:hidden;padding:10px 8px;text-align:left;vertical-align:middle;word-break:normal">u64</td><td style="background-color:#D2E4FC;border-color:#9abad9;border-style:solid;border-width:1px;color:#444;font-family:Arial, sans-serif;font-size:14px;overflow:hidden;padding:10px 8px;text-align:left;vertical-align:middle;word-break:normal">prev_sum_exec_runtime</td><td style="background-color:#EBF5FF;border-color:#9abad9;border-style:solid;border-width:1px;color:#444;font-family:Arial, sans-serif;font-size:14px;overflow:hidden;padding:10px 8px;text-align:left;vertical-align:middle;word-break:normal">记录截至上一次被调度执行结束时当前调度实体消耗掉的CPU执行时间，通过使用sum_exec_runtime和prev_sum_exec_runtime能够计算出在这次调度执行期间当前调度实体实际占用的CPU执行时间</td></tr><tr><td style="background-color:#EBF5FF;border-color:#9abad9;border-style:solid;border-width:1px;color:#444;font-family:Arial, sans-serif;font-size:14px;overflow:hidden;padding:10px 8px;text-align:left;vertical-align:middle;word-break:normal">u64</td><td style="background-color:#D2E4FC;border-color:#9abad9;border-style:solid;border-width:1px;color:#444;font-family:Arial, sans-serif;font-size:14px;overflow:hidden;padding:10px 8px;text-align:left;vertical-align:middle;word-break:normal">nr_migrations</td><td style="background-color:#EBF5FF;border-color:#9abad9;border-style:solid;border-width:1px;color:#444;font-family:Arial, sans-serif;font-size:14px;overflow:hidden;padding:10px 8px;text-align:left;vertical-align:middle;word-break:normal">记录当前调度实体已切换执行CPU的次数</td></tr><tr><td style="background-color:#EBF5FF;border-color:#9abad9;border-style:solid;border-width:1px;color:#444;font-family:Arial, sans-serif;font-size:14px;overflow:hidden;padding:10px 8px;text-align:left;vertical-align:middle;word-break:normal">int</td><td style="background-color:#D2E4FC;border-color:#9abad9;border-style:solid;border-width:1px;color:#444;font-family:Arial, sans-serif;font-size:14px;overflow:hidden;padding:10px 8px;text-align:left;vertical-align:middle;word-break:normal">depth</td><td style="background-color:#EBF5FF;border-color:#9abad9;border-style:solid;border-width:1px;color:#444;font-family:Arial, sans-serif;font-size:14px;overflow:hidden;padding:10px 8px;text-align:left;vertical-align:middle;word-break:normal">记录当前调度实体在层级结构中的深度</td></tr><tr><td style="background-color:#EBF5FF;border-color:#9abad9;border-style:solid;border-width:1px;color:#444;font-family:Arial, sans-serif;font-size:14px;overflow:hidden;padding:10px 8px;text-align:left;vertical-align:middle;word-break:normal">struct sched_entity &#42;</td><td style="background-color:#D2E4FC;border-color:#9abad9;border-style:solid;border-width:1px;color:#444;font-family:Arial, sans-serif;font-size:14px;overflow:hidden;padding:10px 8px;text-align:left;vertical-align:middle;word-break:normal">parent</td><td style="background-color:#EBF5FF;border-color:#9abad9;border-style:solid;border-width:1px;color:#444;font-family:Arial, sans-serif;font-size:14px;overflow:hidden;padding:10px 8px;text-align:left;vertical-align:middle;word-break:normal">指向父调度实体</td></tr><tr><td style="background-color:#EBF5FF;border-color:#9abad9;border-style:solid;border-width:1px;color:#444;font-family:Arial, sans-serif;font-size:14px;overflow:hidden;padding:10px 8px;text-align:left;vertical-align:middle;word-break:normal">struct cfs_rq &#42;</td><td style="background-color:#D2E4FC;border-color:#9abad9;border-style:solid;border-width:1px;color:#444;font-family:Arial, sans-serif;font-size:14px;overflow:hidden;padding:10px 8px;text-align:left;vertical-align:middle;word-break:normal">cfs_rq</td><td style="background-color:#EBF5FF;border-color:#9abad9;border-style:solid;border-width:1px;color:#444;font-family:Arial, sans-serif;font-size:14px;overflow:hidden;padding:10px 8px;text-align:left;vertical-align:middle;word-break:normal">指向当前调度实体将插入的CFS运行队列</td></tr><tr><td style="background-color:#EBF5FF;border-color:#9abad9;border-style:solid;border-width:1px;color:#444;font-family:Arial, sans-serif;font-size:14px;overflow:hidden;padding:10px 8px;text-align:left;vertical-align:middle;word-break:normal">struct cfs_rq &#42;</td><td style="background-color:#D2E4FC;border-color:#9abad9;border-style:solid;border-width:1px;color:#444;font-family:Arial, sans-serif;font-size:14px;overflow:hidden;padding:10px 8px;text-align:left;vertical-align:middle;word-break:normal">my_q</td><td style="background-color:#EBF5FF;border-color:#9abad9;border-style:solid;border-width:1px;color:#444;font-family:Arial, sans-serif;font-size:14px;overflow:hidden;padding:10px 8px;text-align:left;vertical-align:middle;word-break:normal">在创建一个任务组时，其对应的调度实体将动态分配一个私有的内部CFS运行队列来管理它的任务。该字段指向这个私有的内部CFS运行队列</td></tr></tbody></table></div><script charset="utf-8">var TGSort=window.TGSort||function(n){"use strict";function r(n){return n?n.length:0}function t(n,t,e,o=0){for(e=r(n);o<e;++o)t(n[o],o)}function e(n){return n.split("").reverse().join("")}function o(n){var e=n[0];return t(n,function(n){for(;!n.startsWith(e);)e=e.substring(0,r(e)-1)}),r(e)}function u(n,r,e=[]){return t(n,function(n){r(n)&&e.push(n)}),e}var a=parseFloat;function i(n,r){return function(t){var e="";return t.replace(n,function(n,t,o){return e=t.replace(r,"")+"."+(o||"").substring(1)}),a(e)}}var s=i(/^(?:\s*)([+-]?(?:\d+)(?:,\d{3})*)(\.\d*)?$/g,/,/g),c=i(/^(?:\s*)([+-]?(?:\d+)(?:\.\d{3})*)(,\d*)?$/g,/\./g);function f(n){var t=a(n);return!isNaN(t)&&r(""+t)+1>=r(n)?t:NaN}function d(n){var e=[],o=n;return t([f,s,c],function(u){var a=[],i=[];t(n,function(n,r){r=u(n),a.push(r),r||i.push(n)}),r(i)<r(o)&&(o=i,e=a)}),r(u(o,function(n){return n==o[0]}))==r(o)?e:[]}function v(n){if("TABLE"==n.nodeName){for(var a=function(r){var e,o,u=[],a=[];return function n(r,e){e(r),t(r.childNodes,function(r){n(r,e)})}(n,function(n){"TR"==(o=n.nodeName)?(e=[],u.push(e),a.push(n)):"TD"!=o&&"TH"!=o||e.push(n)}),[u,a]}(),i=a[0],s=a[1],c=r(i),f=c>1&&r(i[0])<r(i[1])?1:0,v=f+1,p=i[f],h=r(p),l=[],g=[],N=[],m=v;m<c;++m){for(var T=0;T<h;++T){r(g)<h&&g.push([]);var C=i[m][T],L=C.textContent||C.innerText||"";g[T].push(L.trim())}N.push(m-v)}t(p,function(n,t){l[t]=0;var a=n.classList;a.add("tg-sort-header"),n.addEventListener("click",function(){var n=l[t];!function(){for(var n=0;n<h;++n){var r=p[n].classList;r.remove("tg-sort-asc"),r.remove("tg-sort-desc"),l[n]=0}}(),(n=1==n?-1:+!n)&&a.add(n>0?"tg-sort-asc":"tg-sort-desc"),l[t]=n;var i,f=g[t],m=function(r,t){return n*f[r].localeCompare(f[t])||n*(r-t)},T=function(n){var t=d(n);if(!r(t)){var u=o(n),a=o(n.map(e));t=d(n.map(function(n){return n.substring(u,r(n)-a)}))}return t}(f);(r(T)||r(T=r(u(i=f.map(Date.parse),isNaN))?[]:i))&&(m=function(r,t){var e=T[r],o=T[t],u=isNaN(e),a=isNaN(o);return u&&a?0:u?-n:a?n:e>o?n:e<o?-n:n*(r-t)});var C,L=N.slice();L.sort(m);for(var E=v;E<c;++E)(C=s[E].parentNode).removeChild(s[E]);for(E=v;E<c;++E)C.appendChild(s[v+L[E-v]])})})}}n.addEventListener("DOMContentLoaded",function(){for(var t=n.getElementsByClassName("tg"),e=0;e<r(t);++e)try{v(t[e])}catch(n){}})}(document)</script></div>
+
+<h3 id="调度类别「scheduling-class」和调度策略「scheduling-policy」"><a href="#调度类别「scheduling-class」和调度策略「scheduling-policy」" class="headerlink" title="调度类别「scheduling class」和调度策略「scheduling policy」"></a>调度类别「scheduling class」和调度策略「scheduling policy」</h3><p>在Linux内核中调度器包含5种调度类，支持6个调度策略，其中STOP调度类用于处理最高优先级的stop任务，还有DEADLINE调度类实现了EDF「Early Deadline Firs」算法。</p>
+<p><img data-src="/images/13/scheduling_policy_and_class.svg" alt="scheduling_policy_and_class"></p>
+<center>图22 调度类别「scheduling class」与调度策略「scheduling policy」</center>
+
+<p>与调度类无关的调度器核心代码都放在core.c文件中，每种调度类的自身实现代码单独放在一个文件中，还有这种实现方式能够将调度策略的实现代码从核心调度器「core scheduler」的代码中抽象剥离出，使两者之间能够尽量地解耦，从而使调度器具有良好的可扩展性和灵活性。调度类具有优先级，它会影响系统中被挑选出任务的执行顺序。</p>
+<p><img data-src="/images/13/all_shceduling_class.svg" alt="all_shceduling_class"></p>
+<center>图23 按优先级的顺序遍历调度类别（调度器）</center>
+
+<h3 id="调度器「scheduler」的初始化"><a href="#调度器「scheduler」的初始化" class="headerlink" title="调度器「scheduler」的初始化"></a>调度器「scheduler」的初始化</h3><h4 id="sched-init-：初始化调度器"><a href="#sched-init-：初始化调度器" class="headerlink" title="sched_init()：初始化调度器"></a>sched_init()：初始化调度器</h4><p><img data-src="/images/13/init_root_task_group.svg" alt="init_root_task_group"></p>
+<center>图24 root_task_group初始化</center>
+
+<h5 id="初始化最顶层的任务组（root-task-group）"><a href="#初始化最顶层的任务组（root-task-group）" class="headerlink" title="初始化最顶层的任务组（root_task_group）"></a>初始化最顶层的任务组（root_task_group）</h5><h5 id="初始化CFS运行队列的数据结构"><a href="#初始化CFS运行队列的数据结构" class="headerlink" title="初始化CFS运行队列的数据结构"></a>初始化CFS运行队列的数据结构</h5><h5 id="初始化swapper和注册用于负载均衡「load-balancing」的softirq处理函数"><a href="#初始化swapper和注册用于负载均衡「load-balancing」的softirq处理函数" class="headerlink" title="初始化swapper和注册用于负载均衡「load balancing」的softirq处理函数"></a>初始化swapper和注册用于负载均衡「load balancing」的softirq处理函数</h5>
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer"><div class="post-widgets">
+      <div id="needsharebutton-postbottom">
+        <span class="btn">
+          <i class="fa fa-share-alt" aria-hidden="true"></i>
+        </span>
+      </div>
+    </div>
+          <div class="reward-container">
+  <div>请我一杯咖啡吧！</div>
+  <button>
+    赞赏
+  </button>
+  <div class="post-reward">
+      <div>
+        <img src="/images/wechatpay.png" alt="Xinlu Wang 微信">
+        <span>微信</span>
+      </div>
+      <div>
+        <img src="/images/alipay.jpg" alt="Xinlu Wang 支付宝">
+        <span>支付宝</span>
+      </div>
+
+  </div>
+</div>
+
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>本文作者： </strong>Xinlu Wang
+  </li>
+  <li class="post-copyright-link">
+      <strong>本文链接：</strong>
+      <a href="https://chasinglulu.github.io/posts/4a123606/" title="进程调度1「Key Concepts」">https://chasinglulu.github.io/posts/4a123606/</a>
+  </li>
+  <li class="post-copyright-license">
+      <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/task/" rel="tag"><i class="fa fa-tag"></i> task</a>
+              <a href="/tags/process/" rel="tag"><i class="fa fa-tag"></i> process</a>
+              <a href="/tags/management/" rel="tag"><i class="fa fa-tag"></i> management</a>
+              <a href="/tags/schedule/" rel="tag"><i class="fa fa-tag"></i> schedule</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/3c176007/" rel="prev" title="ARM64分页机制「paging」">
+                  <i class="fa fa-angle-left"></i> ARM64分页机制「paging」
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/posts/3a441eb3/" rel="next" title="进程调度2「Core」">
+                  进程调度2「Core」 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments" id="waline"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2018 – 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-anchor"></i>
+    </span><a href="http://abitacc.com/about" rel="noopener" target="_blank">Xinlu Wang</a>
+    <!-- annotation
+    <span class="author" itemprop="copyrightHolder">Xinlu Wang</span>
+    -->
+  </div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+      <span>站点总字数：</span>
+    <span title="站点总字数">82k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span>站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">4:57</span>
+  </span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+  <a href="https://github.com/chasinglulu" class="github-corner" title="在 GitHub 上关注我" aria-label="在 GitHub 上关注我" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script size="300" alpha="0.6" zIndex="-1" src="https://cdnjs.cloudflare.com/ajax/libs/ribbon.js/1.0.2/ribbon.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lozad.js/1.16.0/lozad.min.js" integrity="sha256-mOFREFhqmHeQbXpK2lp4nA3qooVgACfh88fpJftLBbc=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script><script src="/js/bookmark.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/quicklink/2.3.0/quicklink.umd.js" integrity="sha256-yvJQOINiH9fWemHn0vCA5lsHWJaHs6/ZmO+1Ft04SvM=" crossorigin="anonymous"></script>
+  <script class="next-config" data-name="quicklink" type="application/json">{"enable":true,"home":false,"archive":false,"delay":true,"timeout":3000,"priority":true,"url":"https://chasinglulu.github.io/posts/4a123606/"}</script>
+  <script src="/js/third-party/quicklink.js"></script>
+<script class="next-config" data-name="waline" type="application/json">{"lang":"zh-CN","enable":true,"serverURL":"www.chasinglulu.cn","cssUrl":"https://unpkg.com/@waline/client@v2/dist/waline.css","commentCount":true,"pageview":true,"placeholder":"请文明评论呀","avatar":"mm","meta":["nick","mail"],"pageSize":10,"comment_count":true,"requiredFields":["mail"],"libUrl":"https://cdn.jsdelivr.net/npm/@waline/client@2.15.8/dist/waline.js","emoji":["https://cdn.jsdelivr.net/gh/walinejs/emojis@1.1.0/tw-emoji/"],"el":"#waline","comment":true,"path":"/posts/4a123606/"}</script>
+<link rel="stylesheet" href="https://unpkg.com/@waline/client@v2/dist/waline.css">
+<script>
+document.addEventListener('page:loaded', () => {
+  NexT.utils.loadComments(CONFIG.waline.el).then(() =>
+    NexT.utils.getScript(CONFIG.waline.libUrl, { condition: window.Waline })
+  ).then(() => 
+    Waline.init(Object.assign({}, CONFIG.waline,{ el: document.querySelector(CONFIG.waline.el) }))
+  );
+});
+</script>
+<div id="needsharebutton-float">
+      <span class="btn">
+        <i class="fa fa-share-alt" aria-hidden="true"></i>
+      </span>
+    </div>
+  <script src="//cdn.jsdelivr.net/gh/theme-next/theme-next-needmoreshare2@1/needsharebutton.min.js"></script>
+  <script>
+      pbOptions = {};
+        pbOptions.iconStyle = "default";
+        pbOptions.boxForm = "horizontal";
+        pbOptions.position = "bottomCenter";
+        pbOptions.networks = "Weibo,Wechat,Douban,QQZone,Mailto";
+      new needShareButton('#needsharebutton-postbottom', pbOptions);
+      flOptions = {};
+        flOptions.iconStyle = "box";
+        flOptions.boxForm = "vertical";
+        flOptions.position = "topRight";
+        flOptions.networks = "Weibo,Wechat,Douban,QQZone,Mailto";
+      new needShareButton('#needsharebutton-float', flOptions);
+  </script>
+</body>
+</html>

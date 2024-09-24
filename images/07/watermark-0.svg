@@ -1,0 +1,391 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- 由 Microsoft Visio, SVG Export 生成 watermark-0.svg 页-1 -->
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:ev="http://www.w3.org/2001/xml-events"
+		xmlns:v="http://schemas.microsoft.com/visio/2003/SVGExtensions/" width="6.83689in" height="3.71948in"
+		viewBox="0 0 492.256 267.803" xml:space="preserve" color-interpolation-filters="sRGB" class="st25">
+	<v:documentProperties v:langID="2052" v:metric="true" v:viewMarkup="false"/>
+
+	<style type="text/css">
+	<![CDATA[
+		.st1 {visibility:visible}
+		.st2 {fill:#5b9bd5;fill-opacity:0.22;filter:url(#filter_2);stroke:#5b9bd5;stroke-opacity:0.22}
+		.st3 {fill:#dbdbdb;stroke:#000000;stroke-width:0.5}
+		.st4 {fill:#000000;font-family:Times New Roman;font-size:0.833336em}
+		.st5 {font-size:1em}
+		.st6 {fill:#ffc000;stroke:#000000;stroke-width:0.5}
+		.st7 {fill:#cbffff;stroke:#000000;stroke-width:0.5}
+		.st8 {stroke:#00b0f0;stroke-linecap:round;stroke-linejoin:round;stroke-width:1.25}
+		.st9 {stroke:#ff0000;stroke-dasharray:2.25,2.25;stroke-linecap:round;stroke-linejoin:round;stroke-width:0.75}
+		.st10 {fill:#ff0000;stroke:#000000;stroke-width:0.75}
+		.st11 {fill:none;stroke:none;stroke-width:0.25}
+		.st12 {fill:#000000;font-family:Times New Roman;font-size:0.916672em}
+		.st13 {marker-end:url(#mrkr3-65);marker-start:url(#mrkr3-63);stroke:#000000;stroke-linecap:round;stroke-linejoin:round;stroke-width:0.75}
+		.st14 {fill:#000000;fill-opacity:1;stroke:#000000;stroke-opacity:1;stroke-width:0.22935779816514}
+		.st15 {fill:#5b9bd5;fill-opacity:0.22;filter:url(#filter_2);stroke:#5b9bd5;stroke-dasharray:0.75,1.5;stroke-opacity:0.22}
+		.st16 {fill:#f2f2f2;stroke:#0070c0;stroke-dasharray:0.75,1.5;stroke-width:0.75}
+		.st17 {fill:#000000;font-family:宋体;font-size:0.833336em}
+		.st18 {font-family:Times New Roman;font-size:1em}
+		.st19 {fill:#00b0f0;font-family:宋体;font-size:0.833336em}
+		.st20 {fill:#00b0f0;font-family:Times New Roman;font-size:0.833336em}
+		.st21 {font-family:宋体;font-size:1em}
+		.st22 {stroke:#000000;stroke-width:0.75}
+		.st23 {fill:none;filter:url(#filter_2);stroke:#5b9bd5;stroke-dasharray:1.5,1.5;stroke-opacity:0.22}
+		.st24 {fill:none;stroke:#000000;stroke-dasharray:1.5,1.5;stroke-width:0.5}
+		.st25 {fill:none;fill-rule:evenodd;font-size:12px;overflow:visible;stroke-linecap:square;stroke-miterlimit:3}
+	]]>
+	</style>
+
+	<defs id="Markers">
+		<g id="lend3">
+			<path d="M 2 1 L 0 0 L 2 -1 " style="stroke-linecap:round;stroke-linejoin:round;fill:none"/>
+		</g>
+		<marker id="mrkr3-63" class="st14" v:arrowType="3" v:arrowSize="2" orient="auto" markerUnits="strokeWidth"
+				overflow="visible">
+			<use xlink:href="#lend3" transform="scale(4.36) "/>
+		</marker>
+		<marker id="mrkr3-65" class="st14" v:arrowType="3" v:arrowSize="2" orient="auto" markerUnits="strokeWidth"
+				overflow="visible">
+			<use xlink:href="#lend3" transform="scale(-4.36,-4.36) "/>
+		</marker>
+	</defs>
+	<defs id="Filters">
+		<filter id="filter_2">
+			<feGaussianBlur stdDeviation="2"/>
+		</filter>
+	</defs>
+	<g v:mID="0" v:index="1" v:groupContext="foregroundPage">
+		<title>页-1</title>
+		<v:pageProperties v:drawingScale="0.0393701" v:pageScale="0.0393701" v:drawingUnits="24" v:shadowOffsetX="8.50394"
+				v:shadowOffsetY="-8.50394"/>
+		<v:layer v:name="连接线" v:index="0"/>
+		<g id="group49-1" transform="translate(3.02939,-5.3478)" v:mID="49" v:groupContext="group">
+			<title>工作表.49</title>
+			<g id="shape1-2" v:mID="1" v:groupContext="shape" transform="translate(184.252,-14.1732)">
+				<title>矩形</title>
+				<desc>synchronous (direct-reclaim)</desc>
+				<v:userDefs>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="63.7795" cy="225.283" width="127.56" height="85.0394"/>
+				<g id="shadow1-3" v:groupContext="shadow" v:shadowOffsetX="0.345598" v:shadowOffsetY="-1.97279" v:shadowType="1"
+						transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+					<rect x="0" y="182.763" width="127.559" height="85.0394" rx="1.41732" ry="1.41732" class="st2"/>
+				</g>
+				<rect x="0" y="182.763" width="127.559" height="85.0394" rx="1.41732" ry="1.41732" class="st3"/>
+				<text x="38.5" y="222.28" class="st4" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>synchronous<v:newlineChar/><tspan
+							x="32.41" dy="1.2em" class="st5">(</tspan>direct-reclaim)</text>			</g>
+			<g id="shape3-9" v:mID="3" v:groupContext="shape" transform="translate(184.252,-99.2126)">
+				<title>矩形.3</title>
+				<v:userDefs>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<g id="shadow3-10" v:groupContext="shadow" v:shadowOffsetX="0.345598" v:shadowOffsetY="-1.97279" v:shadowType="1"
+						transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+					<rect x="0" y="168.59" width="127.559" height="99.2126" rx="1.41732" ry="1.41732" class="st2"/>
+				</g>
+				<rect x="0" y="168.59" width="127.559" height="99.2126" rx="1.41732" ry="1.41732" class="st6"/>
+			</g>
+			<g id="shape7-14" v:mID="7" v:groupContext="shape" transform="translate(212.598,-99.2126)">
+				<title>矩形.7</title>
+				<v:userDefs>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<g id="shadow7-15" v:groupContext="shadow" v:shadowOffsetX="0.345598" v:shadowOffsetY="-1.97279" v:shadowType="1"
+						transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+					<rect x="0" y="168.59" width="85.0394" height="99.2126" rx="1.41732" ry="1.41732" class="st2"/>
+				</g>
+				<rect x="0" y="168.59" width="85.0394" height="99.2126" rx="1.41732" ry="1.41732" class="st7"/>
+			</g>
+			<g id="shape17-19" v:mID="17" v:groupContext="shape" transform="translate(436.983,-61.7149) rotate(70.6864)">
+				<title>工作表.17</title>
+				<path d="M0 267.8 L149.99 267.8" class="st8"/>
+			</g>
+			<g id="shape21-22" v:mID="21" v:groupContext="shape" transform="translate(495.225,84.3805) rotate(71.7146)">
+				<title>工作表.21</title>
+				<path d="M0 267.8 L22.59 267.8" class="st8"/>
+			</g>
+			<g id="shape22-25" v:mID="22" v:groupContext="shape" transform="translate(-5.31403,102.172) rotate(-70.9904)">
+				<title>工作表.22</title>
+				<path d="M0 267.8 L22.21 267.8" class="st8"/>
+			</g>
+			<g id="shape23-28" v:mID="23" v:groupContext="shape" transform="translate(9.47344,79.8309) rotate(-70.6864)">
+				<title>工作表.23</title>
+				<path d="M0 267.8 L149.99 267.8" class="st8"/>
+			</g>
+			<g id="shape4-31" v:mID="4" v:groupContext="shape" transform="translate(170.079,-99.3991)">
+				<title>工作表.4</title>
+				<path d="M0 267.8 L155.91 267.8" class="st9"/>
+			</g>
+			<g id="shape25-34" v:mID="25" v:groupContext="shape" transform="translate(255.118,-99.3991)">
+				<title>工作表.25</title>
+				<path d="M0 267.8 L7.09 267.8" class="st8"/>
+			</g>
+			<g id="shape24-37" v:mID="24" v:groupContext="shape" transform="translate(234.709,-99.3991)">
+				<title>工作表.24</title>
+				<path d="M0 267.8 L5.67 267.8" class="st8"/>
+			</g>
+			<g id="shape5-40" v:mID="5" v:groupContext="shape" transform="translate(170.079,-160.441)">
+				<title>工作表.5</title>
+				<path d="M0 267.8 L155.91 267.8" class="st9"/>
+			</g>
+			<g id="shape31-43" v:mID="31" v:groupContext="shape" transform="translate(209.055,-155.906)">
+				<title>圆形</title>
+				<v:userDefs>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<g id="shadow31-44" v:groupContext="shadow" v:shadowOffsetX="0.345598" v:shadowOffsetY="-1.97279" v:shadowType="1"
+						transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+					<path d="M0 264.26 A3.54331 3.54331 0 0 1 7.09 264.26 A3.54331 3.54331 0 1 1 -0 264.26 Z" class="st2"/>
+				</g>
+				<path d="M0 264.26 A3.54331 3.54331 0 0 1 7.09 264.26 A3.54331 3.54331 0 1 1 -0 264.26 Z" class="st10"/>
+			</g>
+			<g id="shape32-48" v:mID="32" v:groupContext="shape" transform="translate(294.094,-194.882)">
+				<title>圆形.32</title>
+				<v:userDefs>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<g id="shadow32-49" v:groupContext="shadow" v:shadowOffsetX="0.345598" v:shadowOffsetY="-1.97279" v:shadowType="1"
+						transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+					<path d="M0 264.26 A3.54331 3.54331 0 0 1 7.09 264.26 A3.54331 3.54331 0 1 1 -0 264.26 Z" class="st2"/>
+				</g>
+				<path d="M0 264.26 A3.54331 3.54331 0 0 1 7.09 264.26 A3.54331 3.54331 0 1 1 -0 264.26 Z" class="st10"/>
+			</g>
+			<g id="shape28-53" v:mID="28" v:groupContext="shape" transform="translate(198.425,-127.559)">
+				<title>工作表.28</title>
+				<desc>asynchronous (background-reclaim)</desc>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="53.1496" cy="257.173" width="106.3" height="21.2598"/>
+				<rect x="0" y="246.543" width="106.299" height="21.2598" class="st11"/>
+				<text x="22.9" y="253.79" class="st12" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>asynchronous<v:newlineChar/><tspan
+							x="5.2" dy="1.211em" class="st5">(</tspan>background-reclaim)</text>			</g>
+			<g id="shape33-57" v:mID="33" v:groupContext="shape" v:layerMember="0" transform="translate(212.598,-148.819)">
+				<title>有向线 1</title>
+				<v:userDefs>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<path d="M0 267.8 L85.04 267.8" class="st13"/>
+			</g>
+			<g id="shape36-66" v:mID="36" v:groupContext="shape" transform="translate(318.898,5.68434E-14)">
+				<title>二维文字提示框.44</title>
+				<desc>对于在该水印线以下的常见内存请求分配过程与页帧回收过程是同步的(回收一定数量的页帧后才进行真正的分配动作)</desc>
+				<v:userDefs>
+					<v:ud v:nameU="Scale" v:val="VT0(1):26"/>
+					<v:ud v:nameU="AntiScale" v:val="VT0(1):26"/>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="81.4961" cy="235.913" width="163" height="63.7795"/>
+				<g id="shadow36-67" v:groupContext="shadow" v:shadowOffsetX="0.345598" v:shadowOffsetY="-1.97279" v:shadowType="1"
+						transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+					<path d="M0 227.94 L0 204.73 a0.708661 0.708661 0 0 1 0.708661 -0.708661 L64.31 204.02 a0.708661 0.708661 -180
+								 0 0 0.339344 -0.0865307 L102.08 183.52 a0.708661 0.708661 0 0 1 1.02947 0.78316 L98.71 203.15 a0.708661
+								 0.708661 -180 0 0 0.690124 0.86969 L162.28 204.02 a0.708661 0.708661 0 0 1 0.708661 0.708661 L162.99
+								 227.94 L162.99 235.91 L162.99 243.89 L162.99 267.09 a0.708661 0.708661 0 0 1 -0.708661 0.708661
+								 L98.5 267.8 L81.5 267.8 L64.49 267.8 L0.71 267.8 a0.708661 0.708661 0 0 1 -0.708661 -0.708661 L0
+								 243.89 L0 235.91 L0 227.94 Z" class="st15"/>
+				</g>
+				<path d="M0 227.94 L0 204.73 a0.708661 0.708661 0 0 1 0.708661 -0.708661 L64.31 204.02 a0.708661 0.708661 -180 0
+							 0 0.339344 -0.0865307 L102.08 183.52 a0.708661 0.708661 0 0 1 1.02947 0.78316 L98.71 203.15 a0.708661
+							 0.708661 -180 0 0 0.690124 0.86969 L162.28 204.02 a0.708661 0.708661 0 0 1 0.708661 0.708661 L162.99
+							 227.94 L162.99 235.91 L162.99 243.89 L162.99 267.09 a0.708661 0.708661 0 0 1 -0.708661 0.708661 L98.5
+							 267.8 L81.5 267.8 L64.49 267.8 L0.71 267.8 a0.708661 0.708661 0 0 1 -0.708661 -0.708661 L0 243.89 L0
+							 235.91 L0 227.94 Z" class="st16"/>
+				<text x="0.4em 1.436em 2.471em 3.507em 4.543em 5.578em 6.614em 7.65em 8.685em 9.721em 10.757em 11.792em 12.828em
+							 13.864em 14.899em" y="219.75" class="st17" v:langID="2052"><v:paragraph v:horizAlign="3"/><v:tabList/>对于在该水印线以下的常见内存请<tspan
+							x="0.4em 1.436em 2.471em 3.507em 4.543em 5.578em 6.614em 7.65em 8.685em 9.721em 10.757em 11.792em 12.828em
+								 13.864em 14.899em" dy="1.2em" class="st5">求分配过程与页帧回收过程是同步</tspan><tspan x="0.4em" dy="1.287em"
+							class="st5">的</tspan><tspan x="1.411em" dy="0em" class="st18">(</tspan><tspan x="1.755em 2.766em 3.777em
+								 4.788em 5.8em 6.811em 7.822em 8.833em 9.844em 10.855em 11.866em 12.877em 13.888em 14.899em"
+							dy="0em" class="st5">回收一定数量的页帧后才进行真</tspan><tspan x="0.4em 1.4em 2.4em 3.4em 4.4em 5.4em" dy="1.316em"
+							class="st5">正的分配动作</tspan><tspan x="6.4em" dy="0em" class="st18">)</tspan></text>			</g>
+			<g id="shape38-78" v:mID="38" v:groupContext="shape" transform="translate(311.811,-216.142)">
+				<title>二维文字提示框.38</title>
+				<desc>kswapd sleep</desc>
+				<v:userDefs>
+					<v:ud v:nameU="Scale" v:val="VT0(1):26"/>
+					<v:ud v:nameU="AntiScale" v:val="VT0(1):26"/>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="38.9764" cy="257.173" width="77.96" height="21.2598"/>
+				<g id="shadow38-79" v:groupContext="shadow" v:shadowOffsetX="0.345598" v:shadowOffsetY="-1.97279" v:shadowType="1"
+						transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+					<path d="M0 254.52 L0 247.25 a0.708661 0.708661 0 0 1 0.708661 -0.708661 L29.23 246.54 L38.98 246.54 L48.72 246.54
+								 L77.24 246.54 a0.708661 0.708661 0 0 1 0.708661 0.708661 L77.95 254.52 L77.95 257.17 L77.95 259.83
+								 L77.95 267.09 a0.708661 0.708661 0 0 1 -0.708661 0.708661 L48.82 267.8 a0.708661 0.708661 -180 0
+								 0 -0.192145 0.0265461 L-2.11 282.12 a0.708661 0.708661 0 0 1 -0.459946 -1.33823 L25.89 269.17 a0.708661
+								 0.708661 -180 0 0 -0.267801 -1.36477 L0.71 267.8 a0.708661 0.708661 0 0 1 -0.708661 -0.708661 L0
+								 259.83 L0 257.17 L0 254.52 Z" class="st15"/>
+				</g>
+				<path d="M0 254.52 L0 247.25 a0.708661 0.708661 0 0 1 0.708661 -0.708661 L29.23 246.54 L38.98 246.54 L48.72 246.54
+							 L77.24 246.54 a0.708661 0.708661 0 0 1 0.708661 0.708661 L77.95 254.52 L77.95 257.17 L77.95 259.83 L77.95
+							 267.09 a0.708661 0.708661 0 0 1 -0.708661 0.708661 L48.82 267.8 a0.708661 0.708661 -180 0 0 -0.192145
+							 0.0265461 L-2.11 282.12 a0.708661 0.708661 0 0 1 -0.459946 -1.33823 L25.89 269.17 a0.708661 0.708661
+							 -180 0 0 -0.267801 -1.36477 L0.71 267.8 a0.708661 0.708661 0 0 1 -0.708661 -0.708661 L0 259.83 L0 257.17
+							 L0 254.52 Z" class="st16"/>
+				<text x="12.18" y="260.17" class="st4" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>kswapd sleep</text>			</g>
+			<g id="shape40-84" v:mID="40" v:groupContext="shape" transform="translate(4.79616E-14,-91.4173)">
+				<title>二维文字提示框.40</title>
+				<desc>在PF_MEMALLOC标识被设置的情况下将忽略水印线对页帧分配的限制</desc>
+				<v:userDefs>
+					<v:ud v:nameU="Scale" v:val="VT0(1):26"/>
+					<v:ud v:nameU="AntiScale" v:val="VT0(1):26"/>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="60.2362" cy="249.732" width="120.48" height="36.1417"/>
+				<g id="shadow40-85" v:groupContext="shadow" v:shadowOffsetX="0.345598" v:shadowOffsetY="-1.97279" v:shadowType="1"
+						transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+					<path d="M0 245.21 L0 232.37 a0.708661 0.708661 0 0 1 0.708661 -0.708661 L45.18 231.66 L60.24 231.66 L75.3 231.66
+								 L119.76 231.66 a0.708661 0.708661 0 0 1 0.708661 0.708661 L120.47 244.68 a0.708661 0.708661 -180
+								 0 0 0.507537 0.679522 L144.48 252.32 a0.708661 0.708661 0 0 1 -0.184992 1.388 L121.16 254.23 a0.708661
+								 0.708661 -180 0 0 -0.692529 0.708478 L120.47 267.09 a0.708661 0.708661 0 0 1 -0.708661 0.708661
+								 L75.3 267.8 L60.24 267.8 L45.18 267.8 L0.71 267.8 a0.708661 0.708661 0 0 1 -0.708661 -0.708661 L0
+								 254.25 L0 249.73 L0 245.21 Z" class="st15"/>
+				</g>
+				<path d="M0 245.21 L0 232.37 a0.708661 0.708661 0 0 1 0.708661 -0.708661 L45.18 231.66 L60.24 231.66 L75.3 231.66
+							 L119.76 231.66 a0.708661 0.708661 0 0 1 0.708661 0.708661 L120.47 244.68 a0.708661 0.708661 -180 0 0
+							 0.507537 0.679522 L144.48 252.32 a0.708661 0.708661 0 0 1 -0.184992 1.388 L121.16 254.23 a0.708661 0.708661
+							 -180 0 0 -0.692529 0.708478 L120.47 267.09 a0.708661 0.708661 0 0 1 -0.708661 0.708661 L75.3 267.8 L60.24
+							 267.8 L45.18 267.8 L0.71 267.8 a0.708661 0.708661 0 0 1 -0.708661 -0.708661 L0 254.25 L0 249.73 L0 245.21
+							 Z" class="st16"/>
+				<text x="4" y="240.44" class="st17" v:langID="2052"><v:paragraph/><v:tabList/>在<tspan class="st18" v:langID="1033">PF</tspan><tspan
+							class="st18" v:langID="1033">_</tspan><tspan class="st18" v:langID="1033">MEMALLOC</tspan>标识<tspan
+							x="4" dy="1.229em" class="st5">被设置的情况下将忽略水</tspan><tspan x="4" dy="1.287em" class="st5">印线对页帧分配的限制</tspan></text>			</g>
+			<g id="shape41-95" v:mID="41" v:groupContext="shape" transform="translate(134.646,-240.945)">
+				<title>工作表.41</title>
+				<desc>空间页帧的变化趋势</desc>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="49.6063" cy="257.173" width="99.22" height="21.2598"/>
+				<rect x="0" y="246.543" width="99.2126" height="21.2598" class="st11"/>
+				<text x="4.61" y="260.46" class="st19" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>空间页帧的变化趋势</text>			</g>
+			<g id="shape42-98" v:mID="42" v:groupContext="shape" transform="translate(325.984,-88.5827)">
+				<title>工作表.42</title>
+				<desc>zone→watermark[WMARK_MIN] (128K ~ 64M)</desc>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="81.4961" cy="257.173" width="163" height="21.2598"/>
+				<rect x="0" y="246.543" width="162.992" height="21.2598" class="st11"/>
+				<text x="10.41" y="254.46" class="st20" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>zone<tspan
+							class="st21">→</tspan>watermark[<tspan class="st5" v:langID="1033">WMARK</tspan><tspan class="st5"
+							v:langID="1033">_</tspan><tspan class="st5" v:langID="1033">MIN</tspan>]<v:newlineChar/><tspan x="52.4"
+							dy="1.229em" class="st5">(</tspan>128K ~ 64M)</text>			</g>
+			<g id="shape43-106" v:mID="43" v:groupContext="shape" transform="translate(325.984,-148.819)">
+				<title>工作表.43</title>
+				<desc>zone→watermark[WMARK_LOW] (min_value * 125%)</desc>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="81.4961" cy="257.173" width="163" height="21.2598"/>
+				<rect x="0" y="246.543" width="162.992" height="21.2598" class="st11"/>
+				<text x="8.74" y="254.46" class="st20" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>zone<tspan
+							class="st21">→</tspan>watermark[<tspan class="st5" v:langID="1033">WMARK</tspan><tspan class="st5"
+							v:langID="1033">_</tspan><tspan class="st5" v:langID="1033">LOW</tspan>]<v:newlineChar/><tspan
+							x="40.39" dy="1.229em" class="st5">(</tspan>min_value * 125%)</text>			</g>
+			<g id="shape44-114" v:mID="44" v:groupContext="shape" transform="translate(325.984,-187.795)">
+				<title>工作表.44</title>
+				<desc>zone→watermark[WMARK_HIGH] (min_value * 150%)</desc>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="81.4961" cy="257.173" width="163" height="21.2598"/>
+				<rect x="0" y="246.543" width="162.992" height="21.2598" class="st11"/>
+				<text x="7.63" y="254.46" class="st20" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>zone<tspan
+							class="st21">→</tspan>watermark[<tspan class="st5" v:langID="1033">WMARK</tspan><tspan class="st5"
+							v:langID="1033">_</tspan>HIGH]<v:newlineChar/><tspan x="40.39" dy="1.229em" class="st5">(</tspan>min_value * 150%)</text>			</g>
+			<g id="shape46-121" v:mID="46" v:groupContext="shape" transform="translate(423.708,254.171) rotate(90) scale(-1,1)">
+				<title>侧边大括号</title>
+				<v:userDefs>
+					<v:ud v:nameU="TxtW" v:val="VT0(0.55555555555556):29"/>
+					<v:ud v:nameU="TxtA" v:val="VT0(1.5707963267949):37"/>
+					<v:ud v:nameU="TxtAState" v:val="VT0(0):26"/>
+					<v:ud v:nameU="TxtWState" v:val="VT0(0):26"/>
+					<v:ud v:nameU="MaxRadius" v:val="VT0(0.19685039370079):24"/>
+					<v:ud v:nameU="PosCH1" v:prompt="Constrains X postion of Control Handle #1" v:val="VT0(0):26"/>
+					<v:ud v:nameU="PosCH2" v:prompt="Constrains Y postion of Control Handle #2" v:val="VT0(0):26"/>
+					<v:ud v:nameU="Scale" v:val="VT0(1):26"/>
+					<v:ud v:nameU="AntiScale" v:val="VT0(1):26"/>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+					<v:ud v:nameU="TxtA" v:prompt="" v:val="VT0(-1.5707963267949):32"/>
+					<v:ud v:nameU="MaxRadius" v:prompt="" v:val="VT0(0.098425196850394):1"/>
+				</v:userDefs>
+				<path d="M-0 260.72 A7.0865 7.0865 -180 0 0 7.09 267.8 L84.9 267.8 A7.0865 7.0865 0 0 1 91.98 274.89 A7.0865 7.0865
+							 0 0 1 99.07 267.8 L177.17 267.8 A7.0865 7.0865 -180 0 0 184.25 260.72" class="st22"/>
+			</g>
+			<g id="shape37-124" v:mID="37" v:groupContext="shape" transform="translate(109.843,-134.646)">
+				<title>二维文字提示框.37</title>
+				<desc>kswapd wakeup</desc>
+				<v:userDefs>
+					<v:ud v:nameU="Scale" v:val="VT0(1):26"/>
+					<v:ud v:nameU="AntiScale" v:val="VT0(1):26"/>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="38.9764" cy="257.173" width="77.96" height="21.2598"/>
+				<g id="shadow37-125" v:groupContext="shadow" v:shadowOffsetX="0.345598" v:shadowOffsetY="-1.97279" v:shadowType="1"
+						transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+					<path d="M0 254.52 L0 247.25 a0.708661 0.708661 0 0 1 0.708661 -0.708661 L29.23 246.54 L38.98 246.54 L48.72 246.54
+								 L77.24 246.54 a0.708661 0.708661 0 0 1 0.708661 0.708661 L77.95 253.46 a0.708661 0.708661 -180 0
+								 0 0.974162 0.657047 L93.24 248.34 a0.708661 0.708661 0 0 1 0.648542 1.25327 L78.28 259.62 a0.708661
+								 0.708661 -180 0 0 -0.32562 0.596222 L77.95 267.09 a0.708661 0.708661 0 0 1 -0.708661 0.708661 L48.72
+								 267.8 L38.98 267.8 L29.23 267.8 L0.71 267.8 a0.708661 0.708661 0 0 1 -0.708661 -0.708661 L0 259.83
+								 L0 257.17 L0 254.52 Z" class="st15"/>
+				</g>
+				<path d="M0 254.52 L0 247.25 a0.708661 0.708661 0 0 1 0.708661 -0.708661 L29.23 246.54 L38.98 246.54 L48.72 246.54
+							 L77.24 246.54 a0.708661 0.708661 0 0 1 0.708661 0.708661 L77.95 253.46 a0.708661 0.708661 -180 0 0 0.974162
+							 0.657047 L93.24 248.34 a0.708661 0.708661 0 0 1 0.648542 1.25327 L78.28 259.62 a0.708661 0.708661 -180
+							 0 0 -0.32562 0.596222 L77.95 267.09 a0.708661 0.708661 0 0 1 -0.708661 0.708661 L48.72 267.8 L38.98
+							 267.8 L29.23 267.8 L0.71 267.8 a0.708661 0.708661 0 0 1 -0.708661 -0.708661 L0 259.83 L0 257.17 L0 254.52
+							 Z" class="st16"/>
+				<text x="6.9" y="260.17" class="st4" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>kswapd wakeup</text>			</g>
+			<g id="shape39-130" v:mID="39" v:groupContext="shape" transform="translate(49.4571,-32.5984)">
+				<title>二维文字提示框.39</title>
+				<desc>针对特殊的分配请求比如GFP_ATOMIC、ALLOC_OOM、PF_MEMALLOC</desc>
+				<v:userDefs>
+					<v:ud v:nameU="Scale" v:val="VT0(1):26"/>
+					<v:ud v:nameU="AntiScale" v:val="VT0(1):26"/>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="79.4447" cy="243.177" width="158.89" height="49.252"/>
+				<g id="shadow39-131" v:groupContext="shadow" v:shadowOffsetX="0.345598" v:shadowOffsetY="-1.97279" v:shadowType="1"
+						transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+					<path d="M0 237.02 L0 219.26 a0.708661 0.708661 0 0 1 0.708661 -0.708661 L62.44 218.55 L79.44 218.55 L96.45 218.55
+								 L158.18 218.55 a0.708661 0.708661 0 0 1 0.708661 0.708661 L158.89 235.63 a0.708661 0.708661 -180
+								 0 0 1.12528 0.573266 L188.68 215.37 a0.708661 0.708661 0 0 1 0.934596 1.05689 L159.08 249.13 a0.708661
+								 0.708661 -180 0 0 -0.19068 0.483628 L158.89 267.09 a0.708661 0.708661 0 0 1 -0.708661 0.708661 L96.45
+								 267.8 L79.44 267.8 L62.44 267.8 L0.71 267.8 a0.708661 0.708661 0 0 1 -0.708661 -0.708661 L0 249.33
+								 L0 243.18 L0 237.02 Z" class="st15"/>
+				</g>
+				<path d="M0 237.02 L0 219.26 a0.708661 0.708661 0 0 1 0.708661 -0.708661 L62.44 218.55 L79.44 218.55 L96.45 218.55
+							 L158.18 218.55 a0.708661 0.708661 0 0 1 0.708661 0.708661 L158.89 235.63 a0.708661 0.708661 -180 0 0
+							 1.12528 0.573266 L188.68 215.37 a0.708661 0.708661 0 0 1 0.934596 1.05689 L159.08 249.13 a0.708661 0.708661
+							 -180 0 0 -0.19068 0.483628 L158.89 267.09 a0.708661 0.708661 0 0 1 -0.708661 0.708661 L96.45 267.8 L79.44
+							 267.8 L62.44 267.8 L0.71 267.8 a0.708661 0.708661 0 0 1 -0.708661 -0.708661 L0 249.33 L0 243.18 L0 237.02
+							 Z" class="st16"/>
+				<text x="0.4em 1.681em 2.962em 4.242em 5.523em 6.804em 8.085em 9.366em 10.646em" y="233.6" class="st17"
+						v:langID="2052"><v:paragraph v:horizAlign="3"/><v:tabList/>针对特殊的分配请求<tspan x="11.927em" dy="0em"
+							class="st5">，</tspan><tspan x="13.208em 14.489em" dy="0em" class="st5">比如</tspan><tspan x="0.4em 1.122em
+								 1.678em" dy="1.287em" class="st18" v:langID="1033">GFP</tspan><tspan x="2.234em" dy="0em"
+							class="st18" v:langID="1033">_</tspan><tspan x="2.734em 3.457em 4.067em 4.79em 5.679em 6.012em"
+							dy="0em" class="st18" v:langID="1033">ATOMIC</tspan><tspan x="6.737em" dy="0em" class="st5">、</tspan><tspan
+							x="7.796em 8.577em 9.246em 9.915em 10.696em" dy="0em" class="st18">ALLOC</tspan><tspan x="11.421em"
+							dy="0em" class="st18">_</tspan><tspan x="11.98em 12.761em 13.541em" dy="0em" class="st18">OOM</tspan><tspan
+							x="14.489em" dy="0em" class="st5">、</tspan><tspan x="0.4em 0.956em" dy="1.229em" class="st18">PF</tspan><tspan
+							x="1.512em" dy="0em" class="st18">_</tspan><tspan x="2.012em 2.901em 3.512em 4.401em 5.124em 5.734em
+								 6.345em 7.067em" dy="0em" class="st18">MEMALLOC</tspan></text>			</g>
+			<g id="shape48-149" v:mID="48" v:groupContext="shape" transform="translate(184.252,-198.425)">
+				<title>矩形.48</title>
+				<v:userDefs>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<g id="shadow48-150" v:groupContext="shadow" v:shadowOffsetX="0.345598" v:shadowOffsetY="-1.97279" v:shadowType="1"
+						transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+					<rect x="0" y="225.283" width="127.559" height="42.5197" rx="1.41732" ry="1.41732" class="st23"/>
+				</g>
+				<rect x="0" y="225.283" width="127.559" height="42.5197" rx="1.41732" ry="1.41732" class="st24"/>
+			</g>
+			<g id="shape6-154" v:mID="6" v:groupContext="shape" transform="translate(170.079,-198.425)">
+				<title>工作表.6</title>
+				<path d="M0 267.8 L155.91 267.8" class="st9"/>
+			</g>
+		</g>
+	</g>
+</svg>

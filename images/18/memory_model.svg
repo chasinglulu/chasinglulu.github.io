@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- 由 Microsoft Visio, SVG Export 生成 memory_model.svg 页-1 -->
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:ev="http://www.w3.org/2001/xml-events"
+		width="7.0504in" height="4.09901in" viewBox="0 0 507.629 295.128" xml:space="preserve" color-interpolation-filters="sRGB"
+		class="st11">
+	<style type="text/css">
+	<![CDATA[
+		.st1 {fill:none;stroke:none;stroke-width:0.25}
+		.st2 {fill:#000000;font-family:Times New Roman;font-size:0.916672em}
+		.st3 {stroke:#a5a5a5;stroke-dasharray:1.75,1.25;stroke-linecap:round;stroke-linejoin:round;stroke-width:0.25}
+		.st4 {font-size:1em}
+		.st5 {visibility:visible}
+		.st6 {fill:none;filter:url(#filter_2);stroke:#5b9bd5;stroke-opacity:0.22}
+		.st7 {fill:none;stroke:#48d9fd;stroke-width:0.25}
+		.st8 {fill:#5b9bd5;fill-opacity:0.22;filter:url(#filter_2);stroke:#5b9bd5;stroke-opacity:0.22}
+		.st9 {fill:#f2f2f2;stroke:#48d9fd;stroke-width:0.25}
+		.st10 {fill:#a5a5a5;stroke:#48d9fd;stroke-width:0.25}
+		.st11 {fill:none;fill-rule:evenodd;font-size:12px;overflow:visible;stroke-linecap:square;stroke-miterlimit:3}
+	]]>
+	</style>
+
+	<defs id="Filters">
+		<filter id="filter_2">
+			<feGaussianBlur stdDeviation="2"/>
+		</filter>
+	</defs>
+	<g>
+		<title>页-1</title>
+		<g id="group46-1" transform="translate(0.25,-3.57917)">
+			<title>工作表.46</title>
+			<g id="group42-2" transform="translate(311.811,5.68434E-014)">
+				<title>工作表.42</title>
+				<g id="shape31-3" transform="translate(0,-41.8504)">
+					<title>工作表.31</title>
+					<desc>section #0</desc>
+					<rect x="0" y="279.498" width="61.4538" height="15.6299" class="st1"/>
+					<text x="8.27" y="290.61" class="st2">section #0</text>				</g>
+				<g id="shape32-6" transform="translate(0,-64.5276)">
+					<title>工作表.32</title>
+					<desc>section #1</desc>
+					<rect x="0" y="279.498" width="61.4538" height="15.6299" class="st1"/>
+					<text x="8.27" y="290.61" class="st2">section #1</text>				</g>
+				<g id="shape33-9" transform="translate(0,-245.945)">
+					<title>工作表.33</title>
+					<desc>section #n</desc>
+					<rect x="0" y="279.498" width="61.4538" height="15.6299" class="st1"/>
+					<text x="8.27" y="290.61" class="st2">section #n</text>				</g>
+				<g id="shape22-12" transform="translate(25.1703,-84.3701)">
+					<title>工作表.22</title>
+					<path d="M0 295.13 L166.68 295.13" class="st3"/>
+				</g>
+				<g id="shape30-15" transform="translate(24.3859,-265.787) rotate(-0.0422224)">
+					<title>工作表.30</title>
+					<path d="M0 295.13 L167.24 295.13" class="st3"/>
+				</g>
+				<g id="shape23-18" transform="translate(24.6492,-107.196) rotate(0.00888892)">
+					<title>工作表.23</title>
+					<path d="M0 295.13 L167.24 295.13" class="st3"/>
+				</g>
+				<g id="shape27-21" transform="translate(24.6034,-197.756)">
+					<title>工作表.27</title>
+					<path d="M0 295.13 L167.24 295.13" class="st3"/>
+				</g>
+				<g id="shape25-24" transform="translate(24.6034,-152.402)">
+					<title>工作表.25</title>
+					<path d="M0 295.13 L167.24 295.13" class="st3"/>
+				</g>
+				<g id="shape24-27" transform="translate(24.3859,-129.601) rotate(-0.0422224)">
+					<title>工作表.24</title>
+					<path d="M0 295.13 L167.24 295.13" class="st3"/>
+				</g>
+				<g id="shape26-30" transform="translate(24.6034,-175.079)">
+					<title>工作表.26</title>
+					<path d="M0 295.13 L167.24 295.13" class="st3"/>
+				</g>
+				<g id="shape28-33" transform="translate(24.6034,-220.433)">
+					<title>工作表.28</title>
+					<path d="M0 295.13 L167.24 295.13" class="st3"/>
+				</g>
+				<g id="shape29-36" transform="translate(24.6034,-243.11)">
+					<title>工作表.29</title>
+					<path d="M0 295.13 L167.24 295.13" class="st3"/>
+				</g>
+				<g id="shape20-39" transform="translate(36.1343,0)">
+					<title>工作表.20</title>
+					<desc>SPARSEMEM (management by section)</desc>
+					<rect x="0" y="256.782" width="150.679" height="38.3465" class="st1"/>
+					<text x="42.02" y="272.66" class="st2">SPARSEMEM <tspan x="19.75" dy="1.2em" class="st4">(</tspan>management by section)</text>				</g>
+				<g id="shape21-43" transform="translate(65.4107,-267.126)">
+					<title>工作表.21</title>
+					<desc>physical memory</desc>
+					<rect x="0" y="270.955" width="92.126" height="24.1732" class="st1"/>
+					<text x="8.03" y="286.34" class="st2">physical memory</text>				</g>
+				<g id="shape37-46" transform="translate(24.6034,-61.6929)">
+					<title>工作表.37</title>
+					<path d="M0 295.13 L167.24 295.13" class="st3"/>
+				</g>
+				<g id="shape38-49" transform="translate(24.3859,-38.8924) rotate(-0.0422224)">
+					<title>工作表.38</title>
+					<path d="M0 295.13 L167.24 295.13" class="st3"/>
+				</g>
+				<g id="group40-52" transform="translate(65.4107,-39.0157)">
+					<title>工作表.40</title>
+					<g id="shape16-53">
+						<title>流程.16</title>
+						<g id="shadow16-54" transform="matrix(1,0,0,1,0.345598,1.97279)" class="st5">
+							<rect x="0" y="68.3567" width="92.126" height="226.772" class="st6"/>
+						</g>
+						<rect x="0" y="68.3567" width="92.126" height="226.772" class="st7"/>
+					</g>
+					<g id="shape17-58" transform="translate(-3.19744E-014,-22.6772)">
+						<title>流程.17</title>
+						<desc>memory.region[0]</desc>
+						<g id="shadow17-59" transform="matrix(1,0,0,1,0.345598,1.97279)" class="st5">
+							<rect x="0" y="227.097" width="92.126" height="68.0315" class="st8"/>
+						</g>
+						<rect x="0" y="227.097" width="92.126" height="68.0315" class="st9"/>
+						<text x="5.89" y="264.41" class="st2">memory.region[0]</text>					</g>
+					<g id="shape18-64" transform="translate(-3.19744E-014,-136.063)">
+						<title>流程.18</title>
+						<desc>memory.region[1] Hot-plug</desc>
+						<g id="shadow18-65" transform="matrix(1,0,0,1,0.345598,1.97279)" class="st5">
+							<rect x="0" y="227.097" width="92.126" height="68.0315" class="st8"/>
+						</g>
+						<rect x="0" y="227.097" width="92.126" height="68.0315" class="st9"/>
+						<text x="5.89" y="257.81" class="st2">memory.region[1] <tspan x="26.2" dy="1.2em" class="st4">Hot</tspan>-plug</text>					</g>
+					<g id="shape19-71" transform="translate(-3.19744E-014,-90.7087)">
+						<title>流程.19</title>
+						<desc>Possible hole</desc>
+						<g id="shadow19-72" transform="matrix(1,0,0,1,0.345598,1.97279)" class="st5">
+							<rect x="0" y="249.774" width="92.126" height="45.3543" class="st8"/>
+						</g>
+						<rect x="0" y="249.774" width="92.126" height="45.3543" class="st10"/>
+						<text x="16.88" y="275.75" class="st2">Possible hole</text>					</g>
+				</g>
+			</g>
+			<g id="group43-77" transform="translate(155.906,5.68434E-014)">
+				<title>工作表.43</title>
+				<g id="shape14-78">
+					<title>工作表.14</title>
+					<desc>DISCONTIGMEM (management by node)</desc>
+					<rect x="0" y="256.782" width="134.646" height="38.3465" class="st1"/>
+					<text x="24.54" y="272.66" class="st2">DISCONTIGMEM <tspan x="16.62" dy="1.2em" class="st4">(</tspan>management by node)</text>				</g>
+				<g id="shape15-82" transform="translate(21.2598,-267.126)">
+					<title>工作表.15</title>
+					<desc>physical memory</desc>
+					<rect x="0" y="270.955" width="92.126" height="24.1732" class="st1"/>
+					<text x="8.03" y="286.34" class="st2">physical memory</text>				</g>
+				<g id="group39-85" transform="translate(21.2598,-39.0157)">
+					<title>工作表.39</title>
+					<g id="shape6-86">
+						<title>流程.6</title>
+						<g id="shadow6-87" transform="matrix(1,0,0,1,0.345598,1.97279)" class="st5">
+							<rect x="0" y="68.3567" width="92.126" height="226.772" class="st6"/>
+						</g>
+						<rect x="0" y="68.3567" width="92.126" height="226.772" class="st7"/>
+					</g>
+					<g id="shape7-91" transform="translate(-3.19744E-014,-31.1811)">
+						<title>流程.7</title>
+						<desc>memory.region[0] Node #0</desc>
+						<g id="shadow7-92" transform="matrix(1,0,0,1,0.345598,1.97279)" class="st5">
+							<rect x="0" y="232.766" width="92.126" height="62.3622" class="st8"/>
+						</g>
+						<rect x="0" y="232.766" width="92.126" height="62.3622" class="st9"/>
+						<text x="5.89" y="260.65" class="st2">memory.region[0] <tspan x="27.27" dy="1.2em" class="st4">Node </tspan>#0</text>					</g>
+					<g id="shape9-98" transform="translate(-3.19744E-014,-140.315)">
+						<title>流程.9</title>
+						<desc>memory.region[1] Node #1</desc>
+						<g id="shadow9-99" transform="matrix(1,0,0,1,0.345598,1.97279)" class="st5">
+							<rect x="0" y="246.939" width="92.126" height="48.189" class="st8"/>
+						</g>
+						<rect x="0" y="246.939" width="92.126" height="48.189" class="st9"/>
+						<text x="5.89" y="267.73" class="st2">memory.region[1] <tspan x="27.27" dy="1.2em" class="st4">Node </tspan>#1</text>					</g>
+					<g id="shape12-105" transform="translate(-3.19744E-014,-90.7874)">
+						<title>流程.12</title>
+						<desc>Possible hole</desc>
+						<g id="shadow12-106" transform="matrix(1,0,0,1,0.345598,1.97279)" class="st5">
+							<rect x="0" y="245.601" width="92.126" height="49.5276" class="st8"/>
+						</g>
+						<rect x="0" y="245.601" width="92.126" height="49.5276" class="st10"/>
+						<text x="16.88" y="273.66" class="st2">Possible hole</text>					</g>
+				</g>
+			</g>
+			<g id="group44-111" transform="translate(-1.59872E-014,-0.669291)">
+				<title>工作表.44</title>
+				<g id="shape3-112">
+					<title>工作表.3</title>
+					<desc>FLATMEM (unified management)</desc>
+					<rect x="0" y="256.782" width="134.646" height="38.3465" class="st1"/>
+					<text x="40.43" y="272.66" class="st2">FLATMEM <tspan x="18.61" dy="1.2em" class="st4">(</tspan>unified management)</text>				</g>
+				<g id="shape5-116" transform="translate(21.2598,-266.457)">
+					<title>工作表.5</title>
+					<desc>physical memory</desc>
+					<rect x="0" y="270.955" width="92.126" height="24.1732" class="st1"/>
+					<text x="8.03" y="286.34" class="st2">physical memory</text>				</g>
+				<g id="group41-119" transform="translate(21.2598,-39.0157)">
+					<title>工作表.41</title>
+					<g id="shape1-120">
+						<title>流程</title>
+						<g id="shadow1-121" transform="matrix(1,0,0,1,0.345598,1.97279)" class="st5">
+							<rect x="0" y="68.3567" width="92.126" height="226.772" class="st6"/>
+						</g>
+						<rect x="0" y="68.3567" width="92.126" height="226.772" class="st7"/>
+					</g>
+					<g id="shape2-125" transform="translate(1.59872E-014,-31.1811)">
+						<title>流程.2</title>
+						<desc>memory.region[0] Node #0</desc>
+						<g id="shadow2-126" transform="matrix(1,0,0,1,0.345598,1.97279)" class="st5">
+							<rect x="0" y="142.058" width="92.126" height="153.071" class="st8"/>
+						</g>
+						<rect x="0" y="142.058" width="92.126" height="153.071" class="st9"/>
+						<text x="5.89" y="215.29" class="st2">memory.region[0] <tspan x="27.27" dy="1.2em" class="st4">Node </tspan>#0</text>					</g>
+				</g>
+			</g>
+		</g>
+	</g>
+</svg>

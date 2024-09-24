@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.0.0">
+<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+<link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/blog.svg">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/blog.svg">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="google-site-verification" content="vuSkRYPVceK1DXhqZWm7wVxYV4YmmnI1Dv_C1M8rJJM">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Georgia:300,300italic,400,400italic,700,700italic%7CCourier+New:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha256-CTSx/A06dm1B063156EVh15m6Y67pAjZZaQc89LLSrU=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"chasinglulu.github.io","root":"/","images":"/images","scheme":"Mist","darkmode":false,"version":"8.18.2","exturl":false,"sidebar":{"position":"right","display":"hide","padding":18,"offset":12},"copycode":{"enable":true,"style":"mac"},"fold":{"enable":true,"height":500},"bookmark":{"enable":true,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="为了更深入地剖析kernel，了解ARMv8体系架构是非常必要的。本文尽量全面地概述ARMv8体系架构涉及的基础知识。Linux内核的绝大部分代码是与体系架构无关的「independent」，但是还存在大量的代码「spinlock、cache管理」都是与体系架构相关的「dependent」，这些代码不仅会在启动时被运行而且在系统正常运行期间也会被经常调用执行。不仅仅Linux内核牵涉了很多的体系架">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ARMv8体系架构概述">
+<meta property="og:url" content="https://chasinglulu.github.io/posts/9e834789/index.html">
+<meta property="og:site_name" content="点滴汇聚">
+<meta property="og:description" content="为了更深入地剖析kernel，了解ARMv8体系架构是非常必要的。本文尽量全面地概述ARMv8体系架构涉及的基础知识。Linux内核的绝大部分代码是与体系架构无关的「independent」，但是还存在大量的代码「spinlock、cache管理」都是与体系架构相关的「dependent」，这些代码不仅会在启动时被运行而且在系统正常运行期间也会被经常调用执行。不仅仅Linux内核牵涉了很多的体系架">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://chasinglulu.github.io/images/04/arm_evolution.svg">
+<meta property="og:image" content="https://chasinglulu.github.io/images/04/armv8_exception_model.svg">
+<meta property="og:image" content="https://chasinglulu.github.io/images/04/execution_state_change.svg">
+<meta property="og:image" content="https://chasinglulu.github.io/images/04/aarch64_register_64bit_and_32bit.svg">
+<meta property="og:image" content="https://chasinglulu.github.io/images/04/aarch64_spsr_register.svg">
+<meta property="og:image" content="https://chasinglulu.github.io/images/04/MMU_example.svg">
+<meta property="og:image" content="https://chasinglulu.github.io/images/04/MMU_translation.svg">
+<meta property="og:image" content="https://chasinglulu.github.io/images/04/VA_to_PA.svg">
+<meta property="article:published_time" content="2019-11-13T13:48:30.000Z">
+<meta property="article:modified_time" content="2024-09-24T07:39:19.294Z">
+<meta property="article:author" content="Xinlu Wang">
+<meta property="article:tag" content="armv8">
+<meta property="article:tag" content="aarch64">
+<meta property="article:tag" content="cache">
+<meta property="article:tag" content="MMU">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://chasinglulu.github.io/images/04/arm_evolution.svg">
+
+
+<link rel="canonical" href="https://chasinglulu.github.io/posts/9e834789/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://chasinglulu.github.io/posts/9e834789/","path":"posts/9e834789/","title":"ARMv8体系架构概述"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>ARMv8体系架构概述 | 点滴汇聚</title>
+  
+
+
+
+
+
+
+
+<link rel="dns-prefetch" href="www.chasinglulu.cn"><link rel="stylesheet" href="//cdn.jsdelivr.net/gh/theme-next/theme-next-needmoreshare2@1/needsharebutton.min.css"><style>
+#needsharebutton-postbottom {
+  cursor: pointer;
+  height: 26px;
+  margin-top: 10px;
+  position: relative;
+}
+#needsharebutton-postbottom .btn {
+  border: 1px solid $btn-default-border-color;
+  border-radius: 3px;
+  display: initial;
+  padding: 1px 4px;
+}
+</style><style>
+#needsharebutton-float {
+  bottom: 88px;
+  cursor: pointer;
+  left: -8px;
+  position: fixed;
+  z-index: 9999;
+}
+#needsharebutton-float .btn {
+  border: 1px solid $btn-default-border-color;
+  border-radius: 4px;
+  padding: 0 10px 0 14px;
+}
+</style>
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">点滴汇聚</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">不积跬步无以至千里，不积小流无以成江海</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-address-card fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">70</span></a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">9</span></a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">43</span></a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#ARMv8%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">ARMv8简介</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#ARMv8%E5%AF%84%E5%AD%98%E5%99%A8"><span class="nav-number">2.</span> <span class="nav-text">ARMv8寄存器</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#exception-handling%E3%80%8C%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86%E6%9C%BA%E5%88%B6%E3%80%8D"><span class="nav-number">3.</span> <span class="nav-text">exception handling「异常处理机制」</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#cache%E3%80%8C%E7%BC%93%E5%AD%98%E5%99%A8%E3%80%8D"><span class="nav-number">4.</span> <span class="nav-text">cache「缓存器」</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#memory-order%E3%80%8C%E5%86%85%E5%AD%98%E8%AE%BF%E9%97%AE%E7%A7%A9%E5%BA%8F%E3%80%8D"><span class="nav-number">5.</span> <span class="nav-text">memory order「内存访问秩序」</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#MMU%E3%80%8C%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E5%8D%95%E5%85%83%E3%80%8D"><span class="nav-number">6.</span> <span class="nav-text">MMU「内存管理单元」</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E8%BD%AC%E6%8D%A2%E8%99%9A%E6%8B%9F%E5%9C%B0%E5%9D%80%E6%88%90%E7%89%A9%E7%90%86%E5%9C%B0%E5%9D%80%E7%9A%84%E5%8E%9F%E7%90%86"><span class="nav-number">6.1.</span> <span class="nav-text">转换虚拟地址成物理地址的原理</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#multi-core-processor%E3%80%8C%E5%A4%9A%E6%A0%B8%E5%A4%84%E7%90%86%E5%99%A8%E3%80%8D"><span class="nav-number">7.</span> <span class="nav-text">multi-core processor「多核处理器」</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#power-management%E3%80%8C%E7%94%B5%E6%BA%90%E7%AE%A1%E7%90%86%E3%80%8D"><span class="nav-number">8.</span> <span class="nav-text">power management「电源管理」</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Xinlu Wang"
+      src="/images/avatar.jpeg">
+  <p class="site-author-name" itemprop="name">Xinlu Wang</p>
+  <div class="site-description" itemprop="description">不积跬步无以至千里 不积小流无以成江海</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">43</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">70</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/chasinglulu" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;chasinglulu" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:wangkart@aliyun.com" title="E-Mail → mailto:wangkart@aliyun.com" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://weibo.com/5052275150" title="Weibo → https:&#x2F;&#x2F;weibo.com&#x2F;5052275150" rel="noopener me" target="_blank"><i class="fab fa-weibo fa-fw"></i>Weibo</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+    <div class="sidebar-inner sidebar-blogroll">
+      <div class="links-of-blogroll animated">
+        <div class="links-of-blogroll-title"><i class="fa fa-globe fa-fw"></i>
+          链接
+        </div>
+        <ul class="links-of-blogroll-list">
+            <li class="links-of-blogroll-item">
+              <a href="https://lore.kernel.org/qemu-devel/" title="https:&#x2F;&#x2F;lore.kernel.org&#x2F;qemu-devel&#x2F;" rel="noopener" target="_blank">Qemu</a>
+            </li>
+            <li class="links-of-blogroll-item">
+              <a href="https://wiki.linuxfoundation.org/realtime/documentation/start" title="https:&#x2F;&#x2F;wiki.linuxfoundation.org&#x2F;realtime&#x2F;documentation&#x2F;start" rel="noopener" target="_blank">RT_Linux</a>
+            </li>
+        </ul>
+      </div>
+    </div>
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://chasinglulu.github.io/posts/9e834789/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpeg">
+      <meta itemprop="name" content="Xinlu Wang">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="点滴汇聚">
+      <meta itemprop="description" content="不积跬步无以至千里 不积小流无以成江海">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="ARMv8体系架构概述 | 点滴汇聚">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          ARMv8体系架构概述
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2019-11-13 21:48:30" itemprop="dateCreated datePublished" datetime="2019-11-13T21:48:30+08:00">2019-11-13</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-09-24 15:39:19" itemprop="dateModified" datetime="2024-09-24T15:39:19+08:00">2024-09-24</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/armv8-arch/" itemprop="url" rel="index"><span itemprop="name">armv8 arch</span></a>
+        </span>
+    </span>
+
+  
+  
+  <span class="post-meta-item">
+    
+    <span class="post-meta-item-icon">
+      <i class="far fa-comment"></i>
+    </span>
+    <span class="post-meta-item-text">Waline：</span>
+  
+    <a title="waline" href="/posts/9e834789/#waline" itemprop="discussionUrl">
+      <span class="post-comments-count waline-comment-count" data-path="/posts/9e834789/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+    <span class="post-meta-item" title="阅读次数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span class="waline-pageview-count" data-path="/posts/9e834789/"></span>
+    </span>
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>760</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>3 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>为了更深入地剖析kernel，了解ARMv8体系架构是非常必要的。本文尽量全面地概述ARMv8体系架构涉及的基础知识。Linux内核的绝大部分代码是与体系架构无关的「independent」，但是还存在大量的代码「spinlock、cache管理」都是与体系架构相关的「dependent」，这些代码不仅会在启动时被运行而且在系统正常运行期间也会被经常调用执行。不仅仅Linux内核牵涉了很多的体系架构知识，而且编译器（比如LLVM「Low Level Virtual Machine」）以及与内核紧密相关的领域（比如虚拟机）也都涉及了大量体系架构方面的知识，为了使系统或软件最大地利用硬件的特点和性能，学习了解体系架构的知识就显得格外重要。尽管ARMv8设备已被广泛地应用到各个领域，但是关于ARMv8体系架构的书籍不是太多，还比较零散，因此我希望本文能够尽量全面的介绍ARMv8体系架构方面的知识点，使我们在研究Linux内核代码不会因为体系架构知识短缺而困惑。</p>
+<span id="more"></span>
+
+<hr>
+<ul>
+<li><strong>Target Platform:</strong> <a target="_blank" rel="noopener" href="https://www.96boards.org/product/rock960c/">Rock960c</a></li>
+<li><strong>ARCH:</strong> arm64</li>
+<li><strong>Linux Kernel:</strong> linux-4.19.27</li>
+</ul>
+<hr>
+<h4 id="ARMv8简介"><a href="#ARMv8简介" class="headerlink" title="ARMv8简介"></a>ARMv8简介</h4><p><img data-src="/images/04/arm_evolution.svg" alt="arm_evolution"></p>
+<center>图1 ARM体系架构的演进</center>
+
+<p><img data-src="/images/04/armv8_exception_model.svg" alt="armv8_exception_model"></p>
+<center>图2 ARMv8异常模型「exception model」</center>
+
+<p><img data-src="/images/04/execution_state_change.svg" alt="execution_state_change"></p>
+<center>图3 执行环境的对比</center>
+
+<p><img data-src="/images/04/aarch64_register_64bit_and_32bit.svg" alt="aarch64_register_64bit_and_32bit"></p>
+<center>图4 AArch64寄存器的32bit和64bit用法</center>
+
+<h4 id="ARMv8寄存器"><a href="#ARMv8寄存器" class="headerlink" title="ARMv8寄存器"></a>ARMv8寄存器</h4><p><img data-src="/images/04/aarch64_spsr_register.svg" alt="aarch64_spsr_register"></p>
+<center>图5 AArch64 SPSR寄存器</center>
+
+<h4 id="exception-handling「异常处理机制」"><a href="#exception-handling「异常处理机制」" class="headerlink" title="exception handling「异常处理机制」"></a>exception handling「异常处理机制」</h4><h4 id="cache「缓存器」"><a href="#cache「缓存器」" class="headerlink" title="cache「缓存器」"></a>cache「缓存器」</h4><h4 id="memory-order「内存访问秩序」"><a href="#memory-order「内存访问秩序」" class="headerlink" title="memory order「内存访问秩序」"></a>memory order「内存访问秩序」</h4><h4 id="MMU「内存管理单元」"><a href="#MMU「内存管理单元」" class="headerlink" title="MMU「内存管理单元」"></a>MMU「内存管理单元」</h4><p>MMU「Memory Management Unit，内存管理单元」的主要功能就是将CPU核心给出的虚拟地址「virtual address」转换成物理地址「physical address」。除此之外，它还具备其他功能，比如访问权限和TLB「Translation Lookaside Buffer，地址转译后援缓冲器」的设置。正是MMU的这些功能才确保各个进程能够在自己独有的虚拟地址空间中运行。如图17所示，给出一个PIPT 「physical indexes physical tags」cache的例子，MMU输出的物理地址被用作检索cacheline的index和tag。</p>
+<p><img data-src="/images/04/MMU_example.svg" alt="MMU_example"></p>
+<center>图17 MMU的一种使用场景</center>
+
+<p>MMU的存在使应用程序能够在不顾虑其他应用程序的情况下灵活使用虚拟地址访问代码数据，即使物理内存比较零散，它也能通过映射「mapping」呈现一个连续的虚拟内存，并且虚拟地址空间与物理地址空间是完全分开的。<center>图18给出了虚拟地址空间与物理地址空间之间的纽带——转换表「translation table」。</p>
+<p><img data-src="/images/04/MMU_translation.svg" alt="MMU_translation"></p>
+<center>图18 通过转换表「translation table」完成地址的转换</center>
+
+<h5 id="转换虚拟地址成物理地址的原理"><a href="#转换虚拟地址成物理地址的原理" class="headerlink" title="转换虚拟地址成物理地址的原理"></a>转换虚拟地址成物理地址的原理</h5><p><img data-src="/images/04/VA_to_PA.svg" alt="VA_to_PA"></p>
+<center>图19 虚拟地址转换成物理地址的过程</center>
+
+
+<h4 id="multi-core-processor「多核处理器」"><a href="#multi-core-processor「多核处理器」" class="headerlink" title="multi-core processor「多核处理器」"></a>multi-core processor「多核处理器」</h4><h4 id="power-management「电源管理」"><a href="#power-management「电源管理」" class="headerlink" title="power management「电源管理」"></a>power management「电源管理」</h4>
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer"><div class="post-widgets">
+      <div id="needsharebutton-postbottom">
+        <span class="btn">
+          <i class="fa fa-share-alt" aria-hidden="true"></i>
+        </span>
+      </div>
+    </div>
+          <div class="reward-container">
+  <div>请我一杯咖啡吧！</div>
+  <button>
+    赞赏
+  </button>
+  <div class="post-reward">
+      <div>
+        <img src="/images/wechatpay.png" alt="Xinlu Wang 微信">
+        <span>微信</span>
+      </div>
+      <div>
+        <img src="/images/alipay.jpg" alt="Xinlu Wang 支付宝">
+        <span>支付宝</span>
+      </div>
+
+  </div>
+</div>
+
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>本文作者： </strong>Xinlu Wang
+  </li>
+  <li class="post-copyright-link">
+      <strong>本文链接：</strong>
+      <a href="https://chasinglulu.github.io/posts/9e834789/" title="ARMv8体系架构概述">https://chasinglulu.github.io/posts/9e834789/</a>
+  </li>
+  <li class="post-copyright-license">
+      <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/armv8/" rel="tag"><i class="fa fa-tag"></i> armv8</a>
+              <a href="/tags/aarch64/" rel="tag"><i class="fa fa-tag"></i> aarch64</a>
+              <a href="/tags/cache/" rel="tag"><i class="fa fa-tag"></i> cache</a>
+              <a href="/tags/MMU/" rel="tag"><i class="fa fa-tag"></i> MMU</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/e5eb1c9f/" rel="prev" title="算法练习-01">
+                  <i class="fa fa-angle-left"></i> 算法练习-01
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/posts/48f0eed/" rel="next" title="内核启动分析3「device tree」">
+                  内核启动分析3「device tree」 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments" id="waline"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2018 – 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-anchor"></i>
+    </span><a href="http://abitacc.com/about" rel="noopener" target="_blank">Xinlu Wang</a>
+    <!-- annotation
+    <span class="author" itemprop="copyrightHolder">Xinlu Wang</span>
+    -->
+  </div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+      <span>站点总字数：</span>
+    <span title="站点总字数">82k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span>站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">4:57</span>
+  </span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+  <a href="https://github.com/chasinglulu" class="github-corner" title="在 GitHub 上关注我" aria-label="在 GitHub 上关注我" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script size="300" alpha="0.6" zIndex="-1" src="https://cdnjs.cloudflare.com/ajax/libs/ribbon.js/1.0.2/ribbon.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lozad.js/1.16.0/lozad.min.js" integrity="sha256-mOFREFhqmHeQbXpK2lp4nA3qooVgACfh88fpJftLBbc=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script><script src="/js/bookmark.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/quicklink/2.3.0/quicklink.umd.js" integrity="sha256-yvJQOINiH9fWemHn0vCA5lsHWJaHs6/ZmO+1Ft04SvM=" crossorigin="anonymous"></script>
+  <script class="next-config" data-name="quicklink" type="application/json">{"enable":true,"home":false,"archive":false,"delay":true,"timeout":3000,"priority":true,"url":"https://chasinglulu.github.io/posts/9e834789/"}</script>
+  <script src="/js/third-party/quicklink.js"></script>
+<script class="next-config" data-name="waline" type="application/json">{"lang":"zh-CN","enable":true,"serverURL":"www.chasinglulu.cn","cssUrl":"https://unpkg.com/@waline/client@v2/dist/waline.css","commentCount":true,"pageview":true,"placeholder":"请文明评论呀","avatar":"mm","meta":["nick","mail"],"pageSize":10,"comment_count":true,"requiredFields":["mail"],"libUrl":"https://cdn.jsdelivr.net/npm/@waline/client@2.15.8/dist/waline.js","emoji":["https://cdn.jsdelivr.net/gh/walinejs/emojis@1.1.0/tw-emoji/"],"el":"#waline","comment":true,"path":"/posts/9e834789/"}</script>
+<link rel="stylesheet" href="https://unpkg.com/@waline/client@v2/dist/waline.css">
+<script>
+document.addEventListener('page:loaded', () => {
+  NexT.utils.loadComments(CONFIG.waline.el).then(() =>
+    NexT.utils.getScript(CONFIG.waline.libUrl, { condition: window.Waline })
+  ).then(() => 
+    Waline.init(Object.assign({}, CONFIG.waline,{ el: document.querySelector(CONFIG.waline.el) }))
+  );
+});
+</script>
+<div id="needsharebutton-float">
+      <span class="btn">
+        <i class="fa fa-share-alt" aria-hidden="true"></i>
+      </span>
+    </div>
+  <script src="//cdn.jsdelivr.net/gh/theme-next/theme-next-needmoreshare2@1/needsharebutton.min.js"></script>
+  <script>
+      pbOptions = {};
+        pbOptions.iconStyle = "default";
+        pbOptions.boxForm = "horizontal";
+        pbOptions.position = "bottomCenter";
+        pbOptions.networks = "Weibo,Wechat,Douban,QQZone,Mailto";
+      new needShareButton('#needsharebutton-postbottom', pbOptions);
+      flOptions = {};
+        flOptions.iconStyle = "box";
+        flOptions.boxForm = "vertical";
+        flOptions.position = "topRight";
+        flOptions.networks = "Weibo,Wechat,Douban,QQZone,Mailto";
+      new needShareButton('#needsharebutton-float', flOptions);
+  </script>
+</body>
+</html>

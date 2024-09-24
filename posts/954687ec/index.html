@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.0.0">
+<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+<link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/blog.svg">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/blog.svg">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="google-site-verification" content="vuSkRYPVceK1DXhqZWm7wVxYV4YmmnI1Dv_C1M8rJJM">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Georgia:300,300italic,400,400italic,700,700italic%7CCourier+New:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha256-CTSx/A06dm1B063156EVh15m6Y67pAjZZaQc89LLSrU=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"chasinglulu.github.io","root":"/","images":"/images","scheme":"Mist","darkmode":false,"version":"8.18.2","exturl":false,"sidebar":{"position":"right","display":"hide","padding":18,"offset":12},"copycode":{"enable":true,"style":"mac"},"fold":{"enable":true,"height":500},"bookmark":{"enable":true,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="CFS是内核使用的一种调度器或调度类，它主要负责处理三种调度策略：SCHED_NORMAL、SCHED_BATCH和SCHED_IDLE。从上一篇文章 可知，调度器的核心在挑选下一个运行的进程时有可能会遍历所有的调度类别。实际上系统大多数进程通常都是CFS调度类负责处理的，因此为了优化下一个进程的挑选调度器核心会先判断当前进程是否采用了CFS调度策略，若是，则直接调用CFS代码来挑选下一个进程，若">
+<meta property="og:type" content="article">
+<meta property="og:title" content="进程调度3「CFS-Completely Fair Scheduling」">
+<meta property="og:url" content="https://chasinglulu.github.io/posts/954687ec/index.html">
+<meta property="og:site_name" content="点滴汇聚">
+<meta property="og:description" content="CFS是内核使用的一种调度器或调度类，它主要负责处理三种调度策略：SCHED_NORMAL、SCHED_BATCH和SCHED_IDLE。从上一篇文章 可知，调度器的核心在挑选下一个运行的进程时有可能会遍历所有的调度类别。实际上系统大多数进程通常都是CFS调度类负责处理的，因此为了优化下一个进程的挑选调度器核心会先判断当前进程是否采用了CFS调度策略，若是，则直接调用CFS代码来挑选下一个进程，若">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://chasinglulu.github.io/images/15/enqueue_task_fair_codeflow.svg">
+<meta property="og:image" content="https://chasinglulu.github.io/images/15/pick_next_task_fair_codeflow.svg">
+<meta property="og:image" content="https://chasinglulu.github.io/images/15/dequeue_task_fair_codeflow.svg">
+<meta property="og:image" content="https://chasinglulu.github.io/images/15/update_curr_codeflow.svg">
+<meta property="og:image" content="https://chasinglulu.github.io/images/15/update_sysctl_codeflow.svg">
+<meta property="article:published_time" content="2019-11-22T14:56:42.000Z">
+<meta property="article:modified_time" content="2024-09-24T07:39:19.298Z">
+<meta property="article:author" content="Xinlu Wang">
+<meta property="article:tag" content="task">
+<meta property="article:tag" content="process">
+<meta property="article:tag" content="management">
+<meta property="article:tag" content="schedule">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://chasinglulu.github.io/images/15/enqueue_task_fair_codeflow.svg">
+
+
+<link rel="canonical" href="https://chasinglulu.github.io/posts/954687ec/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://chasinglulu.github.io/posts/954687ec/","path":"posts/954687ec/","title":"进程调度3「CFS-Completely Fair Scheduling」"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>进程调度3「CFS-Completely Fair Scheduling」 | 点滴汇聚</title>
+  
+
+
+
+
+
+
+
+<link rel="dns-prefetch" href="www.chasinglulu.cn"><link rel="stylesheet" href="//cdn.jsdelivr.net/gh/theme-next/theme-next-needmoreshare2@1/needsharebutton.min.css"><style>
+#needsharebutton-postbottom {
+  cursor: pointer;
+  height: 26px;
+  margin-top: 10px;
+  position: relative;
+}
+#needsharebutton-postbottom .btn {
+  border: 1px solid $btn-default-border-color;
+  border-radius: 3px;
+  display: initial;
+  padding: 1px 4px;
+}
+</style><style>
+#needsharebutton-float {
+  bottom: 88px;
+  cursor: pointer;
+  left: -8px;
+  position: fixed;
+  z-index: 9999;
+}
+#needsharebutton-float .btn {
+  border: 1px solid $btn-default-border-color;
+  border-radius: 4px;
+  padding: 0 10px 0 14px;
+}
+</style>
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">点滴汇聚</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">不积跬步无以至千里，不积小流无以成江海</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-address-card fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">70</span></a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">9</span></a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">43</span></a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B0%86%E4%B8%80%E4%B8%AA%E4%BB%BB%E5%8A%A1%E6%8F%92%E5%85%A5%E8%BF%90%E8%A1%8C%E9%98%9F%E5%88%97"><span class="nav-number">1.</span> <span class="nav-text">将一个任务插入运行队列</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#enqueue-task-fair-%EF%BC%9A%E5%B0%86%E4%B8%80%E4%B8%AA%E4%BB%BB%E5%8A%A1%E6%8F%92%E5%85%A5CFS%E8%BF%90%E8%A1%8C%E9%98%9F%E5%88%97"><span class="nav-number">1.1.</span> <span class="nav-text">enqueue_task_fair()：将一个任务插入CFS运行队列</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#enqueue-entity-%EF%BC%9A%E6%9B%B4%E6%96%B0%E8%B0%83%E5%BA%A6%E5%AE%9E%E4%BD%93%E7%9A%84vruntime%E5%AD%97%E6%AE%B5%E5%B9%B6%E5%B0%86%E5%AE%83%E6%8F%92%E5%85%A5%E7%BA%A2%E9%BB%91%E6%A0%91"><span class="nav-number">1.1.1.</span> <span class="nav-text">enqueue_entity()：更新调度实体的vruntime字段并将它插入红黑树</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#place-entity-%EF%BC%9A%E8%AE%A1%E7%AE%97%E8%B0%83%E5%BA%A6%E5%AE%9E%E4%BD%93%E7%9A%84vruntime"><span class="nav-number">1.1.2.</span> <span class="nav-text">place_entity()：计算调度实体的vruntime</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#enqueue-entity-%EF%BC%9A%E5%B0%86%E8%B0%83%E5%BA%A6%E5%AE%9E%E4%BD%93%E6%8F%92%E5%85%A5%E7%BA%A2%E9%BB%91%E6%A0%91"><span class="nav-number">1.1.3.</span> <span class="nav-text">__enqueue_entity()：将调度实体插入红黑树</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%8E%E8%BF%90%E8%A1%8C%E9%98%9F%E5%88%97%E4%B8%AD%E6%8C%91%E9%80%89%E4%B8%80%E4%B8%AA%E4%BB%BB%E5%8A%A1"><span class="nav-number">2.</span> <span class="nav-text">从运行队列中挑选一个任务</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#pick-next-task-%EF%BC%9A%E5%AF%BB%E6%89%BE%E5%B0%86%E8%A6%81%E8%BF%90%E8%A1%8C%E7%9A%84%E4%B8%8B%E4%B8%80%E4%B8%AA%E4%BB%BB%E5%8A%A1"><span class="nav-number">2.1.</span> <span class="nav-text">pick_next_task()：寻找将要运行的下一个任务</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#pick-next-task-fair-%EF%BC%9A%E4%BB%8ECFS%E8%BF%90%E8%A1%8C%E9%98%9F%E5%88%97%E4%B8%AD%E5%AF%BB%E6%89%BE%E4%B8%8B%E4%B8%80%E4%B8%AA%E4%BB%BB%E5%8A%A1"><span class="nav-number">2.1.1.</span> <span class="nav-text">pick_next_task_fair()：从CFS运行队列中寻找下一个任务</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#pick-next-entity-%EF%BC%9A%E5%9C%A8%E7%BA%A2%E9%BB%91%E6%A0%91%E4%B8%8A%E5%AF%BB%E6%89%BE%E4%B8%8B%E4%B8%80%E4%B8%AA%E5%8D%B3%E5%B0%86%E8%BF%90%E8%A1%8C%E7%9A%84%E8%B0%83%E5%BA%A6%E5%AE%9E%E4%BD%93"><span class="nav-number">2.1.2.</span> <span class="nav-text">pick_next_entity()：在红黑树上寻找下一个即将运行的调度实体</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#put-prev-entity-%EF%BC%9A%E5%88%A0%E9%99%A4%E5%BD%93%E5%89%8D%E7%9A%84%E8%B0%83%E5%BA%A6%E5%AE%9E%E4%BD%93"><span class="nav-number">2.1.3.</span> <span class="nav-text">put_prev_entity()：删除当前的调度实体</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#set-next-entity-%EF%BC%9A%E5%B0%86%E4%BB%A5%E5%8F%82%E6%95%B0%E5%BD%A2%E5%BC%8F%E4%BC%A0%E5%85%A5%E7%9A%84%E8%B0%83%E5%BA%A6%E5%AE%9E%E4%BD%93%E8%AE%BE%E7%BD%AE%E6%88%90%E5%BD%93%E5%89%8D%E8%B0%83%E5%BA%A6%E5%AE%9E%E4%BD%93"><span class="nav-number">2.1.4.</span> <span class="nav-text">set_next_entity()：将以参数形式传入的调度实体设置成当前调度实体</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%8E%E8%BF%90%E8%A1%8C%E9%98%9F%E5%88%97%E4%B8%AD%E7%A7%BB%E9%99%A4%E4%B8%80%E4%B8%AA%E4%BB%BB%E5%8A%A1"><span class="nav-number">3.</span> <span class="nav-text">从运行队列中移除一个任务</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#dequeue-task-fair-%EF%BC%9A%E4%BB%8ECFS%E8%BF%90%E8%A1%8C%E9%98%9F%E5%88%97%E4%B8%AD%E7%A7%BB%E9%99%A4%E4%B8%80%E4%B8%AA%E4%BB%BB%E5%8A%A1"><span class="nav-number">3.1.</span> <span class="nav-text">dequeue_task_fair()：从CFS运行队列中移除一个任务</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#dequeue-entity-%EF%BC%9A%E4%BB%8E%E7%BA%A2%E9%BB%91%E6%A0%91%E4%B8%AD%E7%A7%BB%E9%99%A4%E4%B8%80%E4%B8%AA%E8%B0%83%E5%BA%A6%E5%AE%9E%E4%BD%93"><span class="nav-number">3.1.1.</span> <span class="nav-text">dequeue_entity()：从红黑树中移除一个调度实体</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%91%A8%E6%9C%9F%E6%BB%B4%E7%AD%94%E3%80%8Cperiodic-ticks%E3%80%8D%E7%9A%84%E5%A4%84%E7%90%86"><span class="nav-number">4.</span> <span class="nav-text">周期滴答「periodic ticks」的处理</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#task-tick-fair-%EF%BC%9A%E5%B0%9D%E8%AF%95%E6%8A%A2%E5%8D%A0%E5%BD%93%E5%89%8D%E7%9A%84%E4%BB%BB%E5%8A%A1"><span class="nav-number">4.1.</span> <span class="nav-text">task_tick_fair()：尝试抢占当前的任务</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#entity-tick-%EF%BC%9A%E6%9B%B4%E6%96%B0CFS%E8%BF%90%E8%A1%8C%E9%98%9F%E5%88%97%E7%9A%84%E8%B0%83%E5%BA%A6%E4%BF%A1%E6%81%AF%E4%BB%A5%E5%8F%8A%E5%B0%9D%E8%AF%95%E6%8A%A2%E5%8D%A0%E5%BD%93%E5%89%8D%E8%B0%83%E5%BA%A6%E5%AE%9E%E4%BD%93"><span class="nav-number">4.1.1.</span> <span class="nav-text">entity_tick()：更新CFS运行队列的调度信息以及尝试抢占当前调度实体</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#check-preempt-tick-%EF%BC%9A%E5%B0%9D%E8%AF%95%E6%8A%A2%E5%8D%A0%E5%BD%93%E5%89%8D%E8%B0%83%E5%BA%A6%E5%AE%9E%E4%BD%93"><span class="nav-number">4.1.2.</span> <span class="nav-text">check_preempt_tick()：尝试抢占当前调度实体</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B0%83%E5%BA%A6%E5%AE%9E%E4%BD%93%E7%9A%84runtime%E7%AE%A1%E7%90%86"><span class="nav-number">5.</span> <span class="nav-text">调度实体的runtime管理</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#update-curr-%EF%BC%9A%E6%9B%B4%E6%96%B0CFS%E8%BF%90%E8%A1%8C%E9%98%9F%E5%88%97%E5%92%8C%E8%B0%83%E5%BA%A6%E5%AE%9E%E4%BD%93%E7%9A%84runtime%E7%9B%B8%E5%85%B3%E5%AD%97%E6%AE%B5"><span class="nav-number">5.1.</span> <span class="nav-text">update_curr()：更新CFS运行队列和调度实体的runtime相关字段</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#calc-delta-fair-%EF%BC%9A%E6%A0%B9%E6%8D%AENICE-0-LOAD%E5%92%8Cse-load%E5%8A%A0%E6%9D%83%E8%AE%A1%E7%AE%97%E6%9B%B4%E6%96%B0delta"><span class="nav-number">5.1.1.</span> <span class="nav-text">calc_delta_fair()：根据NICE_0_LOAD和se-&gt;load加权计算更新delta</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#calc-delta-%EF%BC%9A%E6%A0%B9%E6%8D%AEload-weight%E5%92%8Cdelta-exec%E8%AE%A1%E7%AE%97%E6%9D%83%E9%87%8D%E3%80%8Cweight%E3%80%8D"><span class="nav-number">5.1.2.</span> <span class="nav-text">__calc_delta()：根据load_weight和delta_exec计算权重「weight」</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%97%B6%E9%97%B4%E7%89%87%E3%80%8Ctime-slice%E3%80%8D%E7%AE%A1%E7%90%86"><span class="nav-number">6.</span> <span class="nav-text">时间片「time slice」管理</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#sched-slice-%EF%BC%9A%E8%AE%A1%E7%AE%97%E8%B0%83%E5%BA%A6%E5%AE%9E%E4%BD%93%E7%9A%84%E6%97%B6%E9%97%B4%E7%89%87%E3%80%8Ctime-slice%E3%80%8D"><span class="nav-number">6.1.</span> <span class="nav-text">sched_slice()：计算调度实体的时间片「time slice」</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#sched-period-%EF%BC%9A%E6%A0%B9%E6%8D%AE%E4%BB%BB%E5%8A%A1%E6%95%B0%E9%87%8F%E8%AE%A1%E7%AE%97%E8%B0%83%E5%BA%A6%E5%BB%B6%E8%BF%9F%E3%80%8Cscheduling-latency%E3%80%8D"><span class="nav-number">6.1.1.</span> <span class="nav-text">__sched_period()：根据任务数量计算调度延迟「scheduling latency」</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#sched-vslice-%EF%BC%9A%E4%BE%9D%E6%8D%AE%E8%B0%83%E5%BA%A6%E5%AE%9E%E4%BD%93%E7%9A%84%E8%B4%9F%E8%BD%BD%E6%9D%83%E9%87%8D%E8%AE%A1%E7%AE%97%E5%85%B6%E8%99%9A%E6%8B%9F%E6%97%B6%E9%97%B4%E7%89%87%E3%80%8Cvirtual-time-slice%E3%80%8D"><span class="nav-number">6.2.</span> <span class="nav-text">sched_vslice()：依据调度实体的负载权重计算其虚拟时间片「virtual time slice」</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#update-sysctl-%EF%BC%9A%E5%88%9D%E5%A7%8B%E5%8C%96%E6%97%B6%E9%97%B4%E7%89%87%E7%9B%B8%E5%85%B3%E7%9A%84%E5%8F%98%E9%87%8F"><span class="nav-number">6.3.</span> <span class="nav-text">update_sysctl()：初始化时间片相关的变量</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Xinlu Wang"
+      src="/images/avatar.jpeg">
+  <p class="site-author-name" itemprop="name">Xinlu Wang</p>
+  <div class="site-description" itemprop="description">不积跬步无以至千里 不积小流无以成江海</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">43</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">70</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/chasinglulu" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;chasinglulu" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:wangkart@aliyun.com" title="E-Mail → mailto:wangkart@aliyun.com" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://weibo.com/5052275150" title="Weibo → https:&#x2F;&#x2F;weibo.com&#x2F;5052275150" rel="noopener me" target="_blank"><i class="fab fa-weibo fa-fw"></i>Weibo</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+    <div class="sidebar-inner sidebar-blogroll">
+      <div class="links-of-blogroll animated">
+        <div class="links-of-blogroll-title"><i class="fa fa-globe fa-fw"></i>
+          链接
+        </div>
+        <ul class="links-of-blogroll-list">
+            <li class="links-of-blogroll-item">
+              <a href="https://lore.kernel.org/qemu-devel/" title="https:&#x2F;&#x2F;lore.kernel.org&#x2F;qemu-devel&#x2F;" rel="noopener" target="_blank">Qemu</a>
+            </li>
+            <li class="links-of-blogroll-item">
+              <a href="https://wiki.linuxfoundation.org/realtime/documentation/start" title="https:&#x2F;&#x2F;wiki.linuxfoundation.org&#x2F;realtime&#x2F;documentation&#x2F;start" rel="noopener" target="_blank">RT_Linux</a>
+            </li>
+        </ul>
+      </div>
+    </div>
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://chasinglulu.github.io/posts/954687ec/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpeg">
+      <meta itemprop="name" content="Xinlu Wang">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="点滴汇聚">
+      <meta itemprop="description" content="不积跬步无以至千里 不积小流无以成江海">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="进程调度3「CFS-Completely Fair Scheduling」 | 点滴汇聚">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          进程调度3「CFS-Completely Fair Scheduling」
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2019-11-22 22:56:42" itemprop="dateCreated datePublished" datetime="2019-11-22T22:56:42+08:00">2019-11-22</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-09-24 15:39:19" itemprop="dateModified" datetime="2024-09-24T15:39:19+08:00">2024-09-24</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/task-management-and-process-scheduling/" itemprop="url" rel="index"><span itemprop="name">task management and process scheduling</span></a>
+        </span>
+    </span>
+
+  
+  
+  <span class="post-meta-item">
+    
+    <span class="post-meta-item-icon">
+      <i class="far fa-comment"></i>
+    </span>
+    <span class="post-meta-item-text">Waline：</span>
+  
+    <a title="waline" href="/posts/954687ec/#waline" itemprop="discussionUrl">
+      <span class="post-comments-count waline-comment-count" data-path="/posts/954687ec/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+    <span class="post-meta-item" title="阅读次数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span class="waline-pageview-count" data-path="/posts/954687ec/"></span>
+    </span>
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>762</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>3 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>CFS是内核使用的一种调度器或调度类，它主要负责处理三种调度策略：SCHED_NORMAL、SCHED_BATCH和SCHED_IDLE。从<a href="https://chasinglulu.github.io/2019/11/22/%E8%BF%9B%E7%A8%8B%E8%B0%83%E5%BA%A62%E3%80%8CCore%E3%80%8D/">上一篇文章</a> 可知，调度器的核心在挑选下一个运行的进程时有可能会遍历所有的调度类别。实际上系统大多数进程通常都是CFS调度类负责处理的，因此为了优化下一个进程的挑选调度器核心会先判断当前进程是否采用了CFS调度策略，若是，则直接调用CFS代码来挑选下一个进程，若不是或CFS代码未能挑选到一个合适的进程，则会调用各个调度类的挑选函数来寻找一个合适的进程。若CFS代码寻找到了合适的下一个运行的进程，则直接返回该进程的实例而不会再遍历调度类。本文将主要关注下列的CFS活动和行为：</p>
+<ul>
+<li>将一个任务插入运行队列</li>
+<li>从运行队列中挑选一个合适的任务</li>
+<li>从运行队列中移除一个任务</li>
+<li>处理周期滴答「periodic ticks」</li>
+<li>管理调度实体「scheduling entities」的运行时间</li>
+<li>管理时间片「time slices」</li>
+</ul>
+<span id="more"></span>
+<hr>
+<ul>
+<li><strong>Target Platform:</strong> <a target="_blank" rel="noopener" href="https://www.96boards.org/product/rock960c/">Rock960c</a></li>
+<li>**ARCH:**arm64</li>
+<li>**Linux Kernel:**linux-4.19.27</li>
+</ul>
+<hr>
+<h3 id="将一个任务插入运行队列"><a href="#将一个任务插入运行队列" class="headerlink" title="将一个任务插入运行队列"></a>将一个任务插入运行队列</h3><p><img data-src="/images/15/enqueue_task_fair_codeflow.svg" alt="enqueue_task_fair_codeflow.svg"></p>
+<center>图1 enqueue_task_fair函数的调用路径</center>
+
+<h4 id="enqueue-task-fair-：将一个任务插入CFS运行队列"><a href="#enqueue-task-fair-：将一个任务插入CFS运行队列" class="headerlink" title="enqueue_task_fair()：将一个任务插入CFS运行队列"></a>enqueue_task_fair()：将一个任务插入CFS运行队列</h4><h5 id="enqueue-entity-：更新调度实体的vruntime字段并将它插入红黑树"><a href="#enqueue-entity-：更新调度实体的vruntime字段并将它插入红黑树" class="headerlink" title="enqueue_entity()：更新调度实体的vruntime字段并将它插入红黑树"></a>enqueue_entity()：更新调度实体的vruntime字段并将它插入红黑树</h5><h5 id="place-entity-：计算调度实体的vruntime"><a href="#place-entity-：计算调度实体的vruntime" class="headerlink" title="place_entity()：计算调度实体的vruntime"></a>place_entity()：计算调度实体的vruntime</h5><h5 id="enqueue-entity-：将调度实体插入红黑树"><a href="#enqueue-entity-：将调度实体插入红黑树" class="headerlink" title="__enqueue_entity()：将调度实体插入红黑树"></a>__enqueue_entity()：将调度实体插入红黑树</h5><h3 id="从运行队列中挑选一个任务"><a href="#从运行队列中挑选一个任务" class="headerlink" title="从运行队列中挑选一个任务"></a>从运行队列中挑选一个任务</h3><p><img data-src="/images/15/pick_next_task_fair_codeflow.svg" alt="pick_next_task_fair_codeflow.svg"></p>
+<center>图2 pick_next_task_fair函数的调用路径</center>
+
+<h4 id="pick-next-task-：寻找将要运行的下一个任务"><a href="#pick-next-task-：寻找将要运行的下一个任务" class="headerlink" title="pick_next_task()：寻找将要运行的下一个任务"></a>pick_next_task()：寻找将要运行的下一个任务</h4><h5 id="pick-next-task-fair-：从CFS运行队列中寻找下一个任务"><a href="#pick-next-task-fair-：从CFS运行队列中寻找下一个任务" class="headerlink" title="pick_next_task_fair()：从CFS运行队列中寻找下一个任务"></a>pick_next_task_fair()：从CFS运行队列中寻找下一个任务</h5><h5 id="pick-next-entity-：在红黑树上寻找下一个即将运行的调度实体"><a href="#pick-next-entity-：在红黑树上寻找下一个即将运行的调度实体" class="headerlink" title="pick_next_entity()：在红黑树上寻找下一个即将运行的调度实体"></a>pick_next_entity()：在红黑树上寻找下一个即将运行的调度实体</h5><h5 id="put-prev-entity-：删除当前的调度实体"><a href="#put-prev-entity-：删除当前的调度实体" class="headerlink" title="put_prev_entity()：删除当前的调度实体"></a>put_prev_entity()：删除当前的调度实体</h5><h5 id="set-next-entity-：将以参数形式传入的调度实体设置成当前调度实体"><a href="#set-next-entity-：将以参数形式传入的调度实体设置成当前调度实体" class="headerlink" title="set_next_entity()：将以参数形式传入的调度实体设置成当前调度实体"></a>set_next_entity()：将以参数形式传入的调度实体设置成当前调度实体</h5><h3 id="从运行队列中移除一个任务"><a href="#从运行队列中移除一个任务" class="headerlink" title="从运行队列中移除一个任务"></a>从运行队列中移除一个任务</h3><p><img data-src="/images/15/dequeue_task_fair_codeflow.svg" alt="dequeue_task_fair_codeflow.svg"></p>
+<center>图3 dequeue_task_fair函数的调用路径</center>
+
+<h4 id="dequeue-task-fair-：从CFS运行队列中移除一个任务"><a href="#dequeue-task-fair-：从CFS运行队列中移除一个任务" class="headerlink" title="dequeue_task_fair()：从CFS运行队列中移除一个任务"></a>dequeue_task_fair()：从CFS运行队列中移除一个任务</h4><h5 id="dequeue-entity-：从红黑树中移除一个调度实体"><a href="#dequeue-entity-：从红黑树中移除一个调度实体" class="headerlink" title="dequeue_entity()：从红黑树中移除一个调度实体"></a>dequeue_entity()：从红黑树中移除一个调度实体</h5><h3 id="周期滴答「periodic-ticks」的处理"><a href="#周期滴答「periodic-ticks」的处理" class="headerlink" title="周期滴答「periodic ticks」的处理"></a>周期滴答「periodic ticks」的处理</h3><h4 id="task-tick-fair-：尝试抢占当前的任务"><a href="#task-tick-fair-：尝试抢占当前的任务" class="headerlink" title="task_tick_fair()：尝试抢占当前的任务"></a>task_tick_fair()：尝试抢占当前的任务</h4><h5 id="entity-tick-：更新CFS运行队列的调度信息以及尝试抢占当前调度实体"><a href="#entity-tick-：更新CFS运行队列的调度信息以及尝试抢占当前调度实体" class="headerlink" title="entity_tick()：更新CFS运行队列的调度信息以及尝试抢占当前调度实体"></a>entity_tick()：更新CFS运行队列的调度信息以及尝试抢占当前调度实体</h5><h5 id="check-preempt-tick-：尝试抢占当前调度实体"><a href="#check-preempt-tick-：尝试抢占当前调度实体" class="headerlink" title="check_preempt_tick()：尝试抢占当前调度实体"></a>check_preempt_tick()：尝试抢占当前调度实体</h5><h3 id="调度实体的runtime管理"><a href="#调度实体的runtime管理" class="headerlink" title="调度实体的runtime管理"></a>调度实体的runtime管理</h3><p><img data-src="/images/15/update_curr_codeflow.svg" alt="update_curr_codeflow.svg"></p>
+<center>图3 update_curr函数的调用路径</center>
+
+<h4 id="update-curr-：更新CFS运行队列和调度实体的runtime相关字段"><a href="#update-curr-：更新CFS运行队列和调度实体的runtime相关字段" class="headerlink" title="update_curr()：更新CFS运行队列和调度实体的runtime相关字段"></a>update_curr()：更新CFS运行队列和调度实体的runtime相关字段</h4><h5 id="calc-delta-fair-：根据NICE-0-LOAD和se-load加权计算更新delta"><a href="#calc-delta-fair-：根据NICE-0-LOAD和se-load加权计算更新delta" class="headerlink" title="calc_delta_fair()：根据NICE_0_LOAD和se-&gt;load加权计算更新delta"></a>calc_delta_fair()：根据NICE_0_LOAD和se-&gt;load加权计算更新delta</h5><h5 id="calc-delta-：根据load-weight和delta-exec计算权重「weight」"><a href="#calc-delta-：根据load-weight和delta-exec计算权重「weight」" class="headerlink" title="__calc_delta()：根据load_weight和delta_exec计算权重「weight」"></a>__calc_delta()：根据load_weight和delta_exec计算权重「weight」</h5><h3 id="时间片「time-slice」管理"><a href="#时间片「time-slice」管理" class="headerlink" title="时间片「time slice」管理"></a>时间片「time slice」管理</h3><h4 id="sched-slice-：计算调度实体的时间片「time-slice」"><a href="#sched-slice-：计算调度实体的时间片「time-slice」" class="headerlink" title="sched_slice()：计算调度实体的时间片「time slice」"></a>sched_slice()：计算调度实体的时间片「time slice」</h4><h5 id="sched-period-：根据任务数量计算调度延迟「scheduling-latency」"><a href="#sched-period-：根据任务数量计算调度延迟「scheduling-latency」" class="headerlink" title="__sched_period()：根据任务数量计算调度延迟「scheduling latency」"></a>__sched_period()：根据任务数量计算调度延迟「scheduling latency」</h5><h4 id="sched-vslice-：依据调度实体的负载权重计算其虚拟时间片「virtual-time-slice」"><a href="#sched-vslice-：依据调度实体的负载权重计算其虚拟时间片「virtual-time-slice」" class="headerlink" title="sched_vslice()：依据调度实体的负载权重计算其虚拟时间片「virtual time slice」"></a>sched_vslice()：依据调度实体的负载权重计算其虚拟时间片「virtual time slice」</h4><h4 id="update-sysctl-：初始化时间片相关的变量"><a href="#update-sysctl-：初始化时间片相关的变量" class="headerlink" title="update_sysctl()：初始化时间片相关的变量"></a>update_sysctl()：初始化时间片相关的变量</h4><p><img data-src="/images/15/update_sysctl_codeflow.svg" alt="update_sysctl_codeflow.svg"></p>
+<center>图3 update_sysctl函数的调用路径</center>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer"><div class="post-widgets">
+      <div id="needsharebutton-postbottom">
+        <span class="btn">
+          <i class="fa fa-share-alt" aria-hidden="true"></i>
+        </span>
+      </div>
+    </div>
+          <div class="reward-container">
+  <div>请我一杯咖啡吧！</div>
+  <button>
+    赞赏
+  </button>
+  <div class="post-reward">
+      <div>
+        <img src="/images/wechatpay.png" alt="Xinlu Wang 微信">
+        <span>微信</span>
+      </div>
+      <div>
+        <img src="/images/alipay.jpg" alt="Xinlu Wang 支付宝">
+        <span>支付宝</span>
+      </div>
+
+  </div>
+</div>
+
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>本文作者： </strong>Xinlu Wang
+  </li>
+  <li class="post-copyright-link">
+      <strong>本文链接：</strong>
+      <a href="https://chasinglulu.github.io/posts/954687ec/" title="进程调度3「CFS-Completely Fair Scheduling」">https://chasinglulu.github.io/posts/954687ec/</a>
+  </li>
+  <li class="post-copyright-license">
+      <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/task/" rel="tag"><i class="fa fa-tag"></i> task</a>
+              <a href="/tags/process/" rel="tag"><i class="fa fa-tag"></i> process</a>
+              <a href="/tags/management/" rel="tag"><i class="fa fa-tag"></i> management</a>
+              <a href="/tags/schedule/" rel="tag"><i class="fa fa-tag"></i> schedule</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/3a441eb3/" rel="prev" title="进程调度2「Core」">
+                  <i class="fa fa-angle-left"></i> 进程调度2「Core」
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/posts/413c336a/" rel="next" title="进程管理1「Data structures and PID」">
+                  进程管理1「Data structures and PID」 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments" id="waline"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2018 – 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-anchor"></i>
+    </span><a href="http://abitacc.com/about" rel="noopener" target="_blank">Xinlu Wang</a>
+    <!-- annotation
+    <span class="author" itemprop="copyrightHolder">Xinlu Wang</span>
+    -->
+  </div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+      <span>站点总字数：</span>
+    <span title="站点总字数">82k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span>站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">4:57</span>
+  </span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+  <a href="https://github.com/chasinglulu" class="github-corner" title="在 GitHub 上关注我" aria-label="在 GitHub 上关注我" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script size="300" alpha="0.6" zIndex="-1" src="https://cdnjs.cloudflare.com/ajax/libs/ribbon.js/1.0.2/ribbon.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lozad.js/1.16.0/lozad.min.js" integrity="sha256-mOFREFhqmHeQbXpK2lp4nA3qooVgACfh88fpJftLBbc=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script><script src="/js/bookmark.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/quicklink/2.3.0/quicklink.umd.js" integrity="sha256-yvJQOINiH9fWemHn0vCA5lsHWJaHs6/ZmO+1Ft04SvM=" crossorigin="anonymous"></script>
+  <script class="next-config" data-name="quicklink" type="application/json">{"enable":true,"home":false,"archive":false,"delay":true,"timeout":3000,"priority":true,"url":"https://chasinglulu.github.io/posts/954687ec/"}</script>
+  <script src="/js/third-party/quicklink.js"></script>
+<script class="next-config" data-name="waline" type="application/json">{"lang":"zh-CN","enable":true,"serverURL":"www.chasinglulu.cn","cssUrl":"https://unpkg.com/@waline/client@v2/dist/waline.css","commentCount":true,"pageview":true,"placeholder":"请文明评论呀","avatar":"mm","meta":["nick","mail"],"pageSize":10,"comment_count":true,"requiredFields":["mail"],"libUrl":"https://cdn.jsdelivr.net/npm/@waline/client@2.15.8/dist/waline.js","emoji":["https://cdn.jsdelivr.net/gh/walinejs/emojis@1.1.0/tw-emoji/"],"el":"#waline","comment":true,"path":"/posts/954687ec/"}</script>
+<link rel="stylesheet" href="https://unpkg.com/@waline/client@v2/dist/waline.css">
+<script>
+document.addEventListener('page:loaded', () => {
+  NexT.utils.loadComments(CONFIG.waline.el).then(() =>
+    NexT.utils.getScript(CONFIG.waline.libUrl, { condition: window.Waline })
+  ).then(() => 
+    Waline.init(Object.assign({}, CONFIG.waline,{ el: document.querySelector(CONFIG.waline.el) }))
+  );
+});
+</script>
+<div id="needsharebutton-float">
+      <span class="btn">
+        <i class="fa fa-share-alt" aria-hidden="true"></i>
+      </span>
+    </div>
+  <script src="//cdn.jsdelivr.net/gh/theme-next/theme-next-needmoreshare2@1/needsharebutton.min.js"></script>
+  <script>
+      pbOptions = {};
+        pbOptions.iconStyle = "default";
+        pbOptions.boxForm = "horizontal";
+        pbOptions.position = "bottomCenter";
+        pbOptions.networks = "Weibo,Wechat,Douban,QQZone,Mailto";
+      new needShareButton('#needsharebutton-postbottom', pbOptions);
+      flOptions = {};
+        flOptions.iconStyle = "box";
+        flOptions.boxForm = "vertical";
+        flOptions.position = "topRight";
+        flOptions.networks = "Weibo,Wechat,Douban,QQZone,Mailto";
+      new needShareButton('#needsharebutton-float', flOptions);
+  </script>
+</body>
+</html>

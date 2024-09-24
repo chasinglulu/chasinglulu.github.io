@@ -1,0 +1,21 @@
+
+U-Boot SPL 2022.10-00022-ga347a060ca (Jan 17 2024 - 10:43:51 +0800)
+Trying to boot from RAM
+
+
+U-Boot 2022.10-00022-ga347a060ca (Jan 17 2024 - 10:43:51 +0800)
+
+DRAM:  512 KiB
+Core:  7 devices, 6 uclasses, devicetree: separate
+Loading Environment from nowhere... OK
+In:    uart@60d42000
+Out:   uart@60d42000
+Err:   uart@60d42000
+=> version 
+U-Boot 2022.10-00022-ga347a060ca (Jan 17 2024 - 10:43:51 +0800)
+
+riscv32-unknown-linux-gnu-gcc () 12.2.0
+GNU ld (GNU Binutils) 2.40.0.20230214
+=> ls
+Unknown command 'ls' - try 'help'
+=> 

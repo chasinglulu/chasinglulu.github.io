@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- 由 Microsoft Visio, SVG Export 生成 cpu_share_I.svg 页-1 -->
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:ev="http://www.w3.org/2001/xml-events"
+		xmlns:v="http://schemas.microsoft.com/visio/2003/SVGExtensions/" width="6.05229in" height="2.22058in"
+		viewBox="0 0 435.765 159.882" xml:space="preserve" color-interpolation-filters="sRGB" class="st13">
+	<v:documentProperties v:langID="2052" v:metric="true" v:viewMarkup="false"/>
+
+	<style type="text/css">
+	<![CDATA[
+		.st1 {fill:none;stroke:none;stroke-width:0.25}
+		.st2 {fill:#000000;font-family:Times New Roman;font-size:1.00001em}
+		.st3 {font-family:宋体;font-size:1em}
+		.st4 {visibility:visible}
+		.st5 {fill:#5b9bd5;fill-opacity:0.22;filter:url(#filter_2);stroke:none}
+		.st6 {fill:#595959;stroke:none;stroke-width:0.25}
+		.st7 {fill:#feffff;font-family:Times New Roman;font-size:0.916672em}
+		.st8 {fill:#a5a5a5;stroke:none;stroke-width:0.25}
+		.st9 {fill:#000000;font-family:宋体;font-size:0.666664em}
+		.st10 {font-size:1em;font-weight:bold}
+		.st11 {fill:#5b9bd5;fill-opacity:0.22;filter:url(#filter_2);stroke:#5b9bd5;stroke-opacity:0.22}
+		.st12 {fill:#a5a5a5;stroke:#a5a5a5;stroke-width:0.25}
+		.st13 {fill:none;fill-rule:evenodd;font-size:12px;overflow:visible;stroke-linecap:square;stroke-miterlimit:3}
+	]]>
+	</style>
+
+	<defs id="Filters">
+		<filter id="filter_2">
+			<feGaussianBlur stdDeviation="2"/>
+		</filter>
+	</defs>
+	<g v:mID="0" v:index="1" v:groupContext="foregroundPage">
+		<title>页-1</title>
+		<v:pageProperties v:drawingScale="0.0393701" v:pageScale="0.0393701" v:drawingUnits="24" v:shadowOffsetX="8.50394"
+				v:shadowOffsetY="-8.50394"/>
+		<g id="group40-1" transform="translate(2.65439,-4.98619)" v:mID="40" v:groupContext="group">
+			<title>工作表.40</title>
+			<g id="shape34-2" v:mID="34" v:groupContext="shape" transform="translate(159.449,-134.646)">
+				<title>工作表.34</title>
+				<desc>CPU占用份额</desc>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="53.1496" cy="149.882" width="106.3" height="20"/>
+				<rect x="0" y="139.882" width="106.299" height="20" class="st1"/>
+				<text x="17.48" y="153.83" class="st2" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>CPU<tspan
+							class="st3">占用份额</tspan></text>			</g>
+			<g id="shape3-6" v:mID="3" v:groupContext="shape">
+				<title>饼图扇区</title>
+				<desc>50%</desc>
+				<v:userDefs>
+					<v:ud v:nameU="CtrlAng1" v:prompt="" v:val="VT0(5.4977871437822):32"/>
+					<v:ud v:nameU="CtrlAng2" v:prompt="" v:val="VT0(0.78539816339745):32"/>
+					<v:ud v:nameU="InnerDist" v:prompt="" v:val="VT0(0):24"/>
+					<v:ud v:nameU="MidAngle" v:prompt="" v:val="VT0(6.2831853071796):32"/>
+					<v:ud v:nameU="visVersion" v:prompt="" v:val="VT0(15):26"/>
+					<v:ud v:nameU="CtrlAng1" v:prompt="" v:val="VT0(4.7123889803847):32"/>
+					<v:ud v:nameU="CtrlAng2" v:prompt="" v:val="VT0(1.5707963267949):32"/>
+				</v:userDefs>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="85.0394" cy="103.189" width="113.39" height="113.386"/>
+				<g id="shadow3-7" v:groupContext="shadow" v:shadowOffsetX="0.345598" v:shadowOffsetY="-1.97279" v:shadowType="1"
+						transform="matrix(1,0,0,1,0.345598,1.97279)" class="st4">
+					<path d="M56.69 103.19 L56.69 159.88 A56.6929 56.6929 -180 0 0 56.69 46.5 L56.69 103.19 Z" class="st5"/>
+				</g>
+				<path d="M56.69 103.19 L56.69 159.88 A56.6929 56.6929 -180 0 0 56.69 46.5 L56.69 103.19 Z" class="st6"/>
+				<text x="74.96" y="106.49" class="st7" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>50%</text>			</g>
+			<g id="shape4-12" v:mID="4" v:groupContext="shape" transform="translate(113.386,206.378) rotate(180)">
+				<title>饼图扇区.4</title>
+				<desc>50%</desc>
+				<v:userDefs>
+					<v:ud v:nameU="CtrlAng1" v:prompt="" v:val="VT0(5.4977871437822):32"/>
+					<v:ud v:nameU="CtrlAng2" v:prompt="" v:val="VT0(0.78539816339745):32"/>
+					<v:ud v:nameU="InnerDist" v:prompt="" v:val="VT0(0):24"/>
+					<v:ud v:nameU="MidAngle" v:prompt="" v:val="VT0(6.2831853071796):32"/>
+					<v:ud v:nameU="visVersion" v:prompt="" v:val="VT0(15):26"/>
+					<v:ud v:nameU="CtrlAng1" v:prompt="" v:val="VT0(4.7123889803847):32"/>
+					<v:ud v:nameU="CtrlAng2" v:prompt="" v:val="VT0(1.5707963267949):32"/>
+				</v:userDefs>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="85.0394" cy="103.189" width="113.39" height="113.386" transform="rotate(180)"/>
+				<g id="shadow4-13" v:groupContext="shadow" v:shadowOffsetX="0.345598" v:shadowOffsetY="-1.97279" v:shadowType="1"
+						transform="matrix(1,0,0,1,-0.345598,-1.97279)" class="st4">
+					<path d="M56.69 103.19 L56.69 159.88 A56.6929 56.6929 -180 0 0 56.69 46.5 L56.69 103.19 Z" class="st5"/>
+				</g>
+				<path d="M56.69 103.19 L56.69 159.88 A56.6929 56.6929 -180 0 0 56.69 46.5 L56.69 103.19 Z" class="st8"/>
+				<text x="-95.12" y="-99.89" transform="rotate(180)" class="st7" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>50%</text>			</g>
+			<g id="group18-18" transform="translate(120.472,-37.2047)" v:mID="18" v:groupContext="group">
+				<title>工作表.18</title>
+				<g id="group15-19" transform="translate(0,-21.2598)" v:mID="15" v:groupContext="group">
+					<title>工作表.15</title>
+					<g id="shape9-20" v:mID="9" v:groupContext="shape" transform="translate(6.34492E-014,-10.6299)">
+						<title>正方形</title>
+						<v:userDefs>
+							<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+						</v:userDefs>
+						<g id="shadow9-21" v:groupContext="shadow" v:shadowOffsetX="0.345598" v:shadowOffsetY="-1.97279"
+								v:shadowType="1" transform="matrix(1,0,0,1,0.345598,1.97279)" class="st4">
+							<rect x="0" y="152.795" width="7.08661" height="7.08661" class="st5"/>
+						</g>
+						<rect x="0" y="152.795" width="7.08661" height="7.08661" class="st8"/>
+					</g>
+					<g id="shape11-25" v:mID="11" v:groupContext="shape" transform="translate(14.1732,-10.6299)">
+						<title>工作表.11</title>
+						<desc>进程A</desc>
+						<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+						<v:textRect cx="14.1732" cy="156.339" width="28.35" height="7.08661"/>
+						<rect x="0" y="152.795" width="28.3465" height="7.08661" class="st1"/>
+						<text x="4.16" y="158.74" class="st9" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>进程<tspan
+									class="st10">A</tspan></text>					</g>
+					<g id="shape13-29" v:mID="13" v:groupContext="shape">
+						<title>工作表.13</title>
+						<desc>(load weight 1024)</desc>
+						<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+						<v:textRect cx="42.5197" cy="156.339" width="85.04" height="7.08661"/>
+						<rect x="0" y="152.795" width="85.0394" height="7.08661" class="st1"/>
+						<text x="6.52" y="158.74" class="st9" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>(load weight 1024)</text>					</g>
+				</g>
+				<g id="group16-32" v:mID="16" v:groupContext="group">
+					<title>工作表.16</title>
+					<g id="shape10-33" v:mID="10" v:groupContext="shape" transform="translate(6.34492E-014,-10.6299)">
+						<title>正方形.10</title>
+						<v:userDefs>
+							<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+						</v:userDefs>
+						<g id="shadow10-34" v:groupContext="shadow" v:shadowOffsetX="0.345598" v:shadowOffsetY="-1.97279"
+								v:shadowType="1" transform="matrix(1,0,0,1,0.345598,1.97279)" class="st4">
+							<rect x="0" y="152.795" width="7.08661" height="7.08661" class="st5"/>
+						</g>
+						<rect x="0" y="152.795" width="7.08661" height="7.08661" class="st6"/>
+					</g>
+					<g id="shape12-38" v:mID="12" v:groupContext="shape" transform="translate(14.1732,-10.6299)">
+						<title>工作表.12</title>
+						<desc>进程B</desc>
+						<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+						<v:textRect cx="14.1732" cy="156.339" width="28.35" height="7.08661"/>
+						<rect x="0" y="152.795" width="28.3465" height="7.08661" class="st1"/>
+						<text x="4.16" y="158.74" class="st9" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>进程<tspan
+									class="st10">B</tspan></text>					</g>
+					<g id="shape14-42" v:mID="14" v:groupContext="shape">
+						<title>工作表.14</title>
+						<desc>(load weight 1024)</desc>
+						<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+						<v:textRect cx="42.5197" cy="156.339" width="85.04" height="7.08661"/>
+						<rect x="0" y="152.795" width="85.0394" height="7.08661" class="st1"/>
+						<text x="6.52" y="158.74" class="st9" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>(load weight 1024)</text>					</g>
+				</g>
+			</g>
+			<g id="group20-45" transform="translate(347.244,-58.4646)" v:mID="20" v:groupContext="group">
+				<title>工作表.20</title>
+				<g id="shape21-46" v:mID="21" v:groupContext="shape" transform="translate(6.34492E-014,-10.6299)">
+					<title>正方形</title>
+					<v:userDefs>
+						<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+					</v:userDefs>
+					<g id="shadow21-47" v:groupContext="shadow" v:shadowOffsetX="0.345598" v:shadowOffsetY="-1.97279"
+							v:shadowType="1" transform="matrix(1,0,0,1,0.345598,1.97279)" class="st4">
+						<rect x="0" y="152.795" width="7.08661" height="7.08661" class="st5"/>
+					</g>
+					<rect x="0" y="152.795" width="7.08661" height="7.08661" class="st8"/>
+				</g>
+				<g id="shape22-51" v:mID="22" v:groupContext="shape" transform="translate(14.1732,-10.6299)">
+					<title>工作表.22</title>
+					<desc>进程A</desc>
+					<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+					<v:textRect cx="14.1732" cy="156.339" width="28.35" height="7.08661"/>
+					<rect x="0" y="152.795" width="28.3465" height="7.08661" class="st1"/>
+					<text x="4.16" y="158.74" class="st9" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>进程<tspan
+								class="st10">A</tspan></text>				</g>
+				<g id="shape23-55" v:mID="23" v:groupContext="shape">
+					<title>工作表.23</title>
+					<desc>(load weight 820)</desc>
+					<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+					<v:textRect cx="42.5197" cy="156.339" width="85.04" height="7.08661"/>
+					<rect x="0" y="152.795" width="85.0394" height="7.08661" class="st1"/>
+					<text x="8.52" y="158.74" class="st9" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>(load weight 820)</text>				</g>
+			</g>
+			<g id="group30-58" transform="translate(347.244,-37.2047)" v:mID="30" v:groupContext="group">
+				<title>工作表.30</title>
+				<g id="shape25-59" v:mID="25" v:groupContext="shape" transform="translate(6.34492E-014,-10.6299)">
+					<title>正方形.10</title>
+					<v:userDefs>
+						<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+					</v:userDefs>
+					<g id="shadow25-60" v:groupContext="shadow" v:shadowOffsetX="0.345598" v:shadowOffsetY="-1.97279"
+							v:shadowType="1" transform="matrix(1,0,0,1,0.345598,1.97279)" class="st4">
+						<rect x="0" y="152.795" width="7.08661" height="7.08661" class="st5"/>
+					</g>
+					<rect x="0" y="152.795" width="7.08661" height="7.08661" class="st6"/>
+				</g>
+				<g id="shape26-64" v:mID="26" v:groupContext="shape" transform="translate(14.1732,-10.6299)">
+					<title>工作表.26</title>
+					<desc>进程B</desc>
+					<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+					<v:textRect cx="14.1732" cy="156.339" width="28.35" height="7.08661"/>
+					<rect x="0" y="152.795" width="28.3465" height="7.08661" class="st1"/>
+					<text x="4.16" y="158.74" class="st9" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>进程<tspan
+								class="st10">B</tspan></text>				</g>
+				<g id="shape27-68" v:mID="27" v:groupContext="shape">
+					<title>工作表.27</title>
+					<desc>(load weight 1024)</desc>
+					<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+					<v:textRect cx="42.5197" cy="156.339" width="85.04" height="7.08661"/>
+					<rect x="0" y="152.795" width="85.0394" height="7.08661" class="st1"/>
+					<text x="6.52" y="158.74" class="st9" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>(load weight 1024)</text>				</g>
+			</g>
+			<g id="shape5-71" v:mID="5" v:groupContext="shape" transform="translate(226.772,-5.68434E-013)">
+				<title>饼图扇区.5</title>
+				<desc>55.5%</desc>
+				<v:userDefs>
+					<v:ud v:nameU="CtrlAng1" v:prompt="" v:val="VT0(5.4977871437822):32"/>
+					<v:ud v:nameU="CtrlAng2" v:prompt="" v:val="VT0(0.78539816339745):32"/>
+					<v:ud v:nameU="InnerDist" v:prompt="" v:val="VT0(0):24"/>
+					<v:ud v:nameU="MidAngle" v:prompt="" v:val="VT0(6.2831853071796):32"/>
+					<v:ud v:nameU="visVersion" v:prompt="" v:val="VT0(15):26"/>
+					<v:ud v:nameU="CtrlAng1" v:prompt="" v:val="VT0(4.4674103172578):32"/>
+					<v:ud v:nameU="CtrlAng2" v:prompt="" v:val="VT0(2.0344439357957):32"/>
+					<v:ud v:nameU="MidAngle" v:prompt="" v:val="VT0(6.3925197801166):32"/>
+				</v:userDefs>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="84.8701" cy="100.096" width="113.39" height="113.386"/>
+				<g id="shadow5-72" v:groupContext="shadow" v:shadowOffsetX="0.345598" v:shadowOffsetY="-1.97279" v:shadowType="1"
+						transform="matrix(1,0,0,1,0.345598,1.97279)" class="st4">
+					<path d="M56.69 103.19 L42.94 158.19 A56.6929 56.6929 -180 1 0 31.34 52.48 L56.69 103.19 Z" class="st5"/>
+				</g>
+				<path d="M56.69 103.19 L42.94 158.19 A56.6929 56.6929 -180 1 0 31.34 52.48 L56.69 103.19 Z" class="st6"/>
+				<text x="70.66" y="103.4" class="st7" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>55.5%</text>			</g>
+			<g id="shape6-77" v:mID="6" v:groupContext="shape" transform="translate(340.157,206.378) rotate(180)">
+				<title>饼图扇区.6</title>
+				<desc>44.5%</desc>
+				<v:userDefs>
+					<v:ud v:nameU="CtrlAng1" v:prompt="" v:val="VT0(5.4977871437822):32"/>
+					<v:ud v:nameU="CtrlAng2" v:prompt="" v:val="VT0(0.78539816339745):32"/>
+					<v:ud v:nameU="InnerDist" v:prompt="" v:val="VT0(0):24"/>
+					<v:ud v:nameU="MidAngle" v:prompt="" v:val="VT0(6.2831853071796):32"/>
+					<v:ud v:nameU="visVersion" v:prompt="" v:val="VT0(15):26"/>
+					<v:ud v:nameU="CtrlAng1" v:prompt="" v:val="VT0(4.7189248350306):32"/>
+					<v:ud v:nameU="CtrlAng2" v:prompt="" v:val="VT0(1.325817663668):32"/>
+					<v:ud v:nameU="MidAngle" v:prompt="" v:val="VT0(6.1639639029391):32"/>
+				</v:userDefs>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="84.8382" cy="106.56" width="113.39" height="113.386" transform="rotate(180)"/>
+				<g id="shadow6-78" v:groupContext="shadow" v:shadowOffsetX="0.345598" v:shadowOffsetY="-1.97279" v:shadowType="1"
+						transform="matrix(1,0,0,1,-0.345598,-1.97279)" class="st4">
+					<path d="M56.69 103.19 L57.06 159.88 A56.6929 56.6929 -180 0 0 70.44 48.19 L56.69 103.19 Z" class="st11"/>
+				</g>
+				<path d="M56.69 103.19 L57.06 159.88 A56.6929 56.6929 -180 0 0 70.44 48.19 L56.69 103.19 Z" class="st12"/>
+				<text x="-99.04" y="-103.26" transform="rotate(180)" class="st7" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>44.5%</text>			</g>
+		</g>
+	</g>
+</svg>

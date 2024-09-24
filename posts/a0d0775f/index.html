@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.0.0">
+<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+<link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/blog.svg">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/blog.svg">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="google-site-verification" content="vuSkRYPVceK1DXhqZWm7wVxYV4YmmnI1Dv_C1M8rJJM">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Georgia:300,300italic,400,400italic,700,700italic%7CCourier+New:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha256-CTSx/A06dm1B063156EVh15m6Y67pAjZZaQc89LLSrU=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"chasinglulu.github.io","root":"/","images":"/images","scheme":"Mist","darkmode":false,"version":"8.18.2","exturl":false,"sidebar":{"position":"right","display":"hide","padding":18,"offset":12},"copycode":{"enable":true,"style":"mac"},"fold":{"enable":true,"height":500},"bookmark":{"enable":true,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="&ensp;&ensp;&ensp;&ensp;中断使交互式计算的实现成为可能。如果在任务执行期间发生了中断，操作系统将响应处理中断请求，然后继续执行上一个任务或新任务。借助中断，内核能够实现多任务处理「multitasking」。其实在计算机中有很多场景会发生中断，比如从网络设备发送和接收数据包「packet」、通过鼠标或触摸屏等输入设备接收用户输入内容。本文首先从硬件角度了解了什么是中断，然后">
+<meta property="og:type" content="article">
+<meta property="og:title" content="中断「interrupt」">
+<meta property="og:url" content="https://chasinglulu.github.io/posts/a0d0775f/index.html">
+<meta property="og:site_name" content="点滴汇聚">
+<meta property="og:description" content="&ensp;&ensp;&ensp;&ensp;中断使交互式计算的实现成为可能。如果在任务执行期间发生了中断，操作系统将响应处理中断请求，然后继续执行上一个任务或新任务。借助中断，内核能够实现多任务处理「multitasking」。其实在计算机中有很多场景会发生中断，比如从网络设备发送和接收数据包「packet」、通过鼠标或触摸屏等输入设备接收用户输入内容。本文首先从硬件角度了解了什么是中断，然后">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://chasinglulu.github.io/images/23/interrupt.svg">
+<meta property="og:image" content="https://chasinglulu.github.io/images/23/interrupt_multiple.svg">
+<meta property="og:image" content="https://chasinglulu.github.io/images/23/interrupt_irq_handling.svg">
+<meta property="og:image" content="https://chasinglulu.github.io/images/23/proc-interrupts.jpeg">
+<meta property="og:image" content="https://chasinglulu.github.io/images/23/interrupt_irq_handle_process.svg">
+<meta property="og:image" content="https://chasinglulu.github.io/images/23/interrupt_PSTATE_DAIF.svg">
+<meta property="article:published_time" content="2019-07-07T13:33:28.000Z">
+<meta property="article:modified_time" content="2024-09-24T07:39:19.294Z">
+<meta property="article:author" content="Xinlu Wang">
+<meta property="article:tag" content="interrupt">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://chasinglulu.github.io/images/23/interrupt.svg">
+
+
+<link rel="canonical" href="https://chasinglulu.github.io/posts/a0d0775f/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://chasinglulu.github.io/posts/a0d0775f/","path":"posts/a0d0775f/","title":"中断「interrupt」"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>中断「interrupt」 | 点滴汇聚</title>
+  
+
+
+
+
+
+
+
+<link rel="dns-prefetch" href="www.chasinglulu.cn"><link rel="stylesheet" href="//cdn.jsdelivr.net/gh/theme-next/theme-next-needmoreshare2@1/needsharebutton.min.css"><style>
+#needsharebutton-postbottom {
+  cursor: pointer;
+  height: 26px;
+  margin-top: 10px;
+  position: relative;
+}
+#needsharebutton-postbottom .btn {
+  border: 1px solid $btn-default-border-color;
+  border-radius: 3px;
+  display: initial;
+  padding: 1px 4px;
+}
+</style><style>
+#needsharebutton-float {
+  bottom: 88px;
+  cursor: pointer;
+  left: -8px;
+  position: fixed;
+  z-index: 9999;
+}
+#needsharebutton-float .btn {
+  border: 1px solid $btn-default-border-color;
+  border-radius: 4px;
+  padding: 0 10px 0 14px;
+}
+</style>
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">点滴汇聚</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">不积跬步无以至千里，不积小流无以成江海</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-address-card fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">70</span></a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">9</span></a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">43</span></a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%AD%E6%96%AD%E6%A6%82%E5%BF%B5"><span class="nav-number">1.</span> <span class="nav-text">中断概念</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E4%B8%AD%E6%96%AD%EF%BC%9F"><span class="nav-number">1.1.</span> <span class="nav-text">什么是中断？</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%B8%AD%E6%96%AD%E6%8E%A7%E5%88%B6%E5%99%A8%E3%80%8Cinterrupt-controller%E3%80%8D"><span class="nav-number">1.2.</span> <span class="nav-text">中断控制器「interrupt controller」</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E4%B8%AD%E6%96%AD%E6%8E%A7%E5%88%B6%E5%99%A8%E7%9A%84%E5%8A%9F%E8%83%BD"><span class="nav-number">1.2.1.</span> <span class="nav-text">中断控制器的功能</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%A4%9A%E4%B8%AD%E6%96%AD%E6%8E%A7%E5%88%B6%E5%99%A8%E7%9A%84%E7%BB%93%E6%9E%84"><span class="nav-number">1.2.2.</span> <span class="nav-text">多中断控制器的结构</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Linux%E4%B8%AD%E6%96%AD%E5%AD%90%E7%B3%BB%E7%BB%9F"><span class="nav-number">2.</span> <span class="nav-text">Linux中断子系统</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#irq-chip%EF%BC%9A-%E6%8F%8F%E8%BF%B0%E4%B8%AD%E6%96%AD%E6%8E%A7%E5%88%B6%E5%99%A8%E7%9A%84%E7%BB%93%E6%9E%84%E4%BD%93"><span class="nav-number">2.1.</span> <span class="nav-text">irq_chip： 描述中断控制器的结构体</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#irq-domain%EF%BC%9A%E4%B8%AD%E6%96%AD%E5%9F%9F%E3%80%8Cinterrupt-domain%E3%80%8D"><span class="nav-number">2.2.</span> <span class="nav-text">irq_domain：中断域「interrupt domain」</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#irq-desc%EF%BC%9A%E4%B8%AD%E6%96%AD%E6%8F%8F%E8%BF%B0%E7%AC%A6%E3%80%8Cinterrupt-descriptor%E3%80%8D"><span class="nav-number">2.3.</span> <span class="nav-text">irq_desc：中断描述符「interrupt descriptor」</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%AD%E6%96%AD%E5%A4%84%E7%90%86%E5%87%BD%E6%95%B0%E3%80%8Cinterrupter-handler%E3%80%8D"><span class="nav-number">3.</span> <span class="nav-text">中断处理函数「interrupter handler」</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%B8%AD%E6%96%AD%E8%AF%B7%E6%B1%82"><span class="nav-number">3.1.</span> <span class="nav-text">中断请求</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#request-threaded-irq%E5%87%BD%E6%95%B0%EF%BC%9A%E6%B3%A8%E5%86%8C%E4%B8%AD%E6%96%AD%E5%A4%84%E7%90%86%E5%87%BD%E6%95%B0"><span class="nav-number">3.1.1.</span> <span class="nav-text">request_threaded_irq函数：注册中断处理函数</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%B8%AD%E6%96%AD%E6%B5%81%E5%A4%84%E7%90%86%E5%87%BD%E6%95%B0%E3%80%8Cinterrupt-flow-handler%E3%80%8D%E7%9A%84%E8%B0%83%E7%94%A8%E6%B5%81%E7%A8%8B"><span class="nav-number">3.2.</span> <span class="nav-text">中断流处理函数「interrupt flow handler」的调用流程</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E4%B8%AD%E6%96%AD%E5%8A%A8%E4%BD%9C%E3%80%8Cirqaction%E3%80%8D%E7%9A%84%E5%A4%84%E7%90%86"><span class="nav-number">3.2.1.</span> <span class="nav-text">中断动作「irqaction」的处理</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#IPI%E3%80%8CInter-Processor-Interrupts%E3%80%8D%EF%BC%9A%E5%A4%84%E7%90%86%E5%99%A8%E9%97%B4%E7%9A%84%E9%80%9A%E4%BF%A1"><span class="nav-number">3.2.2.</span> <span class="nav-text">IPI「Inter Processor Interrupts」：处理器间的通信</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AE%B9%E8%AE%B8%E3%80%8Cenabling%E3%80%8D%E4%B8%8E%E7%A6%81%E6%AD%A2%E3%80%8Cdisabling%E3%80%8D%E4%B8%AD%E6%96%AD"><span class="nav-number">3.3.</span> <span class="nav-text">容许「enabling」与禁止「disabling」中断</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%AE%B9%E8%AE%B8%E5%92%8C%E7%A6%81%E6%AD%A2%E5%BD%93%E5%89%8D%E6%A0%B8%E5%BF%83%E7%9A%84%E4%B8%AD%E6%96%AD"><span class="nav-number">3.3.1.</span> <span class="nav-text">容许和禁止当前核心的中断</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%90%AF%E7%94%A8%E5%92%8C%E5%B1%8F%E8%94%BD%E7%89%B9%E5%AE%9A%E4%B8%AD%E6%96%AD%E7%AE%A1%E8%84%9A%E3%80%8Cinterrupt-line%E3%80%8D"><span class="nav-number">3.3.2.</span> <span class="nav-text">启用和屏蔽特定中断管脚「interrupt line」</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#disable-irq-%EF%BC%9A%E5%B1%8F%E8%94%BD%E6%9F%90%E4%B8%AA%E4%B8%AD%E6%96%AD%E7%AE%A1%E8%84%9A"><span class="nav-number">3.3.2.1.</span> <span class="nav-text">disable_irq()：屏蔽某个中断管脚</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#enable-irq-%EF%BC%9A%E5%90%AF%E7%94%A8%E6%9F%90%E4%B8%AA%E4%B8%AD%E6%96%AD%E7%AE%A1%E8%84%9A"><span class="nav-number">3.3.2.2.</span> <span class="nav-text">enable_irq()：启用某个中断管脚</span></a></li></ol></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%B8%AD%E6%96%AD%E5%AD%90%E7%B3%BB%E7%BB%9F%E7%9A%84%E5%88%9D%E5%A7%8B%E5%8C%96"><span class="nav-number">3.4.</span> <span class="nav-text">中断子系统的初始化</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#early-irq-init-%EF%BC%9A%E5%88%9D%E5%A7%8B%E5%8C%96%E4%B8%AD%E6%96%AD%E6%8F%8F%E8%BF%B0%E7%AC%A6"><span class="nav-number">3.4.1.</span> <span class="nav-text">early_irq_init()：初始化中断描述符</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#init-IRQ-%EF%BC%9A%E5%88%9D%E5%A7%8B%E5%8C%96%E4%B8%AD%E6%96%AD%E7%A1%AC%E4%BB%B6"><span class="nav-number">3.4.2.</span> <span class="nav-text">init_IRQ()：初始化中断硬件</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#of-irq-init-%EF%BC%9A%E5%88%9D%E5%A7%8B%E5%8C%96%E4%B8%AD%E6%96%AD%E6%8E%A7%E5%88%B6%E5%99%A8"><span class="nav-number">3.4.3.</span> <span class="nav-text">of_irq_init()：初始化中断控制器</span></a></li></ol></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Xinlu Wang"
+      src="/images/avatar.jpeg">
+  <p class="site-author-name" itemprop="name">Xinlu Wang</p>
+  <div class="site-description" itemprop="description">不积跬步无以至千里 不积小流无以成江海</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">43</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">70</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/chasinglulu" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;chasinglulu" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:wangkart@aliyun.com" title="E-Mail → mailto:wangkart@aliyun.com" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://weibo.com/5052275150" title="Weibo → https:&#x2F;&#x2F;weibo.com&#x2F;5052275150" rel="noopener me" target="_blank"><i class="fab fa-weibo fa-fw"></i>Weibo</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+    <div class="sidebar-inner sidebar-blogroll">
+      <div class="links-of-blogroll animated">
+        <div class="links-of-blogroll-title"><i class="fa fa-globe fa-fw"></i>
+          链接
+        </div>
+        <ul class="links-of-blogroll-list">
+            <li class="links-of-blogroll-item">
+              <a href="https://lore.kernel.org/qemu-devel/" title="https:&#x2F;&#x2F;lore.kernel.org&#x2F;qemu-devel&#x2F;" rel="noopener" target="_blank">Qemu</a>
+            </li>
+            <li class="links-of-blogroll-item">
+              <a href="https://wiki.linuxfoundation.org/realtime/documentation/start" title="https:&#x2F;&#x2F;wiki.linuxfoundation.org&#x2F;realtime&#x2F;documentation&#x2F;start" rel="noopener" target="_blank">RT_Linux</a>
+            </li>
+        </ul>
+      </div>
+    </div>
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://chasinglulu.github.io/posts/a0d0775f/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpeg">
+      <meta itemprop="name" content="Xinlu Wang">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="点滴汇聚">
+      <meta itemprop="description" content="不积跬步无以至千里 不积小流无以成江海">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="中断「interrupt」 | 点滴汇聚">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          中断「interrupt」
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2019-07-07 21:33:28" itemprop="dateCreated datePublished" datetime="2019-07-07T21:33:28+08:00">2019-07-07</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-09-24 15:39:19" itemprop="dateModified" datetime="2024-09-24T15:39:19+08:00">2024-09-24</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/interrupt-management/" itemprop="url" rel="index"><span itemprop="name">interrupt management</span></a>
+        </span>
+    </span>
+
+  
+  
+  <span class="post-meta-item">
+    
+    <span class="post-meta-item-icon">
+      <i class="far fa-comment"></i>
+    </span>
+    <span class="post-meta-item-text">Waline：</span>
+  
+    <a title="waline" href="/posts/a0d0775f/#waline" itemprop="discussionUrl">
+      <span class="post-comments-count waline-comment-count" data-path="/posts/a0d0775f/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+    <span class="post-meta-item" title="阅读次数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span class="waline-pageview-count" data-path="/posts/a0d0775f/"></span>
+    </span>
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>12k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>45 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>&ensp;&ensp;&ensp;&ensp;中断使交互式计算的实现成为可能。如果在任务执行期间发生了中断，操作系统将响应处理中断请求，然后继续执行上一个任务或新任务。借助中断，内核能够实现多任务处理「multitasking」。其实在计算机中有很多场景会发生中断，比如从网络设备发送和接收数据包「packet」、通过鼠标或触摸屏等输入设备接收用户输入内容。本文首先从硬件角度了解了什么是中断，然后介绍了从中断硬件抽象出来的Linux通用中断处理层「generic interrupt handling layer」，最后分析了中断子系统的初始化。</p>
+<span id="more"></span>
+
+<hr>
+<ul>
+<li><strong>Target Platform:</strong> <a target="_blank" rel="noopener" href="https://www.96boards.org/product/rock960c/">Rock960c</a></li>
+<li><strong>ARCH:</strong> arm64</li>
+<li><strong>Linux Kernel:</strong> linux-4.19.27</li>
+</ul>
+<hr>
+<h3 id="中断概念"><a href="#中断概念" class="headerlink" title="中断概念"></a>中断概念</h3><h4 id="什么是中断？"><a href="#什么是中断？" class="headerlink" title="什么是中断？"></a>什么是中断？</h4><p>&ensp;&ensp;&ensp;&ensp;中断就是硬件或软件生成的信号「signal」和事件「event」。一旦中断发生，处理器会立即中止现在的执行并响应中断请求。硬件中断就是从设备发送给处理器的物理信号「physical signal」。一旦设备满足特定条件，它就会通知处理器并要求立刻处理。软件中断是由运行在处理器上的软件生成的信号，且它多发生在特殊情况，比如执行系统调用「system call」、陷阱「trap」指令或系统提供的其他中断生成指令。</p>
+<h4 id="中断控制器「interrupt-controller」"><a href="#中断控制器「interrupt-controller」" class="headerlink" title="中断控制器「interrupt controller」"></a>中断控制器「interrupt controller」</h4><p>&ensp;&ensp;&ensp;&ensp;处理器能不能接受和处理很多设备同时发送的中断？实际上这是可能的，正是由于中断控制器的存在，使多个设备产生的中断复用处理器的一条中断线。中断控制器仲裁并按顺序转递设备发出的中断给处理器。在多核系统「multicore system」中，每个核心都可以接收中断，因此中断控制器要与每个核心的控制接口相连接。</p>
+<p><img data-src="/images/23/interrupt.svg" alt="interrupt"></p>
+<center>图1 中断与中断控制器</center>
+
+<h5 id="中断控制器的功能"><a href="#中断控制器的功能" class="headerlink" title="中断控制器的功能"></a>中断控制器的功能</h5><p>中断控制器有如下主要功能：</p>
+<ul>
+<li>中断复用和路由「interrupt multiplexing and routing」</li>
+<li>中断优先处理「interrupt prioritizing」</li>
+<li>中断屏蔽「interrupt masking」</li>
+</ul>
+<p>&ensp;&ensp;&ensp;&ensp;除了以上主要功能外，中断控制器目前引入越来越多的其他功能，比如支持多核处理器「multicore processor」、支持唤醒事件「wakeup event」以及生成软件中断等。随着各个体系架构的改进，中断控制器所需的功能也在不断变化。例如，ARM定义了通用中断控制器「Generic Interrupt Controller，GIC」，随着ARM体系架构的演进，GIC的版本也在不断迭代，目前已经迭代到GICv3&#x2F;v4。比如，最新的GICV3&#x2F;v4支持了ARMv8架构的安全扩展[security extension]和虚拟化扩展[virtualization extension]，其能够分配安全和非安全状态【secure&#x2F;non-secure state】的中断，以及能够触发产生虚拟中断并发送给虚拟机【virtual machine, VM】</p>
+<h5 id="多中断控制器的结构"><a href="#多中断控制器的结构" class="headerlink" title="多中断控制器的结构"></a>多中断控制器的结构</h5><p>&ensp;&ensp;&ensp;&ensp;一个简单的系统仅需使用一个中断控制器，但有些系统却需使用多个中断控制器。比如，在有些系统中GPIO控制器具有中断功能，通常以级联方式将它与主中断控制器相连，并被配置成从中断控制器。如图2所示，给出了两种关于多个中断控制器的配置示例。</p>
+<p><img data-src="/images/23/interrupt_multiple.svg" alt="multiple interrupt controller structure"></p>
+<center>图2 多个中断控制器的连接方式</center>
+
+<h3 id="Linux中断子系统"><a href="#Linux中断子系统" class="headerlink" title="Linux中断子系统"></a>Linux中断子系统</h3><p>&ensp;&ensp;&ensp;&ensp;尽管中断控制器硬件差异很大，但通常都可以对中断控制器进行编程配置，使其能够按照设置进行操作。为了使Linux支持多种硬件系统，因此内核从中断控制器和中断信号的物理特性抽象出一个通用中断处理层「generic interrupt handling layer 」。当设备驱动调用诸如请求「requesting」、取消「canceling」、启用「enabling」和禁止「disabling」等中断操作函数时，配置数据会通过通用中断处理层被传递给中断控制器驱动的处理函数。正是由于这个抽象层的存在，不管体系架构和平台如何变化，设备驱动都能以相似的方式处理中断。相关代码都位于&lt;kernel &#x2F; irq&gt;目录下。</p>
+<p><img data-src="/images/23/interrupt_irq_handling.svg" alt="linux generic irq handling layer"></p>
+<center>图3 Linux通用IRQ处理方式</center>
+
+<h4 id="irq-chip：-描述中断控制器的结构体"><a href="#irq-chip：-描述中断控制器的结构体" class="headerlink" title="irq_chip： 描述中断控制器的结构体"></a>irq_chip： 描述中断控制器的结构体</h4><p>结构体struct irq_chip用于描述和管理硬件中断芯片（控制器），称之为中断芯片描述符，其大部分字段都是由中断控制器驱动程序负责初始化的函数指针。在初始化后，内部中断处理函数「函数前面带有两个下划线__」就能直接调用它们。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line">&lt;include/linux/irq.h&gt;</span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">irq_chip</span> &#123;</span></span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">device</span>	*<span class="title">parent_device</span>;</span></span><br><span class="line">	<span class="type">const</span> <span class="type">char</span>	*name;</span><br><span class="line">	<span class="type">unsigned</span> <span class="title function_">int</span>	<span class="params">(*irq_startup)</span><span class="params">(<span class="keyword">struct</span> irq_data *data)</span>;</span><br><span class="line">	<span class="type">void</span>		(*irq_shutdown)(<span class="keyword">struct</span> irq_data *data);</span><br><span class="line">	<span class="type">void</span>		(*irq_enable)(<span class="keyword">struct</span> irq_data *data);</span><br><span class="line">	<span class="type">void</span>		(*irq_disable)(<span class="keyword">struct</span> irq_data *data);</span><br><span class="line"></span><br><span class="line">	<span class="type">void</span>		(*irq_ack)(<span class="keyword">struct</span> irq_data *data);</span><br><span class="line">	<span class="type">void</span>		(*irq_mask)(<span class="keyword">struct</span> irq_data *data);</span><br><span class="line">	<span class="type">void</span>		(*irq_mask_ack)(<span class="keyword">struct</span> irq_data *data);</span><br><span class="line">	<span class="type">void</span>		(*irq_unmask)(<span class="keyword">struct</span> irq_data *data);</span><br><span class="line">	<span class="type">void</span>		(*irq_eoi)(<span class="keyword">struct</span> irq_data *data);</span><br><span class="line"></span><br><span class="line">	<span class="type">int</span>		(*irq_set_affinity)(<span class="keyword">struct</span> irq_data *data, <span class="type">const</span> <span class="keyword">struct</span> cpumask *dest, <span class="type">bool</span> force);</span><br><span class="line">	<span class="type">int</span>		(*irq_retrigger)(<span class="keyword">struct</span> irq_data *data);</span><br><span class="line">	<span class="type">int</span>		(*irq_set_type)(<span class="keyword">struct</span> irq_data *data, <span class="type">unsigned</span> <span class="type">int</span> flow_type);</span><br><span class="line">	<span class="type">int</span>		(*irq_set_wake)(<span class="keyword">struct</span> irq_data *data, <span class="type">unsigned</span> <span class="type">int</span> on);</span><br><span class="line"></span><br><span class="line">	<span class="type">void</span>		(*irq_bus_lock)(<span class="keyword">struct</span> irq_data *data);</span><br><span class="line">	<span class="type">void</span>		(*irq_bus_sync_unlock)(<span class="keyword">struct</span> irq_data *data);</span><br><span class="line"></span><br><span class="line">	<span class="type">void</span>		(*irq_cpu_online)(<span class="keyword">struct</span> irq_data *data);</span><br><span class="line">	<span class="type">void</span>		(*irq_cpu_offline)(<span class="keyword">struct</span> irq_data *data);</span><br><span class="line"></span><br><span class="line">	<span class="type">void</span>		(*irq_suspend)(<span class="keyword">struct</span> irq_data *data);</span><br><span class="line">	<span class="type">void</span>		(*irq_resume)(<span class="keyword">struct</span> irq_data *data);</span><br><span class="line">	<span class="type">void</span>		(*irq_pm_shutdown)(<span class="keyword">struct</span> irq_data *data);</span><br><span class="line"></span><br><span class="line">	<span class="type">void</span>		(*irq_calc_mask)(<span class="keyword">struct</span> irq_data *data);</span><br><span class="line"></span><br><span class="line">	<span class="type">void</span>		(*irq_print_chip)(<span class="keyword">struct</span> irq_data *data, <span class="keyword">struct</span> seq_file *p);</span><br><span class="line">	<span class="type">int</span>		(*irq_request_resources)(<span class="keyword">struct</span> irq_data *data);</span><br><span class="line">	<span class="type">void</span>		(*irq_release_resources)(<span class="keyword">struct</span> irq_data *data);</span><br><span class="line"></span><br><span class="line">	<span class="type">void</span>		(*irq_compose_msi_msg)(<span class="keyword">struct</span> irq_data *data, <span class="keyword">struct</span> msi_msg *msg);</span><br><span class="line">	<span class="type">void</span>		(*irq_write_msi_msg)(<span class="keyword">struct</span> irq_data *data, <span class="keyword">struct</span> msi_msg *msg);</span><br><span class="line"></span><br><span class="line">	<span class="type">int</span>		(*irq_get_irqchip_state)(<span class="keyword">struct</span> irq_data *data, <span class="keyword">enum</span> irqchip_irq_state which, <span class="type">bool</span> *state);</span><br><span class="line">	<span class="type">int</span>		(*irq_set_irqchip_state)(<span class="keyword">struct</span> irq_data *data, <span class="keyword">enum</span> irqchip_irq_state which, <span class="type">bool</span> state);</span><br><span class="line"></span><br><span class="line">	<span class="type">int</span>		(*irq_set_vcpu_affinity)(<span class="keyword">struct</span> irq_data *data, <span class="type">void</span> *vcpu_info);</span><br><span class="line"></span><br><span class="line">	<span class="type">void</span>		(*ipi_send_single)(<span class="keyword">struct</span> irq_data *data, <span class="type">unsigned</span> <span class="type">int</span> cpu);</span><br><span class="line">	<span class="type">void</span>		(*ipi_send_mask)(<span class="keyword">struct</span> irq_data *data, <span class="type">const</span> <span class="keyword">struct</span> cpumask *dest);</span><br><span class="line"></span><br><span class="line">	<span class="type">unsigned</span> <span class="type">long</span>	flags;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>如表1所示，将详细说明结构体的部分主要字段。</p>
+<div align="center">表1 结构体struct irq_chip的字段描述
+<table style="border-collapse:collapse;border-spacing:0;border-color:#9ABAD9;margin:0px auto" class="tg"><tr><th style="font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#fff;background-color:#409cff;text-align:center">字段名称</th><th style="font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#fff;background-color:#409cff;text-align:center">含义解释</th></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:center">name</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#D2E4FC;text-align:left">当读取/proc/interrupts时输出的中断芯片名称<br></td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:center">irq_ack</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#D2E4FC;text-align:left">当开始处理新中断时调用的回调函数<br></td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:center">irq_mask</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#D2E4FC;text-align:left;vertical-align:top">回调函数，用于屏蔽（禁止）特定的中断源<br></td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center">irq_eoi</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#D2E4FC;text-align:left;vertical-align:top">在完成中断处理后调用的回调函数</td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center">irq_set_type</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#D2E4FC;text-align:left;vertical-align:top">回调函数，用于设置中断流「interrupt flow」的类型，比如IRQ_TYPE_EDGE_RISING和IRQ_TYPE_LEVEL_HIGH</td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center">irq_get_irqchip_state</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#D2E4FC;text-align:left;vertical-align:top">回调函数，获取特定中断在irqchip内部的状态<br>1. IRQCHIP_STATE_PENDING： 中断是否在挂起状态中（待处理）<br>2. IRQCHIP_STATE_ACTIVE： 中断是否在处理状态中<br>3. IRQCHIP_STATE_MASKED：中断是否在屏蔽状态中<br>4. IRQCHIP_STATE_LINE_LEVEL：IRQ管脚是否在高电平状态中</td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center">irq_set_irqchip_state</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#D2E4FC;text-align:left;vertical-align:top">回调函数，为指定中断设置在irqchip内部的状态</td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center">flags</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#D2E4FC;text-align:left;vertical-align:top">记录irqchip相关的控制信息</td></tr></table></div>
+
+<h4 id="irq-domain：中断域「interrupt-domain」"><a href="#irq-domain：中断域「interrupt-domain」" class="headerlink" title="irq_domain：中断域「interrupt domain」"></a>irq_domain：中断域「interrupt domain」</h4><p>结构体struct irq_domain用于统一管理Linux内核采用的中断编号。在中断初始化过程中，Linux内核会从特定整数区间中选取一个整数作为一个中断源「interrupt source」的编号，并且使每个中断源都有一个独一无二且不重复的编号。如果系统仅存有一个中断控制器，那么能简单地给每个引脚对应的中断源分配一个编号。不过，如前所述，在有些情况下系统可能配置了多个中断控制器，所以中断源的编号方式将会有点复杂。因此内核需要一种机制去管理硬件中断编号「hwirq」与Linux中断编号「irq」之间的映射，以便使多个中断控制器之间不会出现重复相同的irq。正因如此，内核抽象出了中断域概念，由它实现处理中断号的分配和管理。</p>
+<div align="center">表2 结构体struct irq_domain的主要字段描述
+<table style="border-collapse:collapse;border-spacing:0;border-color:#9ABAD9;margin:0px auto" class="tg"><tr><th style="font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#fff;background-color:#409cff;text-align:center">数据类型</th><th style="font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#fff;background-color:#409cff;text-align:center">字段名称</th><th style="font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#fff;background-color:#409cff;text-align:center">含义解释</th></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center">const char &#42;</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#D2E4FC;text-align:center">name</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:left">中断域名称</td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:center">const struct irq_domain_ops &#42;<br></td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#D2E4FC;text-align:center">ops<br></td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:left">指向irq_domain对象的方法<br></td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center">void &#42;</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#D2E4FC;text-align:center">host_data</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:left">私有数据指针，由irq_domain对象持有者使用，irq_domain核心代码不使用这个字段。</td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center">unsigned int</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#D2E4FC;text-align:center">flags</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:left">中断域标识</td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center">unsigned int</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#D2E4FC;text-align:center">mapcount</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:left">已映射的hwirq数量</td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center">irq_hw_number_t</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#D2E4FC;text-align:center">hwirq_max</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:left">中断控制器的最大hwirq</td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center">unsigned int</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#D2E4FC;text-align:center">revmap_direct_max_irq</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:left">能为直接映射「direct mapping」的中断控制器设置的最大hwirq</td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center">unsigned int</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#D2E4FC;text-align:center">revmap_size</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:left">线性映射表（linear_revmap数组）的容量</td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center">struct radix_tree_root</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#D2E4FC;text-align:center">revmap_tree</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:left">有些情况线性映射表不适合，通过基数树构建hwirq-&gt;irq的逆映射</td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center">unsigned int [ ]</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#D2E4FC;text-align:center">linear_revmap</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:left">过数组构建hwirq-&gt;irq的逆映射</td></tr></table></div>
+
+<h4 id="irq-desc：中断描述符「interrupt-descriptor」"><a href="#irq-desc：中断描述符「interrupt-descriptor」" class="headerlink" title="irq_desc：中断描述符「interrupt descriptor」"></a>irq_desc：中断描述符「interrupt descriptor」</h4><p>结构体struct irq_desc用于描述和管理中断，其大多数字段由中断处理核心部分「interrupt core」所使用。如果没有选用CONFIG_SPARSE_IRQ配置选项，中断描述符和irq之间的关联映射是通过数组，根据irq能够直接索引到对应的中断描述符。否则，通过基数数「radix tree」构建两者之间的关联映射，依据irq遍历搜索基数树才能寻找到对应的中断描述符。不管是否启用这个配置，两种情况都是通过irq_to_desc函数获取到对应的中断描述符。在ARM64的内核配置中，为了能够动态分配和管理中断描述符，默认启用了CONFIG_SPARSE_IRQ选项。</p>
+<div align="center">表3 结构体struct irq_desc的主要字段描述
+<table style="border-collapse:collapse;border-spacing:0;border-color:#9ABAD9;margin:0px auto" class="tg"><tr><th style="font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#fff;background-color:#409cff;text-align:center">数据类型</th><th style="font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#fff;background-color:#409cff;text-align:center">字段名称</th><th style="font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#fff;background-color:#409cff;text-align:center">含义解释</th></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:center">struct irq_common_data</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#D2E4FC;text-align:center">irq_common_data</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:left">用于传递有关中断的信息给中断芯片「irqchip」相关函数，并且保存所有irqchip共享的数据<br></td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:center">struct irq_data</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#D2E4FC;text-align:center">irq_data<br></td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:left">用于传递有关中断的信息给irqchip相关函数，并且保存各个irqchip独有的数据<br></td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:center">unsigned int __precpu &#42;</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#D2E4FC;text-align:center">kstat_irqs<br></td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:top">用于记录每个CPU的中断统计信息<br></td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:center">irq_flow_handler_t<br></td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#D2E4FC;text-align:center">handle_irq</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:top">为中断指定高级编程语言「C语言」实现的中断处理函数。当中断发生时，一开始会执行低级体系架构指令「汇编」实现的函数，然后才调用通用中断处理代码。<br></td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:center">struct irqaction &#42;</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#D2E4FC;text-align:center">action</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:left;vertical-align:top">提供中断处理所需的行动「action」。如果以线程形式处理中断，则要指定中断线程执行的中断处理函数「thread_fn」。对于共享中断，结构体irqaction的next字段指向下一个irqaction。</td></tr></table></div>
+
+<h3 id="中断处理函数「interrupter-handler」"><a href="#中断处理函数「interrupter-handler」" class="headerlink" title="中断处理函数「interrupter handler」"></a>中断处理函数「interrupter handler」</h3><p>本小节首先介绍了内核代码在请求中断时如何完成中断处理函数的注册以及中断管脚的配置。然后分析了在CPU接收到物理中断信号后中断处理函数的调用流程。最后说明了各个中断容许和禁止函数、以及中断子系统初始化函数。</p>
+<h4 id="中断请求"><a href="#中断请求" class="headerlink" title="中断请求"></a>中断请求</h4><p>所谓的中断请求其实就是启用中断号对应的中断管脚以及注册中断触发后执行的中断处理函数。一个中断管脚「interrupt line」就是一条传递中断电信号的媒介，其与中断控制器相连并且拥有一个硬件中断号「hwirq」作为标识。一旦启用的中断管脚上触发了中断，就会调用中断号对应的中断处理函数。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&lt;include/linux/interrupt.h&gt;</span><br><span class="line"><span class="type">static</span> <span class="keyword">inline</span> <span class="type">int</span> __must_check</span><br><span class="line"><span class="title function_">request_irq</span><span class="params">(<span class="type">unsigned</span> <span class="type">int</span> irq, <span class="type">irq_handler_t</span> handler, <span class="type">unsigned</span> <span class="type">long</span> flags,</span></span><br><span class="line"><span class="params">	    <span class="type">const</span> <span class="type">char</span> *name, <span class="type">void</span> *dev)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="keyword">return</span> request_threaded_irq(irq, handler, <span class="literal">NULL</span>, flags, name, dev);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>request_irq()用于注册给定的中断处理函数，它直接把给定参数全传递给request_threaded_irq()。但是除了这些参数，还为request_threaded_irq()的irq_handler_t thread_fn参数赋值NULL，因此request_irq()仅注册中断处理函数而不会创建中断线程「interrupt thread」。关于中断线程「thread_fn」的更多细节，请参考<a href="">中断延迟处理</a>。<br>在请求中断时传递给request_irq函数的参数如表4所示：</p>
+<div align="center">表4 传递给request_irq()的参数
+<table style="border-collapse:collapse;border-spacing:0;border-color:#9ABAD9;margin:0px auto" class="tg"><tr><th style="font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#fff;background-color:#409cff;text-align:center">数据类型</th><th style="font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#fff;background-color:#409cff;text-align:center">参数名称</th><th style="font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#fff;background-color:#409cff;text-align:center">含义解释</th></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:center">unsigned int<br></td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#D2E4FC;text-align:center">irq<br></td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:left">指定的中断编号<br></td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:center">irq_handler_t</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#D2E4FC;text-align:center">handler<br></td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:left">在中断发生时执行的中断处理函数<br></td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:center">unsigned long</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#D2E4FC;text-align:center">flags</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:left">中断属性标识<br></td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:center">const char &#42;</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#D2E4FC;text-align:center">name</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:left">中断名称，在读取/proc/interrupts时输出的名称<br></td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center">void &#42;</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#D2E4FC;text-align:center">dev</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:left">中断处理函数在执行时使用的私有数据</td></tr></table></div>
+
+<p>可以通过读取<code>/proc/interrupts</code>查看系统中已注册的所有中断，如图4所示。 </p>
+<p><img data-src="/images/23/proc-interrupts.jpeg" alt="proc-interrupts.jpeg"></p>
+<center>图4 当读取/proc/interrupts时输出画面</center>
+
+<h5 id="request-threaded-irq函数：注册中断处理函数"><a href="#request-threaded-irq函数：注册中断处理函数" class="headerlink" title="request_threaded_irq函数：注册中断处理函数"></a>request_threaded_irq函数：注册中断处理函数</h5><p>在请求中断时调用的request_threaded_irq()函数不仅能够注册一个在中断上下文「interrupt context」执行的中断处理程序「intrrupt handler」，还可以注册一个在线程环境运行的中断处理函数「thread_fn」。除了thread_fn参数（中断线程调用执行的函数）外，其他参数都是与request_irq()的参数相同。下面代码将分析介绍该函数的具体细节。</p>
+<p><strong>kernel&#x2F;irq&#x2F;manage.c的request_threaded_irq()</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">request_threaded_irq</span><span class="params">(<span class="type">unsigned</span> <span class="type">int</span> irq, <span class="type">irq_handler_t</span> handler,</span></span><br><span class="line"><span class="params">			 <span class="type">irq_handler_t</span> thread_fn, <span class="type">unsigned</span> <span class="type">long</span> irqflags,</span></span><br><span class="line"><span class="params">			 <span class="type">const</span> <span class="type">char</span> *devname, <span class="type">void</span> *dev_id)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">irqaction</span> *<span class="title">action</span>;</span></span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">irq_desc</span> *<span class="title">desc</span>;</span></span><br><span class="line">	<span class="type">int</span> retval;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> (irq == IRQ_NOTCONNECTED)</span><br><span class="line">		<span class="keyword">return</span> -ENOTCONN;</span><br><span class="line"></span><br><span class="line">	<span class="comment">/*</span></span><br><span class="line"><span class="comment">	 * Sanity-check: shared interrupts must pass in a real dev-ID,</span></span><br><span class="line"><span class="comment">	 * otherwise we&#x27;ll have trouble later trying to figure out</span></span><br><span class="line"><span class="comment">	 * which interrupt is which (messes up the interrupt freeing</span></span><br><span class="line"><span class="comment">	 * logic etc).</span></span><br><span class="line"><span class="comment">	 *</span></span><br><span class="line"><span class="comment">	 * Also IRQF_COND_SUSPEND only makes sense for shared interrupts and</span></span><br><span class="line"><span class="comment">	 * it cannot be set along with IRQF_NO_SUSPEND.</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	<span class="keyword">if</span> (((irqflags &amp; IRQF_SHARED) &amp;&amp; !dev_id) ||</span><br><span class="line">	    (!(irqflags &amp; IRQF_SHARED) &amp;&amp; (irqflags &amp; IRQF_COND_SUSPEND)) ||</span><br><span class="line">	    ((irqflags &amp; IRQF_NO_SUSPEND) &amp;&amp; (irqflags &amp; IRQF_COND_SUSPEND)))</span><br><span class="line">		<span class="keyword">return</span> -EINVAL;</span><br><span class="line"></span><br><span class="line">	desc = irq_to_desc(irq);</span><br><span class="line">	<span class="keyword">if</span> (!desc)</span><br><span class="line">		<span class="keyword">return</span> -EINVAL;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> (!irq_settings_can_request(desc) ||</span><br><span class="line">	    WARN_ON(irq_settings_is_per_cpu_devid(desc)))</span><br><span class="line">		<span class="keyword">return</span> -EINVAL;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> (!handler) &#123;</span><br><span class="line">		<span class="keyword">if</span> (!thread_fn)</span><br><span class="line">			<span class="keyword">return</span> -EINVAL;</span><br><span class="line">		handler = irq_default_primary_handler;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	action = kzalloc(<span class="keyword">sizeof</span>(<span class="keyword">struct</span> irqaction), GFP_KERNEL);</span><br><span class="line">	<span class="keyword">if</span> (!action)</span><br><span class="line">		<span class="keyword">return</span> -ENOMEM;</span><br><span class="line"></span><br><span class="line">	action-&gt;handler = handler;</span><br><span class="line">	action-&gt;thread_fn = thread_fn;</span><br><span class="line">	action-&gt;flags = irqflags;</span><br><span class="line">	action-&gt;name = devname;</span><br><span class="line">	action-&gt;dev_id = dev_id;</span><br><span class="line"></span><br><span class="line">	retval = irq_chip_pm_get(&amp;desc-&gt;irq_data);</span><br><span class="line">	<span class="keyword">if</span> (retval &lt; <span class="number">0</span>) &#123;</span><br><span class="line">		kfree(action);</span><br><span class="line">		<span class="keyword">return</span> retval;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	retval = __setup_irq(irq, desc, action);</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> (retval) &#123;</span><br><span class="line">		irq_chip_pm_put(&amp;desc-&gt;irq_data);</span><br><span class="line">		kfree(action-&gt;secondary);</span><br><span class="line">		kfree(action);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> retval;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">irqreturn_t</span> <span class="title function_">irq_default_primary_handler</span><span class="params">(<span class="type">int</span> irq, <span class="type">void</span> *dev_id)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="keyword">return</span> IRQ_WAKE_THREAD;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>21～24行：对传递的中断标识「irqflags」进行合理性检查和验证。如果请求多个设备共享的中断并且没有指定设备标识符「device ID」，或不支持suspend的设备指定了IRQF_COND_SUSPEND标志，也就是说这两种情况都将导致请求中断失败。</li>
+<li>26行：根据Linux中断号「irq」获取对应的中断描述符。</li>
+<li>37行：如果没有指定在中断上下文执行的中断处理函数「参数handler」，将为其指定默认的中断处理函数。下面67～70行给出的默认中断处理函数「irq_default_primary_handler」总是返回IRQ_WAKE_THREAD。该数值表示中断处理程序「handler」需要唤醒中断处理线程去继续处理中断。注意，中断处理函数的返回值如下所示：<ul>
+<li>IRQ_NONE：中断未能正确处理或者与设备不相关</li>
+<li>IRQ_HANDLED：成功处理了设备产生的中断</li>
+<li>IRQ_WAKE_THREAD：要求中断处理程序唤醒中断处理线程</li>
+</ul>
+</li>
+<li>44行：根据传入的参数为中断设置struct irqaction实例</li>
+<li>56行：将struct irqaction实例添入irq_desc对象的action链表</li>
+</ul>
+<h4 id="中断流处理函数「interrupt-flow-handler」的调用流程"><a href="#中断流处理函数「interrupt-flow-handler」的调用流程" class="headerlink" title="中断流处理函数「interrupt flow handler」的调用流程"></a>中断流处理函数「interrupt flow handler」的调用流程</h4><p>尽管中断控制器千差万别，但采用的中断流处理函数（比如handle_level_irq()、handle_percpu_irq()、handle_fasteoi_irq()、handle_edge_irq()等等）却大同小异。正如我们所知道的，基于ARMv8架构实现的AArch64核心在捕获到中断控制器触发的中断时会生成一个异步中断异常，该异常会使CPU暂停当前执行来响应处理中断。在中断异常发生后，CPU会执行函数指针handle_arch_irq所指向的一个回调函数，其是在中断控制器驱动初始化时调用set_handle_irq()设定的。<br>更具体地说，使用GIC的ARM64内核在初始化时会调用set_handle_irq()使函数指针handle_arch_irq指向gic_handle_irq()函数，因此在发生中断时就会调用执行gic_handle_irq()函数，然后其调用执行通用中断处理层的generic_handle_irq()函数，接着调用执行函数指针desc-&gt;handle_irq所指向的一个回调函数。而且desc-&gt;handle_irq指向的回调函数也是在由中断控制器驱动初始化时根据中断类型负责设定的。比如在ARM64内核中，对于单个CPU响应的中断，为desc-&gt;handle_irq所设定的回调函数都是handle_percpu_devid_irq()，对于多CPU响应的中断，为desc-&gt;handle_irq所设定的回调函数都是handle_fasteoi_irq()。</p>
+<p><img data-src="/images/23/interrupt_irq_handle_process.svg" alt="irq handle process"></p>
+<center>图5 中断处理函数的调用流程</center>
+
+<p>接下来看一下handle_fasteoi_irq()函数，其处理常见设备触发的中断。</p>
+<p><strong>kernel&#x2F;irq&#x2F;chip.c</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">handle_fasteoi_irq</span><span class="params">(<span class="keyword">struct</span> irq_desc *desc)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">irq_chip</span> *<span class="title">chip</span> =</span> desc-&gt;irq_data.chip;</span><br><span class="line"></span><br><span class="line">	raw_spin_lock(&amp;desc-&gt;lock);</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> (!irq_may_run(desc))</span><br><span class="line">		<span class="keyword">goto</span> out;</span><br><span class="line"></span><br><span class="line">	desc-&gt;istate &amp;= ~(IRQS_REPLAY | IRQS_WAITING);</span><br><span class="line"></span><br><span class="line">	<span class="comment">/*</span></span><br><span class="line"><span class="comment">	 * If its disabled or no action available</span></span><br><span class="line"><span class="comment">	 * then mask it and get out of here:</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	<span class="keyword">if</span> (unlikely(!desc-&gt;action || irqd_irq_disabled(&amp;desc-&gt;irq_data))) &#123;</span><br><span class="line">		desc-&gt;istate |= IRQS_PENDING;</span><br><span class="line">		mask_irq(desc);</span><br><span class="line">		<span class="keyword">goto</span> out;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	kstat_incr_irqs_this_cpu(desc);</span><br><span class="line">	<span class="keyword">if</span> (desc-&gt;istate &amp; IRQS_ONESHOT)</span><br><span class="line">		mask_irq(desc);</span><br><span class="line"></span><br><span class="line">	preflow_handler(desc);</span><br><span class="line">	handle_irq_event(desc);</span><br><span class="line"></span><br><span class="line">	cond_unmask_eoi_irq(desc, chip);</span><br><span class="line"></span><br><span class="line">	raw_spin_unlock(&amp;desc-&gt;lock);</span><br><span class="line">	<span class="keyword">return</span>;</span><br><span class="line">out:</span><br><span class="line">	<span class="keyword">if</span> (!(chip-&gt;flags &amp; IRQCHIP_EOI_IF_HANDLED))</span><br><span class="line">		chip-&gt;irq_eoi(&amp;desc-&gt;irq_data);</span><br><span class="line">	raw_spin_unlock(&amp;desc-&gt;lock);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>kernel&#x2F;irq&#x2F;handle.c</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">irqreturn_t</span> <span class="title function_">handle_irq_event</span><span class="params">(<span class="keyword">struct</span> irq_desc *desc)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="type">irqreturn_t</span> ret;</span><br><span class="line"></span><br><span class="line">	desc-&gt;istate &amp;= ~IRQS_PENDING;</span><br><span class="line">	irqd_set(&amp;desc-&gt;irq_data, IRQD_IRQ_INPROGRESS);</span><br><span class="line">	raw_spin_unlock(&amp;desc-&gt;lock);</span><br><span class="line"></span><br><span class="line">	ret = handle_irq_event_percpu(desc);</span><br><span class="line"></span><br><span class="line">	raw_spin_lock(&amp;desc-&gt;lock);</span><br><span class="line">	irqd_clear(&amp;desc-&gt;irq_data, IRQD_IRQ_INPROGRESS);</span><br><span class="line">	<span class="keyword">return</span> ret;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h5 id="中断动作「irqaction」的处理"><a href="#中断动作「irqaction」的处理" class="headerlink" title="中断动作「irqaction」的处理"></a>中断动作「irqaction」的处理</h5><p>下面代码展示了__handle_irq_event_percpu()函数如何调用执行传递给request_irq()的中断处理函数。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">irqreturn_t</span> __handle_irq_event_percpu(<span class="keyword">struct</span> irq_desc *desc, <span class="type">unsigned</span> <span class="type">int</span> *flags)</span><br><span class="line">&#123;</span><br><span class="line">	<span class="type">irqreturn_t</span> retval = IRQ_NONE;</span><br><span class="line">	<span class="type">unsigned</span> <span class="type">int</span> irq = desc-&gt;irq_data.irq;</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">irqaction</span> *<span class="title">action</span>;</span></span><br><span class="line"></span><br><span class="line">	record_irq_time(desc);</span><br><span class="line"></span><br><span class="line">	for_each_action_of_desc(desc, action) &#123;</span><br><span class="line">		<span class="type">irqreturn_t</span> res;</span><br><span class="line"></span><br><span class="line">		trace_irq_handler_entry(irq, action);</span><br><span class="line">		res = action-&gt;handler(irq, action-&gt;dev_id);</span><br><span class="line">		trace_irq_handler_exit(irq, action, res);</span><br><span class="line"></span><br><span class="line">		<span class="keyword">if</span> (WARN_ONCE(!irqs_disabled(),<span class="string">&quot;irq %u handler %pF enabled interrupts\n&quot;</span>,</span><br><span class="line">			      irq, action-&gt;handler))</span><br><span class="line">			local_irq_disable();</span><br><span class="line"></span><br><span class="line">		<span class="keyword">switch</span> (res) &#123;</span><br><span class="line">		<span class="keyword">case</span> IRQ_WAKE_THREAD:</span><br><span class="line">			<span class="comment">/*</span></span><br><span class="line"><span class="comment">			 * Catch drivers which return WAKE_THREAD but</span></span><br><span class="line"><span class="comment">			 * did not set up a thread function</span></span><br><span class="line"><span class="comment">			 */</span></span><br><span class="line">			<span class="keyword">if</span> (unlikely(!action-&gt;thread_fn)) &#123;</span><br><span class="line">				warn_no_thread(irq, action);</span><br><span class="line">				<span class="keyword">break</span>;</span><br><span class="line">			&#125;</span><br><span class="line"></span><br><span class="line">			__irq_wake_thread(desc, action);</span><br><span class="line"></span><br><span class="line">			<span class="comment">/* Fall through to add to randomness */</span></span><br><span class="line">		<span class="keyword">case</span> IRQ_HANDLED:</span><br><span class="line">			*flags |= action-&gt;flags;</span><br><span class="line">			<span class="keyword">break</span>;</span><br><span class="line"></span><br><span class="line">		<span class="keyword">default</span>:</span><br><span class="line">			<span class="keyword">break</span>;</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		retval |= res;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> retval;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>9行：遍历中断描述符「irq_desc」的中断动作「irqaction」链表，它们是由request_irq()创建的struct irqaction实例，一个实例描述了中断处理活动中的一个动作，主要为了封装注册的中断处理函数，隐藏handle_fn和thread_fn的差异，从而简化中断处理函数的调用执行逻辑，并使中断处理函数与通用中断处理层解耦。</li>
+<li>13行：调用每个action绑定的中断处理函数，正如前面中断请求小节所述，中断处理函数一定会返回三个返回值中的一个。</li>
+<li>21行：返回值IRQ_WAKE_THREAD表示需要唤醒中断处理线程去执行中断处理函数「thread_fn」。</li>
+<li>34行：返回值IRQ_HANDLED表示中断处理函数已正常处理。在这种情况下，仅返回action的标识给调用者，利用它往熵池添加中断随机种子。</li>
+</ul>
+<h5 id="IPI「Inter-Processor-Interrupts」：处理器间的通信"><a href="#IPI「Inter-Processor-Interrupts」：处理器间的通信" class="headerlink" title="IPI「Inter Processor Interrupts」：处理器间的通信"></a>IPI「Inter Processor Interrupts」：处理器间的通信</h5><p>在SMP系统中，IPI用于传递核间事件「inter-core event」。为了使用硬件体系架构相关的特殊功能，要借助中断控制器提供的功能使IPI从一个核传递给另外其他核。因此，在中断控制器驱动初始化时将调用set_smp_cross_call()函数去设定触发IPI的回调函数。IPI不仅需要能够被一个核或多个核捕获，而且还需要能够被中断处理函数辨识出。例如，在使用GIC中断控制器的系统中，小于等于15的硬中断号「hwirq」都属于软件生成中断「SGI，Software Generated Interrupt」。如果gic_handle_irq()函数处理的中断属于SGI，那么它将调用handle_IPI()函数而不是handle_domain_irq()函数。</p>
+<p>ARM64内核使用的IPI种类如下所示。内核调用smp_cross_call()函数向目标CPU发送特定IPI，该函数需要传入IPI编号和参数cpumask，其用于记录要接收IPI的CPU。</p>
+<div align="center">表5 ARM64的IPI种类
+<table style="border-collapse:collapse;border-spacing:0;border-color:#9ABAD9;margin:0px auto" class="tg"><tr><th style="font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#fff;background-color:#409cff;text-align:center">IPI种类</th><th style="font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#fff;background-color:#409cff;text-align:center">功能</th><th style="font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#fff;background-color:#409cff;text-align:center">例子</th></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:center">IPI_RESCHEDULE<br></td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#D2E4FC;text-align:left">唤醒挂起的任务<br></td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:left">使用前缀ttwu「try to wake up」的API去唤醒某个CPU上的任务<br></td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:center">IPI_CALL_FUNC<br></td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#D2E4FC;text-align:left">让其他CPU执行特定的函数<br></td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:left">drain_all_pages()函数将per-cpu页帧「由per-cpu分配器管理的物理内存页」交还给伙伴分配器「buddy allocator」<br></td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:center">IPI_STOP_CPU<br></td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#D2E4FC;text-align:left">暂停其他CPU<br></td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:left">为了系统重启暂停其他所有CPU<br></td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:center">IPI_TIMER</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#D2E4FC;text-align:left">调用tick时钟设备「tick-clock device」的事件处理程序<br></td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:left">在广播「broadcast」tick事件时<br></td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:center">IPI_IRQ_WORK<br></td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#D2E4FC;text-align:left">执行当前CPU的irq_work<br></td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:inherit;color:#444;background-color:#EBF5FF;text-align:left">在使用irq_work_queue()函数将irq_work入队列时<br></td></tr><tr><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:center">IPI_WAKEUP</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#D2E4FC;text-align:left">唤醒其他CPU</td><td style="font-family:Arial, sans-serif;font-size:14px;padding:10px 8px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#9ABAD9;color:#444;background-color:#EBF5FF;text-align:left">在使用APCI parking protocol唤醒CPU时</td></tr></table></div>
+
+<h4 id="容许「enabling」与禁止「disabling」中断"><a href="#容许「enabling」与禁止「disabling」中断" class="headerlink" title="容许「enabling」与禁止「disabling」中断"></a>容许「enabling」与禁止「disabling」中断</h4><p>目前存在两种用于容许&#x2F;禁止中断的方法。第一种禁止中断的方法是禁止当前核心「core」上的所有中断，从而不可能再发生中断异常。另一种方法是屏蔽特定中断管脚「interrupt line」。同样地，容许中断的方法也是这种情况。</p>
+<h5 id="容许和禁止当前核心的中断"><a href="#容许和禁止当前核心的中断" class="headerlink" title="容许和禁止当前核心的中断"></a>容许和禁止当前核心的中断</h5><p>如果禁止了核心的中断，则中断进入挂起状态以及中断处理程序不会执行。即使中断产生了也不会触发抢占「preemption 」。换句话说，禁止本地中断「local interrupt」也能保护当前核心上的执行环境「context」不受影响。但是在多核系统中，仅禁止本地中断并不能完全保护执行环境「context」不改变。由于其他核心仍然可以接收中断，如果在其他核心上执行的中断处理程序与当前核心上执行的代码共享数据，那么将可能破坏共享数据的同步。为此，在屏蔽本地中断时还需使用自旋锁「spinlock」。接下来看看如何禁止当前核心（本地）的中断。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&lt;include/linux/irqflags.h&gt;</span><br><span class="line"><span class="meta">#<span class="keyword">define</span> local_irq_enable()	do &#123; raw_local_irq_enable(); &#125; while (0)</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> local_irq_disable()	do &#123; raw_local_irq_disable(); &#125; while (0)</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> raw_local_irq_disable()		arch_local_irq_disable()</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> raw_local_irq_enable()		arch_local_irq_enable()</span></span><br></pre></td></tr></table></figure>
+<p>由于会使用处理器相关的汇编指令，所以每种体系架构的具体实现都不相同。在ARM64内核使用如下的代码。</p>
+<p><strong>arch&#x2F;arm64&#x2F;include&#x2F;asm&#x2F;irqflags.h的arch_local_irq_disable()和arch_local_irq_enable()</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="keyword">inline</span> <span class="type">void</span> <span class="title function_">arch_local_irq_enable</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="keyword">asm</span> <span class="title function_">volatile</span><span class="params">(</span></span><br><span class="line"><span class="params">		<span class="string">&quot;msr	daifclr, #2		// arch_local_irq_enable&quot;</span></span></span><br><span class="line"><span class="params">		:</span></span><br><span class="line"><span class="params">		:</span></span><br><span class="line"><span class="params">		: <span class="string">&quot;memory&quot;</span>)</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="keyword">inline</span> <span class="type">void</span> <span class="title function_">arch_local_irq_disable</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="keyword">asm</span> <span class="title function_">volatile</span><span class="params">(</span></span><br><span class="line"><span class="params">		<span class="string">&quot;msr	daifset, #2		// arch_local_irq_disable&quot;</span></span></span><br><span class="line"><span class="params">		:</span></span><br><span class="line"><span class="params">		:</span></span><br><span class="line"><span class="params">		: <span class="string">&quot;memory&quot;</span>)</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>4行：将2写入DAIF清除寄存器「DAIF clear register」就能屏蔽「diable」本地中断。</li>
+<li>13行：将2写入DAIF置位寄存器「DAIF set register」就能容许「enable」本地中断。<br>在ARMv8体系架构中，能够利用汇编指令仅操作PSTATE寄存器的DAIF字段。写入寄存器的值也仅根据DAIF计算得出，如果IRQ位被掩蔽「mask」，那么当前核心不再接收中断，从而使中断被挂起。反之，如果IRQ位被去除掩蔽「unmask」，那么当前核心能继续接收中断。如图6所示说明了PSTATE的DAIF位操作。</li>
+</ul>
+<p><img data-src="/images/23/interrupt_PSTATE_DAIF.svg" alt="DAIF field of PSTATE register"></p>
+<center>图6 PSTATE寄存器的DAIF字段</center>
+
+<h5 id="启用和屏蔽特定中断管脚「interrupt-line」"><a href="#启用和屏蔽特定中断管脚「interrupt-line」" class="headerlink" title="启用和屏蔽特定中断管脚「interrupt line」"></a>启用和屏蔽特定中断管脚「interrupt line」</h5><p>如果必要的话，驱动程序可以先屏蔽已激活的中断管脚，然后再启用那个中断管脚。然而如果中断管脚被多个设备共享，那么它就不可以被屏蔽。对中断禁止函数的调用本质上就是调用中断控制器驱动提供的回调函数。容许和屏蔽中断管脚函数都允许多次被调用，但它们只能被成对地调用。也就是说，只要调用了中断管脚屏蔽函数，就必须调用中断管脚容许函数，以致于实际的中断管脚任然是激活的。具体细节参考下面的代码。</p>
+<h6 id="disable-irq-：屏蔽某个中断管脚"><a href="#disable-irq-：屏蔽某个中断管脚" class="headerlink" title="disable_irq()：屏蔽某个中断管脚"></a>disable_irq()：屏蔽某个中断管脚</h6><p>目前内核存在两种中断管脚屏蔽函数。第一种是disable_irq()函数，它屏蔽特定中断管脚，并一直等待相关的待处理中断处理程序执行完毕才返回。第二种是disable_irq_nosync()函数，它在屏蔽特定中断管脚后立马返回。</p>
+<p><strong>kernel&#x2F;irq&#x2F;manage.c的disable_irq()和disable_irq_nosync()</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">disable_irq</span><span class="params">(<span class="type">unsigned</span> <span class="type">int</span> irq)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="keyword">if</span> (!__disable_irq_nosync(irq))</span><br><span class="line">		synchronize_irq(irq);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> __disable_irq(<span class="keyword">struct</span> irq_desc *desc)</span><br><span class="line">&#123;</span><br><span class="line">	<span class="keyword">if</span> (!desc-&gt;depth++)</span><br><span class="line">		irq_disable(desc);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">int</span> __disable_irq_nosync(<span class="type">unsigned</span> <span class="type">int</span> irq)</span><br><span class="line">&#123;</span><br><span class="line">	<span class="type">unsigned</span> <span class="type">long</span> flags;</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">irq_desc</span> *<span class="title">desc</span> =</span> irq_get_desc_buslock(irq, &amp;flags, IRQ_GET_DESC_CHECK_GLOBAL);</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> (!desc)</span><br><span class="line">		<span class="keyword">return</span> -EINVAL;</span><br><span class="line">	__disable_irq(desc);</span><br><span class="line">	irq_put_desc_busunlock(desc, flags);</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">disable_irq_nosync</span><span class="params">(<span class="type">unsigned</span> <span class="type">int</span> irq)</span></span><br><span class="line">&#123;</span><br><span class="line">	__disable_irq_nosync(irq);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>3行：__disable_irq_nosync()屏蔽特定的中断管脚，并检查它是否无错误地完成操作。</li>
+<li>4行：一直等待对应中断处理程序执行结束，很可能它正在其他CPU上运行。如果直接调用disable_irq()的驱动程序与对应中断处理程序共享相同数据资源，那很有可能发生死锁。比如驱动在调用disable_irq()之前获得了资源的自旋锁，并一直等待中断处理程序执行完毕，但中断处理程序在执行过程中也需要获得该资源的自旋锁，因此这样导致死锁。</li>
+<li>20行：通用中断处理函数实质上是对中断硬件相关函数的封装，__disable_irq()最终会调用中断控制器驱动初始化的irq_disable或irq_mask回调函数完成具体的中断管脚屏蔽操作。</li>
+<li>9～10行：检查中断描述符对象的depth成员是否等于0，若是，irq_disable()将调用中断控制器驱动指定的中断屏蔽函数。depth是一个计数器，每调用一次__disable_irq()将它自增1。</li>
+<li>27行：disable_irq_nosync()不会等待中断处理程序执行完成，它屏蔽中断管脚后直接返回。</li>
+</ul>
+<h6 id="enable-irq-：启用某个中断管脚"><a href="#enable-irq-：启用某个中断管脚" class="headerlink" title="enable_irq()：启用某个中断管脚"></a>enable_irq()：启用某个中断管脚</h6><p>目前内核仅有一种启用中断管脚的函数。</p>
+<p><strong>kernel&#x2F;irq&#x2F;manage.c的enable_irq()和__enable_irq()</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">enable_irq</span><span class="params">(<span class="type">unsigned</span> <span class="type">int</span> irq)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="type">unsigned</span> <span class="type">long</span> flags;</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">irq_desc</span> *<span class="title">desc</span> =</span> irq_get_desc_buslock(irq, &amp;flags, IRQ_GET_DESC_CHECK_GLOBAL);</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> (!desc)</span><br><span class="line">		<span class="keyword">return</span>;</span><br><span class="line">	<span class="keyword">if</span> (WARN(!desc-&gt;irq_data.chip,</span><br><span class="line">		 KERN_ERR <span class="string">&quot;enable_irq before setup/request_irq: irq %u\n&quot;</span>, irq))</span><br><span class="line">		<span class="keyword">goto</span> out;</span><br><span class="line"></span><br><span class="line">	__enable_irq(desc);</span><br><span class="line">out:</span><br><span class="line">	irq_put_desc_busunlock(desc, flags);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> __enable_irq(<span class="keyword">struct</span> irq_desc *desc)</span><br><span class="line">&#123;</span><br><span class="line">	<span class="keyword">switch</span> (desc-&gt;depth) &#123;</span><br><span class="line">	<span class="keyword">case</span> <span class="number">0</span>:</span><br><span class="line"> err_out:</span><br><span class="line">		WARN(<span class="number">1</span>, KERN_WARNING <span class="string">&quot;Unbalanced enable for IRQ %d\n&quot;</span>,</span><br><span class="line">		     irq_desc_get_irq(desc));</span><br><span class="line">		<span class="keyword">break</span>;</span><br><span class="line">	<span class="keyword">case</span> <span class="number">1</span>: &#123;</span><br><span class="line">		<span class="keyword">if</span> (desc-&gt;istate &amp; IRQS_SUSPENDED)</span><br><span class="line">			<span class="keyword">goto</span> err_out;</span><br><span class="line">		<span class="comment">/* Prevent probing on this irq: */</span></span><br><span class="line">		irq_settings_set_noprobe(desc);</span><br><span class="line">		<span class="comment">/*</span></span><br><span class="line"><span class="comment">		 * Call irq_startup() not irq_enable() here because the</span></span><br><span class="line"><span class="comment">		 * interrupt might be marked NOAUTOEN. So irq_startup()</span></span><br><span class="line"><span class="comment">		 * needs to be invoked when it gets enabled the first</span></span><br><span class="line"><span class="comment">		 * time. If it was already started up, then irq_startup()</span></span><br><span class="line"><span class="comment">		 * will invoke irq_enable() under the hood.</span></span><br><span class="line"><span class="comment">		 */</span></span><br><span class="line">		irq_startup(desc, IRQ_RESEND, IRQ_START_FORCE);</span><br><span class="line">		<span class="keyword">break</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">default</span>:</span><br><span class="line">		desc-&gt;depth--;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>4行：在发出中断控制器操作命令之前，先要获得总线锁「bus lock」，在操作命令执行完后，还要释放总线锁，从而保证命令能在总线上同步执行「bus-level synchronization」。</li>
+<li>12行：调用内部使用的中断容许函数__enable_irq()，其最终会使用中断硬件相关的回调函数去启用中断管脚。</li>
+<li>19行：查看irq_desc对象的depth成员，从而选择不同的代码处理路径</li>
+<li>20行：如果depth等于0，则不能启用中断管脚并输出警告消息</li>
+<li>25行：如果depth等于1，则调用中断控制器驱动初始化的启用中断管脚的回调函数， 并将depth减1。</li>
+<li>41行：除此之外，将记录disable_irq()调用次数的depth自减1，借助它能实现中断管脚的重复屏蔽或启用，从而追踪disable_irq()和enable_irq()两者是否成对调用。</li>
+</ul>
+<h4 id="中断子系统的初始化"><a href="#中断子系统的初始化" class="headerlink" title="中断子系统的初始化"></a>中断子系统的初始化</h4><p>中断子系统是内核的重要组成部分，在内核启动阶段必定会初始化中断子系统。这里将介绍的初始化函数会直接被start_kernel()调用。下面将分析代码具体完成了哪些初始化。</p>
+<h5 id="early-irq-init-：初始化中断描述符"><a href="#early-irq-init-：初始化中断描述符" class="headerlink" title="early_irq_init()：初始化中断描述符"></a>early_irq_init()：初始化中断描述符</h5><p>在中断未初始化之前，首先为中断设置默认CPU亲和性「affinity 」，除此之外，还为中断硬件分配必要的中断描述符「irq_desc」实例。</p>
+<p>kernel&#x2F;irq&#x2F;irqdesc.c的early_irq_init()</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> __init <span class="title function_">early_irq_init</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="type">int</span> i, initcnt, node = first_online_node;</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">irq_desc</span> *<span class="title">desc</span>;</span></span><br><span class="line"></span><br><span class="line">	init_irq_default_affinity();</span><br><span class="line"></span><br><span class="line">	<span class="comment">/* Let arch update nr_irqs and return the nr of preallocated irqs */</span></span><br><span class="line">	initcnt = arch_probe_nr_irqs();</span><br><span class="line">	printk(KERN_INFO <span class="string">&quot;NR_IRQS: %d, nr_irqs: %d, preallocated irqs: %d\n&quot;</span>,</span><br><span class="line">	       NR_IRQS, nr_irqs, initcnt);</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> (WARN_ON(nr_irqs &gt; IRQ_BITMAP_BITS))</span><br><span class="line">		nr_irqs = IRQ_BITMAP_BITS;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> (WARN_ON(initcnt &gt; IRQ_BITMAP_BITS))</span><br><span class="line">		initcnt = IRQ_BITMAP_BITS;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> (initcnt &gt; nr_irqs)</span><br><span class="line">		nr_irqs = initcnt;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; initcnt; i++) &#123;</span><br><span class="line">		desc = alloc_desc(i, node, <span class="number">0</span>, <span class="literal">NULL</span>, <span class="literal">NULL</span>);</span><br><span class="line">		set_bit(i, allocated_irqs);</span><br><span class="line">		irq_insert_desc(i, desc);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> arch_early_irq_init();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>6行：初始化struct cpumask类型的实例irq_default_affinity，其实就是分配它所用的内存空间并全部置位，结构体struct cpumask包含一个具有NR_CPUS位的位图。如果命令行参数irqaffinity指定了允许中断的CPU列表，那么irq_default_affinity位图内这些CPU对应位将被设置成1（置位）。不过，如果irq_default_affinity位图内任何位都没有被设置，也即所有位都是0（复位），则将所有CPU对应位都设置成1。</li>
+<li>9行：获得NR_IRQS_LEGACY宏的值，该宏记录着每种体系架构「arch」必须提前预处理的中断数量，比如在ARM64内核中该宏的值等于0。</li>
+<li>19～20行：如果initcnt大于Linux内核配置的中断数量「全局变量nr_irqs &#x3D; NR_IRQS宏」，将nr_irqs更新为预处理的中断数量。</li>
+<li>23行：分配与initcnt个中断描述符「struct irq_desc」实例</li>
+<li>24行：allocated_irqs位图内中断号对应位被设置成1</li>
+<li>25行：如果启用了CONFIG_SPARSE_IRQ选项，则将分配的中断描述符「struct irq_desc」实例插入基数树「radix tree」。</li>
+<li>27行：执行每种体系架构定义的早期中断初始化函数，比如在ARM64内核，该函数是一个不做任何事情的空函数。</li>
+</ul>
+<h5 id="init-IRQ-：初始化中断硬件"><a href="#init-IRQ-：初始化中断硬件" class="headerlink" title="init_IRQ()：初始化中断硬件"></a>init_IRQ()：初始化中断硬件</h5><p>该函数搜索寻找设备树「device tree」的中断控制器节点和初始化系统所用的中断控制器。</p>
+<p>arch&#x2F;arm64&#x2F;kernel&#x2F;irq.c的init_IRQ()</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> __init <span class="title function_">init_IRQ</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">	init_irq_stacks();</span><br><span class="line">	irqchip_init();</span><br><span class="line">	<span class="keyword">if</span> (!handle_arch_irq)</span><br><span class="line">		panic(<span class="string">&quot;No interrupt controller found.&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>4行：将设备树的所有节点与__irqchip_of_table表进行比对，从而找到匹配的中断控制器节点和对应的struct of_device_id实例。一旦发现了匹配的中断控制器节点，就会立马调用初始化函数设置中断控制器，这些都由of_irq_init()负责完成，同时它在执行初始化时还必须为handle_arch_irq指定回调函数。</p>
+<h5 id="of-irq-init-：初始化中断控制器"><a href="#of-irq-init-：初始化中断控制器" class="headerlink" title="of_irq_init()：初始化中断控制器"></a>of_irq_init()：初始化中断控制器</h5><p>该函数搜索设备树的所有中断控制器节点，并根据中断控制器的层次关系依次执行中断控制器的初始化函数。__irqchip_of_table是由struct of_device_id实例组成的一个匹配比对表，这些实例是在设备驱动中声明定义的。一旦搜索发现与__irqchip_of_table的实例相匹配的中断控制器节点，就将它添入链表「intc_desc_list」的末尾。每个添入链表的中断控制器节点都设置了回调函数，因此后面能够调用它初始化中断硬件。接下来分析代码是如何执行回调函数的。</p>
+<p><strong>drivers&#x2F;of&#x2F;irq.c的of_irq_init()[1&#x2F;2]</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> __init <span class="title function_">of_irq_init</span><span class="params">(<span class="type">const</span> <span class="keyword">struct</span> of_device_id *matches)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="type">const</span> <span class="class"><span class="keyword">struct</span> <span class="title">of_device_id</span> *<span class="title">match</span>;</span></span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">device_node</span> *<span class="title">np</span>, *<span class="title">parent</span> =</span> <span class="literal">NULL</span>;</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">of_intc_desc</span> *<span class="title">desc</span>, *<span class="title">temp_desc</span>;</span></span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">list_head</span> <span class="title">intc_desc_list</span>, <span class="title">intc_parent_list</span>;</span></span><br><span class="line"></span><br><span class="line">	INIT_LIST_HEAD(&amp;intc_desc_list);</span><br><span class="line">	INIT_LIST_HEAD(&amp;intc_parent_list);</span><br><span class="line"></span><br><span class="line">	for_each_matching_node_and_match(np, matches, &amp;match) &#123;</span><br><span class="line">		<span class="keyword">if</span> (!of_property_read_bool(np, <span class="string">&quot;interrupt-controller&quot;</span>) ||</span><br><span class="line">				!of_device_is_available(np))</span><br><span class="line">			<span class="keyword">continue</span>;</span><br><span class="line"></span><br><span class="line">		<span class="keyword">if</span> (WARN(!match-&gt;data, <span class="string">&quot;of_irq_init: no init function for %s\n&quot;</span>,</span><br><span class="line">			 match-&gt;compatible))</span><br><span class="line">			<span class="keyword">continue</span>;</span><br><span class="line"></span><br><span class="line">		<span class="comment">/*</span></span><br><span class="line"><span class="comment">		 * Here, we allocate and populate an of_intc_desc with the node</span></span><br><span class="line"><span class="comment">		 * pointer, interrupt-parent device_node etc.</span></span><br><span class="line"><span class="comment">		 */</span></span><br><span class="line">		desc = kzalloc(<span class="keyword">sizeof</span>(*desc), GFP_KERNEL);</span><br><span class="line">		<span class="keyword">if</span> (WARN_ON(!desc)) &#123;</span><br><span class="line">			of_node_put(np);</span><br><span class="line">			<span class="keyword">goto</span> err;</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		desc-&gt;irq_init_cb = match-&gt;data;</span><br><span class="line">		desc-&gt;dev = of_node_get(np);</span><br><span class="line">		desc-&gt;interrupt_parent = of_irq_find_parent(np);</span><br><span class="line">		<span class="keyword">if</span> (desc-&gt;interrupt_parent == np)</span><br><span class="line">			desc-&gt;interrupt_parent = <span class="literal">NULL</span>;</span><br><span class="line">		list_add_tail(&amp;desc-&gt;<span class="built_in">list</span>, &amp;intc_desc_list);</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	.......</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>8～9行：初始化管理中断控制器的两个链表，其中intc_desc_list用于连接struct of_intc_desc实例，每一个实例记录着一个中断控制器的信息，intc_parent_list用于连接已初始化的中断控制器对象「struct of_intc_desc实例」，那为什么这个链表的名字要包含parent，我估计原因是从上到下优先初始化父中断控制器。</li>
+<li>11行：遍历设备树的每一个节点，并通过与matchs表比对获得匹配的节点和对应的struct of_device_id实例（也叫匹配对象）</li>
+<li>12～14行：使用of_property_read_bool()在匹配的节点内搜寻给定属性，of_device_is_available()判断匹配的节点是否可用。如果未发现“interrupt-controller”属性或节点不可用，则跳过当前匹配的节点并继续搜寻下一个节点。</li>
+<li>24行：分配一个struct of_intc_desc实例，用于保存中断控制器的初始化信息</li>
+<li>30行：将匹配对象「struct of_device_id实例」的data成员用作回调函数，用于初始化匹配节点所描述的中断控制器。对于ARM64内核，若在设备树中创建了interrupt-controller节点，则在搜寻匹配后回调函数通常会设定为gic_of_init()。不管怎么样，后面的代码定会调用执行设定的回调函数。</li>
+<li>31行：到目前为止，已经通过遍历设备树发现了匹配的GIC节点，因此让desc-&gt;dev指向这个中断控制器节点。</li>
+<li>32～34行：行使desc-&gt;interrupt_parent指向当前节点的父节点，若指向的父节点与当前节点相同，则意味着当前节点没有父节点，因此重新设置desc-&gt;interrupt_parent为NULL。</li>
+<li>35行：将一个中断控制器对象「struct of_intc_desc实例」添加到intc_desc_list链表的末尾。至此就完成了在intc_desc_list链表注册入中断控制器对象，接下来看看如何处理注册的对象。</li>
+</ul>
+<p><strong>drivers&#x2F;of&#x2F;irq.c的of_irq_init()[2&#x2F;2]</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br></pre></td><td class="code"><pre><span class="line">	......</span><br><span class="line">	</span><br><span class="line">	<span class="keyword">while</span> (!list_empty(&amp;intc_desc_list)) &#123;</span><br><span class="line">		<span class="comment">/*</span></span><br><span class="line"><span class="comment">		 * Process all controllers with the current &#x27;parent&#x27;.</span></span><br><span class="line"><span class="comment">		 * First pass will be looking for NULL as the parent.</span></span><br><span class="line"><span class="comment">		 * The assumption is that NULL parent means a root controller.</span></span><br><span class="line"><span class="comment">		 */</span></span><br><span class="line">		list_for_each_entry_safe(desc, temp_desc, &amp;intc_desc_list, <span class="built_in">list</span>) &#123;</span><br><span class="line">			<span class="type">int</span> ret;</span><br><span class="line"></span><br><span class="line">			<span class="keyword">if</span> (desc-&gt;interrupt_parent != parent)</span><br><span class="line">				<span class="keyword">continue</span>;</span><br><span class="line"></span><br><span class="line">			list_del(&amp;desc-&gt;<span class="built_in">list</span>);</span><br><span class="line"></span><br><span class="line">			of_node_set_flag(desc-&gt;dev, OF_POPULATED);</span><br><span class="line"></span><br><span class="line">			pr_debug(<span class="string">&quot;of_irq_init: init %pOF (%p), parent %p\n&quot;</span>,</span><br><span class="line">				 desc-&gt;dev,</span><br><span class="line">				 desc-&gt;dev, desc-&gt;interrupt_parent);</span><br><span class="line">			ret = desc-&gt;irq_init_cb(desc-&gt;dev,</span><br><span class="line">						desc-&gt;interrupt_parent);</span><br><span class="line">			<span class="keyword">if</span> (ret) &#123;</span><br><span class="line">				of_node_clear_flag(desc-&gt;dev, OF_POPULATED);</span><br><span class="line">				kfree(desc);</span><br><span class="line">				<span class="keyword">continue</span>;</span><br><span class="line">			&#125;</span><br><span class="line"></span><br><span class="line">			<span class="comment">/*</span></span><br><span class="line"><span class="comment">			 * This one is now set up; add it to the parent list so</span></span><br><span class="line"><span class="comment">			 * its children can get processed in a subsequent pass.</span></span><br><span class="line"><span class="comment">			 */</span></span><br><span class="line">			list_add_tail(&amp;desc-&gt;<span class="built_in">list</span>, &amp;intc_parent_list);</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		<span class="comment">/* Get the next pending parent that might have children */</span></span><br><span class="line">		desc = list_first_entry_or_null(&amp;intc_parent_list,</span><br><span class="line">						typeof(*desc), <span class="built_in">list</span>);</span><br><span class="line">		<span class="keyword">if</span> (!desc) &#123;</span><br><span class="line">			pr_err(<span class="string">&quot;of_irq_init: children remain, but no parents\n&quot;</span>);</span><br><span class="line">			<span class="keyword">break</span>;</span><br><span class="line">		&#125;</span><br><span class="line">		list_del(&amp;desc-&gt;<span class="built_in">list</span>);</span><br><span class="line">		parent = desc-&gt;dev;</span><br><span class="line">		kfree(desc);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	list_for_each_entry_safe(desc, temp_desc, &amp;intc_parent_list, <span class="built_in">list</span>) &#123;</span><br><span class="line">		list_del(&amp;desc-&gt;<span class="built_in">list</span>);</span><br><span class="line">		kfree(desc);</span><br><span class="line">	&#125;</span><br><span class="line">err:</span><br><span class="line">	list_for_each_entry_safe(desc, temp_desc, &amp;intc_desc_list, <span class="built_in">list</span>) &#123;</span><br><span class="line">		list_del(&amp;desc-&gt;<span class="built_in">list</span>);</span><br><span class="line">		of_node_put(desc-&gt;dev);</span><br><span class="line">		kfree(desc);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>3行：检查intc_desc_list链表，直到所有的中断控制器对象都处理完才退出循环。被处理的对象将从链表中移除，若检查到链表为空，意味着所有注册的对象已经出来完。</li>
+<li>9行：从intc_desc_list链表头开始遍历每个对象。除了遍历链表，该宏会提前保存指向下一个对象的指针以防数据结构的破坏，也就是说即使在遍历时删除了当前处理对象，也能安全地继续进行遍历。</li>
+<li>12～13行：检查判断当前节点的父节点，如果它是父节点「parent」的孩子，将调用回调函数初始化对应的中断控制器，否则继续检查下一个节点。在第一轮外循环「while层循环」，parent为NULL，所以首先搜寻初始化的是根中断控制器。在第二轮外循环，parent变成上一轮发现的中断控制器，所以会搜寻初始化它的孩子。</li>
+<li>15～22行：在执行初始化回调函数前将从intc_desc_list链表移除中断控制器对象「struct of_intc_desc实例」。对于ARM64内核，将执行的初始化回调函数是gic_of_init()，它既为__smp_cross_call设定gic_raise_softirq()回调函数，又为handle_arch_irq指定gic_handle_irq()回调函数。但是，具体的初始化回调函数依赖于使用的体系架构和设备树配置的中断硬件。</li>
+<li>23行：如果初始化执行失败，则释放当前中断控制器对象并继续处理intc_desc_list链表中的下一个对象。</li>
+<li>34行：将当前已经初始化的中断控制器对象添加到intc_parent_list链表的末尾，因此后面的代码能用它指向的中断控制器节点更新父节点「parent」，从而能够继续初始化作为它孩子的中断控制器对象。</li>
+<li>38～39行：如果intc_parent_list链表非空，则该函数将返回第一个已初始化的中断控制器对象。若为空，就是说不存在已初始化的父中断控制器对象，因此该函数返回NULL，意味着中断子系统初始化出现致命错误。</li>
+<li>44～45行：从intc_parent_list链表删除这个中断控制器对象，然后用它指向的节点更新父节点「parent」以便进行下一轮循环。</li>
+<li>49～57行：释放intc_parent_list和intc_desc_list中所有的中断控制器对象。至此，该函数完成了中断控制器及相关中断的初始化。</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer"><div class="post-widgets">
+      <div id="needsharebutton-postbottom">
+        <span class="btn">
+          <i class="fa fa-share-alt" aria-hidden="true"></i>
+        </span>
+      </div>
+    </div>
+          <div class="reward-container">
+  <div>请我一杯咖啡吧！</div>
+  <button>
+    赞赏
+  </button>
+  <div class="post-reward">
+      <div>
+        <img src="/images/wechatpay.png" alt="Xinlu Wang 微信">
+        <span>微信</span>
+      </div>
+      <div>
+        <img src="/images/alipay.jpg" alt="Xinlu Wang 支付宝">
+        <span>支付宝</span>
+      </div>
+
+  </div>
+</div>
+
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>本文作者： </strong>Xinlu Wang
+  </li>
+  <li class="post-copyright-link">
+      <strong>本文链接：</strong>
+      <a href="https://chasinglulu.github.io/posts/a0d0775f/" title="中断「interrupt」">https://chasinglulu.github.io/posts/a0d0775f/</a>
+  </li>
+  <li class="post-copyright-license">
+      <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/interrupt/" rel="tag"><i class="fa fa-tag"></i> interrupt</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/dae1ffea/" rel="prev" title="内存模型「memory model」">
+                  <i class="fa fa-angle-left"></i> 内存模型「memory model」
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/posts/8b7c2647/" rel="next" title="时间管理「time management」">
+                  时间管理「time management」 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments" id="waline"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2018 – 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-anchor"></i>
+    </span><a href="http://abitacc.com/about" rel="noopener" target="_blank">Xinlu Wang</a>
+    <!-- annotation
+    <span class="author" itemprop="copyrightHolder">Xinlu Wang</span>
+    -->
+  </div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+      <span>站点总字数：</span>
+    <span title="站点总字数">82k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span>站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">4:57</span>
+  </span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+  <a href="https://github.com/chasinglulu" class="github-corner" title="在 GitHub 上关注我" aria-label="在 GitHub 上关注我" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script size="300" alpha="0.6" zIndex="-1" src="https://cdnjs.cloudflare.com/ajax/libs/ribbon.js/1.0.2/ribbon.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lozad.js/1.16.0/lozad.min.js" integrity="sha256-mOFREFhqmHeQbXpK2lp4nA3qooVgACfh88fpJftLBbc=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script><script src="/js/bookmark.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/quicklink/2.3.0/quicklink.umd.js" integrity="sha256-yvJQOINiH9fWemHn0vCA5lsHWJaHs6/ZmO+1Ft04SvM=" crossorigin="anonymous"></script>
+  <script class="next-config" data-name="quicklink" type="application/json">{"enable":true,"home":false,"archive":false,"delay":true,"timeout":3000,"priority":true,"url":"https://chasinglulu.github.io/posts/a0d0775f/"}</script>
+  <script src="/js/third-party/quicklink.js"></script>
+<script class="next-config" data-name="waline" type="application/json">{"lang":"zh-CN","enable":true,"serverURL":"www.chasinglulu.cn","cssUrl":"https://unpkg.com/@waline/client@v2/dist/waline.css","commentCount":true,"pageview":true,"placeholder":"请文明评论呀","avatar":"mm","meta":["nick","mail"],"pageSize":10,"comment_count":true,"requiredFields":["mail"],"libUrl":"https://cdn.jsdelivr.net/npm/@waline/client@2.15.8/dist/waline.js","emoji":["https://cdn.jsdelivr.net/gh/walinejs/emojis@1.1.0/tw-emoji/"],"el":"#waline","comment":true,"path":"/posts/a0d0775f/"}</script>
+<link rel="stylesheet" href="https://unpkg.com/@waline/client@v2/dist/waline.css">
+<script>
+document.addEventListener('page:loaded', () => {
+  NexT.utils.loadComments(CONFIG.waline.el).then(() =>
+    NexT.utils.getScript(CONFIG.waline.libUrl, { condition: window.Waline })
+  ).then(() => 
+    Waline.init(Object.assign({}, CONFIG.waline,{ el: document.querySelector(CONFIG.waline.el) }))
+  );
+});
+</script>
+<div id="needsharebutton-float">
+      <span class="btn">
+        <i class="fa fa-share-alt" aria-hidden="true"></i>
+      </span>
+    </div>
+  <script src="//cdn.jsdelivr.net/gh/theme-next/theme-next-needmoreshare2@1/needsharebutton.min.js"></script>
+  <script>
+      pbOptions = {};
+        pbOptions.iconStyle = "default";
+        pbOptions.boxForm = "horizontal";
+        pbOptions.position = "bottomCenter";
+        pbOptions.networks = "Weibo,Wechat,Douban,QQZone,Mailto";
+      new needShareButton('#needsharebutton-postbottom', pbOptions);
+      flOptions = {};
+        flOptions.iconStyle = "box";
+        flOptions.boxForm = "vertical";
+        flOptions.position = "topRight";
+        flOptions.networks = "Weibo,Wechat,Douban,QQZone,Mailto";
+      new needShareButton('#needsharebutton-float', flOptions);
+  </script>
+</body>
+</html>

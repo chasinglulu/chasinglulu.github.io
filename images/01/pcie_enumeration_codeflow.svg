@@ -1,0 +1,428 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- 由 Microsoft Visio, SVG Export 生成 pcie_enumeration_codeflow.svg 页-1 -->
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:ev="http://www.w3.org/2001/xml-events"
+		xmlns:v="http://schemas.microsoft.com/visio/2003/SVGExtensions/" width="11.6095in" height="5.31029in"
+		viewBox="0 0 835.884 382.341" xml:space="preserve" color-interpolation-filters="sRGB" class="st13">
+	<v:documentProperties v:langID="2052" v:metric="true" v:viewMarkup="false"/>
+
+	<style type="text/css">
+	<![CDATA[
+		.st1 {visibility:visible}
+		.st2 {fill:#5b9bd5;fill-opacity:0.22;filter:url(#filter_2);stroke:#5b9bd5;stroke-opacity:0.22}
+		.st3 {fill:#ffc000;stroke:#ffc000;stroke-width:0.75}
+		.st4 {fill:#000000;font-family:Times New Roman;font-size:1.00001em}
+		.st5 {fill:#00b0f0;stroke:#00b0f0;stroke-width:0.75}
+		.st6 {font-size:1em}
+		.st7 {fill:#ed7d31;stroke:#ed7d31;stroke-width:0.75}
+		.st8 {marker-end:url(#mrkr3-27);stroke:#000000;stroke-linecap:round;stroke-linejoin:round;stroke-width:0.75}
+		.st9 {fill:#000000;fill-opacity:1;stroke:#000000;stroke-opacity:1;stroke-width:0.22935779816514}
+		.st10 {fill:#ffffff;stroke:none;stroke-linecap:butt;stroke-width:7.2}
+		.st11 {fill:#ed7d31;font-family:Times New Roman;font-size:0.75em}
+		.st12 {fill:#00b050;stroke:#00b050;stroke-width:0.75}
+		.st13 {fill:none;fill-rule:evenodd;font-size:12px;overflow:visible;stroke-linecap:square;stroke-miterlimit:3}
+	]]>
+	</style>
+
+	<defs id="Markers">
+		<g id="lend3">
+			<path d="M 2 1 L 0 0 L 2 -1 " style="stroke-linecap:round;stroke-linejoin:round;fill:none"/>
+		</g>
+		<marker id="mrkr3-27" class="st9" v:arrowType="3" v:arrowSize="2" orient="auto" markerUnits="strokeWidth"
+				overflow="visible">
+			<use xlink:href="#lend3" transform="scale(-4.36,-4.36) "/>
+		</marker>
+	</defs>
+	<defs id="Filters">
+		<filter id="filter_2">
+			<feGaussianBlur stdDeviation="2"/>
+		</filter>
+	</defs>
+	<g v:mID="0" v:index="1" v:groupContext="foregroundPage">
+		<title>页-1</title>
+		<v:pageProperties v:drawingScale="0.0393701" v:pageScale="0.0393701" v:drawingUnits="24" v:shadowOffsetX="8.50394"
+				v:shadowOffsetY="-8.50394"/>
+		<v:layer v:name="连接线" v:index="0"/>
+		<g id="group30-1" transform="translate(3.0294,-5.3478)" v:mID="30" v:groupContext="group">
+			<title>工作表.30</title>
+			<g id="shape1-2" v:mID="1" v:groupContext="shape" transform="translate(-3.19744E-14,-354.331)">
+				<title>矩形.2</title>
+				<desc>acpi_pci_root_add()</desc>
+				<v:userDefs>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="63.7795" cy="371.711" width="127.56" height="21.2598"/>
+				<g id="shadow1-3" v:groupContext="shadow" v:shadowOffsetX="0.345598" v:shadowOffsetY="-1.97279" v:shadowType="1"
+						transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+					<rect x="0" y="361.081" width="127.559" height="21.2598" rx="2.83465" ry="2.83465" class="st2"/>
+				</g>
+				<rect x="0" y="361.081" width="127.559" height="21.2598" rx="2.83465" ry="2.83465" class="st3"/>
+				<text x="15.13" y="375.31" class="st4" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>acpi_pci_root_add()</text>			</g>
+			<g id="shape2-8" v:mID="2" v:groupContext="shape" transform="translate(120.472,-311.811)">
+				<title>Rectangle.2</title>
+				<desc>acpi_pci_root_get_mcfg_addr()</desc>
+				<v:userDefs>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="85.0394" cy="371.711" width="170.08" height="21.2598"/>
+				<g id="shadow2-9" v:groupContext="shadow" v:shadowOffsetX="0.345598" v:shadowOffsetY="-1.97279" v:shadowType="1"
+						transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+					<rect x="0" y="361.081" width="170.079" height="21.2598" rx="2.83465" ry="2.83465" class="st2"/>
+				</g>
+				<rect x="0" y="361.081" width="170.079" height="21.2598" rx="2.83465" ry="2.83465" class="st5"/>
+				<text x="8.73" y="375.31" class="st4" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/>acpi_pci_root_get_mcfg_addr<tspan
+							class="st6" v:langID="2052">()</tspan></text>			</g>
+			<g id="shape3-15" v:mID="3" v:groupContext="shape" transform="translate(120.472,-269.291)">
+				<title>Rectangle.3</title>
+				<desc>pci_acpi_scan_root()</desc>
+				<v:userDefs>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="63.7795" cy="371.711" width="127.56" height="21.2598"/>
+				<g id="shadow3-16" v:groupContext="shadow" v:shadowOffsetX="0.345598" v:shadowOffsetY="-1.97279" v:shadowType="1"
+						transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+					<rect x="0" y="361.081" width="127.559" height="21.2598" rx="2.83465" ry="2.83465" class="st2"/>
+				</g>
+				<rect x="0" y="361.081" width="127.559" height="21.2598" rx="2.83465" ry="2.83465" class="st7"/>
+				<text x="13.13" y="375.31" class="st4" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/>pci_acpi_scan_root<tspan
+							class="st6" v:langID="2052">()</tspan></text>			</g>
+			<g id="shape7-22" v:mID="7" v:groupContext="shape" v:layerMember="0"
+					transform="translate(251.226,-305.229) rotate(29.3578)">
+				<title>波浪连接线 1</title>
+				<desc>1</desc>
+				<v:userDefs>
+					<v:ud v:nameU="Scale" v:val="VT0(1):26"/>
+					<v:ud v:nameU="AntiScale" v:val="VT0(1):26"/>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="29.8005" cy="388.753" width="45" height="18.8036" transform="rotate(-29.3578)"/>
+				<path d="M0 382.34 C17.54 388.93 39.34 394.99 65.05 382.34" class="st8"/>
+				<rect v:rectContext="textBkgnd" x="-166.867" y="348.038" width="4.5" height="10.7998" transform="rotate(-29.3578)"
+						class="st10"/>
+				<text x="-166.87" y="356.14" transform="rotate(-29.3578)" class="st11" v:langID="2052"><v:paragraph
+							v:horizAlign="1"/><v:tabList/>1</text>			</g>
+			<g id="shape8-30" v:mID="8" v:groupContext="shape" v:layerMember="0"
+					transform="translate(367.905,-203.705) rotate(52.6961)">
+				<title>波浪连接线 1.8</title>
+				<desc>2</desc>
+				<v:userDefs>
+					<v:ud v:nameU="Scale" v:val="VT0(1):26"/>
+					<v:ud v:nameU="AntiScale" v:val="VT0(1):26"/>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="42.8573" cy="388.753" width="45" height="18.8036" transform="rotate(-52.6961)"/>
+				<path d="M0 382.34 C25.23 388.93 56.57 394.99 93.55 382.34" class="st8"/>
+				<rect v:rectContext="textBkgnd" x="-285.503" y="264.292" width="4.5" height="10.7998" transform="rotate(-52.6961)"
+						class="st10"/>
+				<text x="-285.5" y="272.39" transform="rotate(-52.6961)" class="st11" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>2</text>			</g>
+			<g id="shape9-37" v:mID="9" v:groupContext="shape" transform="translate(120.472,-56.6929)">
+				<title>Rectangle.9</title>
+				<desc>pci_bus_add_devices()</desc>
+				<v:userDefs>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="63.7795" cy="371.711" width="127.56" height="21.2598"/>
+				<g id="shadow9-38" v:groupContext="shadow" v:shadowOffsetX="0.345598" v:shadowOffsetY="-1.97279" v:shadowType="1"
+						transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+					<rect x="0" y="361.081" width="127.559" height="21.2598" rx="2.83465" ry="2.83465" class="st2"/>
+				</g>
+				<rect x="0" y="361.081" width="127.559" height="21.2598" rx="2.83465" ry="2.83465" class="st5"/>
+				<text x="9.96" y="375.31" class="st4" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/>pci_bus_add_devices<tspan
+							class="st6" v:langID="2052">()</tspan></text>			</g>
+			<g id="shape10-44" v:mID="10" v:groupContext="shape" v:layerMember="0"
+					transform="translate(438.872,-46.0826) rotate(78.8262)">
+				<title>波浪连接线 1.10</title>
+				<desc>3</desc>
+				<v:userDefs>
+					<v:ud v:nameU="Scale" v:val="VT0(1):26"/>
+					<v:ud v:nameU="AntiScale" v:val="VT0(1):26"/>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="135.278" cy="403.283" width="45" height="18.8036" transform="rotate(-78.8262)"/>
+				<path d="M0 382.34 C85.88 397.38 173.68 430.13 292.55 382.34" class="st8"/>
+				<rect v:rectContext="textBkgnd" x="-371.674" y="205.464" width="4.5" height="10.7998" transform="rotate(-78.8262)"
+						class="st10"/>
+				<text x="-371.67" y="213.56" transform="rotate(-78.8262)" class="st11" v:langID="2052"><v:paragraph
+							v:horizAlign="1"/><v:tabList/>3</text>			</g>
+			<g id="shape11-51" v:mID="11" v:groupContext="shape" transform="translate(290.551,-233.858)">
+				<title>Rectangle.11</title>
+				<desc>pci_acpi_setup_ecam_mapping()</desc>
+				<v:userDefs>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="88.5827" cy="371.711" width="177.17" height="21.2598"/>
+				<g id="shadow11-52" v:groupContext="shadow" v:shadowOffsetX="0.345598" v:shadowOffsetY="-1.97279" v:shadowType="1"
+						transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+					<rect x="0" y="361.081" width="177.165" height="21.2598" rx="2.83465" ry="2.83465" class="st2"/>
+				</g>
+				<rect x="0" y="361.081" width="177.165" height="21.2598" rx="2.83465" ry="2.83465" class="st5"/>
+				<text x="10.44" y="375.31" class="st4" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/>pci_acpi_setup_ecam_mapping<tspan
+							class="st6" v:langID="2052">()</tspan></text>			</g>
+			<g id="shape12-58" v:mID="12" v:groupContext="shape" transform="translate(290.551,-198.425)">
+				<title>Rectangle.12</title>
+				<desc>acpi_pci_root_create()</desc>
+				<v:userDefs>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="63.7795" cy="371.711" width="127.56" height="21.2598"/>
+				<g id="shadow12-59" v:groupContext="shadow" v:shadowOffsetX="0.345598" v:shadowOffsetY="-1.97279" v:shadowType="1"
+						transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+					<rect x="0" y="361.081" width="127.559" height="21.2598" rx="2.83465" ry="2.83465" class="st2"/>
+				</g>
+				<rect x="0" y="361.081" width="127.559" height="21.2598" rx="2.83465" ry="2.83465" class="st5"/>
+				<text x="10.98" y="375.31" class="st4" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/>acpi_pci_root_create<tspan
+							class="st6" v:langID="2052">()</tspan></text>			</g>
+			<g id="shape13-65" v:mID="13" v:groupContext="shape" transform="translate(290.551,-127.559)">
+				<title>Rectangle.13</title>
+				<desc>pci_bus_size_bridges()</desc>
+				<v:userDefs>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="63.7795" cy="371.711" width="127.56" height="21.2598"/>
+				<g id="shadow13-66" v:groupContext="shadow" v:shadowOffsetX="0.345598" v:shadowOffsetY="-1.97279" v:shadowType="1"
+						transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+					<rect x="0" y="361.081" width="127.559" height="21.2598" rx="2.83465" ry="2.83465" class="st2"/>
+				</g>
+				<rect x="0" y="361.081" width="127.559" height="21.2598" rx="2.83465" ry="2.83465" class="st5"/>
+				<text x="9.63" y="375.31" class="st4" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/>pci_bus_size_bridges<tspan
+							class="st6" v:langID="2052">()</tspan></text>			</g>
+			<g id="shape14-72" v:mID="14" v:groupContext="shape" transform="translate(290.551,-70.8661)">
+				<title>Rectangle.14</title>
+				<desc>pci_bus_assign_resources()</desc>
+				<v:userDefs>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="77.9528" cy="371.711" width="155.91" height="21.2598"/>
+				<g id="shadow14-73" v:groupContext="shadow" v:shadowOffsetX="0.345598" v:shadowOffsetY="-1.97279" v:shadowType="1"
+						transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+					<rect x="0" y="361.081" width="155.906" height="21.2598" rx="2.83465" ry="2.83465" class="st2"/>
+				</g>
+				<rect x="0" y="361.081" width="155.906" height="21.2598" rx="2.83465" ry="2.83465" class="st5"/>
+				<text x="13.14" y="375.31" class="st4" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/>pci_bus_assign_resources<tspan
+							class="st6" v:langID="2052">()</tspan></text>			</g>
+			<g id="shape15-79" v:mID="15" v:groupContext="shape" v:layerMember="0"
+					transform="translate(271.131,-259.29) rotate(13.134)">
+				<title>波浪连接线 1.15</title>
+				<desc>1</desc>
+				<v:userDefs>
+					<v:ud v:nameU="Scale" v:val="VT0(1):26"/>
+					<v:ud v:nameU="AntiScale" v:val="VT0(1):26"/>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="49.3684" cy="388.316" width="45" height="18.8036" transform="rotate(-13.134)"/>
+				<path d="M0 382.34 C31.36 390.24 62.17 392.37 109.15 382.34" class="st8"/>
+				<rect v:rectContext="textBkgnd" x="-42.4099" y="383.976" width="4.5" height="10.7998" transform="rotate(-13.134)"
+						class="st10"/>
+				<text x="-42.41" y="392.08" transform="rotate(-13.134)" class="st11" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>1</text>			</g>
+			<g id="shape16-86" v:mID="16" v:groupContext="shape" v:layerMember="0"
+					transform="translate(372.751,-219.596) rotate(29.5388)">
+				<title>波浪连接线 1.16</title>
+				<desc>2</desc>
+				<v:userDefs>
+					<v:ud v:nameU="Scale" v:val="VT0(1):26"/>
+					<v:ud v:nameU="AntiScale" v:val="VT0(1):26"/>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="55.9756" cy="388.753" width="45" height="18.8036" transform="rotate(-29.5388)"/>
+				<path d="M0 382.34 C32.95 388.93 73.89 394.99 122.18 382.34" class="st8"/>
+				<rect v:rectContext="textBkgnd" x="-145.21" y="360.421" width="4.5" height="10.7998" transform="rotate(-29.5388)"
+						class="st10"/>
+				<text x="-145.21" y="368.52" transform="rotate(-29.5388)" class="st11" v:langID="2052"><v:paragraph
+							v:horizAlign="1"/><v:tabList/>2</text>			</g>
+			<g id="shape17-93" v:mID="17" v:groupContext="shape" v:layerMember="0"
+					transform="translate(481.237,-127.75) rotate(50.9645)">
+				<title>波浪连接线 1.17</title>
+				<desc>3</desc>
+				<v:userDefs>
+					<v:ud v:nameU="Scale" v:val="VT0(1):26"/>
+					<v:ud v:nameU="AntiScale" v:val="VT0(1):26"/>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="79.431" cy="391.645" width="45" height="18.8036" transform="rotate(-50.9645)"/>
+				<path d="M0 382.34 C48.05 390.37 105.85 402.23 168.78 382.34" class="st8"/>
+				<rect v:rectContext="textBkgnd" x="-256.437" y="302.958" width="4.5" height="10.7998" transform="rotate(-50.9645)"
+						class="st10"/>
+				<text x="-256.44" y="311.06" transform="rotate(-50.9645)" class="st11" v:langID="2052"><v:paragraph
+							v:horizAlign="1"/><v:tabList/>3</text>			</g>
+			<g id="shape18-100" v:mID="18" v:groupContext="shape" v:layerMember="0"
+					transform="translate(516.986,-75.2911) rotate(60.4885)">
+				<title>波浪连接线 1.18</title>
+				<desc>4</desc>
+				<v:userDefs>
+					<v:ud v:nameU="Scale" v:val="VT0(1):26"/>
+					<v:ud v:nameU="AntiScale" v:val="VT0(1):26"/>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="101.555" cy="391.645" width="45" height="18.8036" transform="rotate(-60.4885)"/>
+				<path d="M0 382.34 C61.43 390.37 135.33 402.23 215.79 382.34" class="st8"/>
+				<rect v:rectContext="textBkgnd" x="-293.056" y="275.903" width="4.5" height="10.7998" transform="rotate(-60.4885)"
+						class="st10"/>
+				<text x="-293.06" y="284" transform="rotate(-60.4885)" class="st11" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>4</text>			</g>
+			<g id="shape19-107" v:mID="19" v:groupContext="shape" transform="translate(488.976,-170.079)">
+				<title>Rectangle.19</title>
+				<desc>pci_create_root_bus()</desc>
+				<v:userDefs>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="63.7795" cy="371.711" width="127.56" height="21.2598"/>
+				<g id="shadow19-108" v:groupContext="shadow" v:shadowOffsetX="0.345598" v:shadowOffsetY="-1.97279" v:shadowType="1"
+						transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+					<rect x="0" y="361.081" width="127.559" height="21.2598" rx="2.83465" ry="2.83465" class="st2"/>
+				</g>
+				<rect x="0" y="361.081" width="127.559" height="21.2598" rx="2.83465" ry="2.83465" class="st5"/>
+				<text x="11.14" y="375.31" class="st4" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/>pci_create_root_bus<tspan
+							class="st6" v:langID="2052">()</tspan></text>			</g>
+			<g id="shape20-114" v:mID="20" v:groupContext="shape" transform="translate(488.976,-134.646)">
+				<title>Rectangle.20</title>
+				<desc>pci_scan_child_bus()</desc>
+				<v:userDefs>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="63.7795" cy="371.711" width="127.56" height="21.2598"/>
+				<g id="shadow20-115" v:groupContext="shadow" v:shadowOffsetX="0.345598" v:shadowOffsetY="-1.97279" v:shadowType="1"
+						transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+					<rect x="0" y="361.081" width="127.559" height="21.2598" rx="2.83465" ry="2.83465" class="st2"/>
+				</g>
+				<rect x="0" y="361.081" width="127.559" height="21.2598" rx="2.83465" ry="2.83465" class="st12"/>
+				<text x="12.46" y="375.31" class="st4" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/>pci_scan_child_bus<tspan
+							class="st6" v:langID="2052">()</tspan></text>			</g>
+			<g id="shape21-121" v:mID="21" v:groupContext="shape" v:layerMember="0"
+					transform="translate(404.209,-195.158) rotate(7.49586)">
+				<title>波浪连接线 1.21</title>
+				<desc>1</desc>
+				<v:userDefs>
+					<v:ud v:nameU="Scale" v:val="VT0(1):26"/>
+					<v:ud v:nameU="AntiScale" v:val="VT0(1):26"/>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="56.6004" cy="386.615" width="45" height="18.8036" transform="rotate(-7.49586)"/>
+				<path d="M0 382.34 C28.76 390.52 73.14 386.99 135.81 382.34" class="st8"/>
+				<rect v:rectContext="textBkgnd" x="3.431" y="385.295" width="4.5" height="10.7998" transform="rotate(-7.49586)"
+						class="st10"/>
+				<text x="3.43" y="393.4" transform="rotate(-7.49586)" class="st11" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>1</text>			</g>
+			<g id="shape22-128" v:mID="22" v:groupContext="shape" v:layerMember="0"
+					transform="translate(494.713,-171.721) rotate(21.541)">
+				<title>波浪连接线 1.22</title>
+				<desc>2</desc>
+				<v:userDefs>
+					<v:ud v:nameU="Scale" v:val="VT0(1):26"/>
+					<v:ud v:nameU="AntiScale" v:val="VT0(1):26"/>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="66.3187" cy="388.753" width="45" height="18.8036" transform="rotate(-21.541)"/>
+				<path d="M0 382.34 C39.04 388.93 87.54 394.99 144.76 382.34" class="st8"/>
+				<rect v:rectContext="textBkgnd" x="-83.3006" y="380.551" width="4.5" height="10.7998" transform="rotate(-21.541)"
+						class="st10"/>
+				<text x="-83.3" y="388.65" transform="rotate(-21.541)" class="st11" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>2</text>			</g>
+			<g id="shape23-135" v:mID="23" v:groupContext="shape" transform="translate(488.976,-99.2126)">
+				<title>Rectangle.23</title>
+				<desc>__pci_bus_size_bridges()</desc>
+				<v:userDefs>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="77.9528" cy="371.711" width="155.91" height="21.2598"/>
+				<g id="shadow23-136" v:groupContext="shadow" v:shadowOffsetX="0.345598" v:shadowOffsetY="-1.97279" v:shadowType="1"
+						transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+					<rect x="0" y="361.081" width="155.906" height="21.2598" rx="2.83465" ry="2.83465" class="st2"/>
+				</g>
+				<rect x="0" y="361.081" width="155.906" height="21.2598" rx="2.83465" ry="2.83465" class="st5"/>
+				<text x="16.3" y="375.31" class="st4" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/>__pci_bus_size_bridges<tspan
+							class="st6" v:langID="2052">()</tspan></text>			</g>
+			<g id="shape24-142" v:mID="24" v:groupContext="shape" v:layerMember="0"
+					transform="translate(404.209,-124.292) rotate(7.49586)">
+				<title>波浪连接线 1.24</title>
+				<desc>1</desc>
+				<v:userDefs>
+					<v:ud v:nameU="Scale" v:val="VT0(1):26"/>
+					<v:ud v:nameU="AntiScale" v:val="VT0(1):26"/>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="56.6004" cy="386.615" width="45" height="18.8036" transform="rotate(-7.49586)"/>
+				<path d="M0 382.34 C28.76 390.52 73.14 386.99 135.81 382.34" class="st8"/>
+				<rect v:rectContext="textBkgnd" x="3.431" y="385.295" width="4.5" height="10.7998" transform="rotate(-7.49586)"
+						class="st10"/>
+				<text x="3.43" y="393.4" transform="rotate(-7.49586)" class="st11" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>1</text>			</g>
+			<g id="shape25-149" v:mID="25" v:groupContext="shape" transform="translate(488.976,-35.4331)">
+				<title>Rectangle.25</title>
+				<desc>__pci_bus_assign_resources()</desc>
+				<v:userDefs>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="77.9528" cy="371.711" width="155.91" height="21.2598"/>
+				<g id="shadow25-150" v:groupContext="shadow" v:shadowOffsetX="0.345598" v:shadowOffsetY="-1.97279" v:shadowType="1"
+						transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+					<rect x="0" y="361.081" width="155.906" height="21.2598" rx="2.83465" ry="2.83465" class="st2"/>
+				</g>
+				<rect x="0" y="361.081" width="155.906" height="21.2598" rx="2.83465" ry="2.83465" class="st5"/>
+				<text x="5.64" y="375.31" class="st4" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/>__pci_bus_assign_resources<tspan
+							class="st6" v:langID="2052">()</tspan></text>			</g>
+			<g id="shape26-156" v:mID="26" v:groupContext="shape" transform="translate(659.055,0)">
+				<title>Rectangle.26</title>
+				<desc>pbus_assign_resources_sorted()</desc>
+				<v:userDefs>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="85.0394" cy="371.711" width="170.08" height="21.2598"/>
+				<g id="shadow26-157" v:groupContext="shadow" v:shadowOffsetX="0.345598" v:shadowOffsetY="-1.97279" v:shadowType="1"
+						transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+					<rect x="0" y="361.081" width="170.079" height="21.2598" rx="2.83465" ry="2.83465" class="st2"/>
+				</g>
+				<rect x="0" y="361.081" width="170.079" height="21.2598" rx="2.83465" ry="2.83465" class="st5"/>
+				<text x="8.39" y="375.31" class="st4" v:langID="1033"><v:paragraph v:horizAlign="1"/><v:tabList/>pbus_assign_resources_sorted<tspan
+							class="st6" v:langID="2052">()</tspan></text>			</g>
+			<g id="shape28-163" v:mID="28" v:groupContext="shape" v:layerMember="0"
+					transform="translate(445.604,-63.0117) rotate(11.6336)">
+				<title>波浪连接线 1.28</title>
+				<desc>1</desc>
+				<v:userDefs>
+					<v:ud v:nameU="Scale" v:val="VT0(1):26"/>
+					<v:ud v:nameU="AntiScale" v:val="VT0(1):26"/>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="51.2628" cy="386.615" width="45" height="18.8036" transform="rotate(-11.6336)"/>
+				<path d="M0 382.34 C26.05 390.52 66.24 386.99 123 382.34" class="st8"/>
+				<rect v:rectContext="textBkgnd" x="-30.0024" y="383.611" width="4.5" height="10.7998" transform="rotate(-11.6336)"
+						class="st10"/>
+				<text x="-30" y="391.71" transform="rotate(-11.6336)" class="st11" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>1</text>			</g>
+			<g id="shape29-170" v:mID="29" v:groupContext="shape" v:layerMember="0"
+					transform="translate(666.328,-22.2866) rotate(15.0685)">
+				<title>波浪连接线 1.29</title>
+				<desc>1</desc>
+				<v:userDefs>
+					<v:ud v:nameU="Scale" v:val="VT0(1):26"/>
+					<v:ud v:nameU="AntiScale" v:val="VT0(1):26"/>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="39.7629" cy="386.615" width="45" height="18.8036" transform="rotate(-15.0685)"/>
+				<path d="M0 382.34 C20.21 390.52 51.38 386.99 95.41 382.34" class="st8"/>
+				<rect v:rectContext="textBkgnd" x="-64.3641" y="378.259" width="4.5" height="10.7998" transform="rotate(-15.0685)"
+						class="st10"/>
+				<text x="-64.36" y="386.36" transform="rotate(-15.0685)" class="st11" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>1</text>			</g>
+		</g>
+	</g>
+</svg>

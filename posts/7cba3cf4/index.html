@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.0.0">
+<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+<link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/blog.svg">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/blog.svg">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="google-site-verification" content="vuSkRYPVceK1DXhqZWm7wVxYV4YmmnI1Dv_C1M8rJJM">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Georgia:300,300italic,400,400italic,700,700italic%7CCourier+New:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha256-CTSx/A06dm1B063156EVh15m6Y67pAjZZaQc89LLSrU=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"chasinglulu.github.io","root":"/","images":"/images","scheme":"Mist","darkmode":false,"version":"8.18.2","exturl":false,"sidebar":{"position":"right","display":"hide","padding":18,"offset":12},"copycode":{"enable":true,"style":"mac"},"fold":{"enable":true,"height":500},"bookmark":{"enable":true,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="从eMMC中加载镜像并启动是我们常见开发板的启动方式，通过Qemu模拟eMMC设备，这样我们可以在Qemu上直接验证我们很多相关的逻辑功能，比如eMMC的启动、文件系统的mount、文件读写等。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="基于Qemu eMMC模拟设备的启动">
+<meta property="og:url" content="https://chasinglulu.github.io/posts/7cba3cf4/index.html">
+<meta property="og:site_name" content="点滴汇聚">
+<meta property="og:description" content="从eMMC中加载镜像并启动是我们常见开发板的启动方式，通过Qemu模拟eMMC设备，这样我们可以在Qemu上直接验证我们很多相关的逻辑功能，比如eMMC的启动、文件系统的mount、文件读写等。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://chasinglulu.github.io/images/28/uboot-sdhci-framework.jpg">
+<meta property="og:image" content="https://chasinglulu.github.io/images/28/eMMC.svg">
+<meta property="og:image" content="https://chasinglulu.github.io/images/28/ubuntu.gif">
+<meta property="og:image" content="https://chasinglulu.github.io/images/28/uboot_kernel.gif">
+<meta property="og:image" content="https://chasinglulu.github.io/images/28/emmc-size.svg">
+<meta property="og:image" content="https://chasinglulu.github.io/images/28/rpmb.gif">
+<meta property="article:published_time" content="2023-11-24T17:48:51.000Z">
+<meta property="article:modified_time" content="2024-09-24T07:39:19.294Z">
+<meta property="article:author" content="Xinlu Wang">
+<meta property="article:tag" content="qemu">
+<meta property="article:tag" content="u-boot">
+<meta property="article:tag" content="linux">
+<meta property="article:tag" content="ATF">
+<meta property="article:tag" content="eMMC">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://chasinglulu.github.io/images/28/uboot-sdhci-framework.jpg">
+
+
+<link rel="canonical" href="https://chasinglulu.github.io/posts/7cba3cf4/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://chasinglulu.github.io/posts/7cba3cf4/","path":"posts/7cba3cf4/","title":"基于Qemu eMMC模拟设备的启动"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>基于Qemu eMMC模拟设备的启动 | 点滴汇聚</title>
+  
+
+
+
+
+
+
+
+<link rel="dns-prefetch" href="www.chasinglulu.cn"><link rel="stylesheet" href="//cdn.jsdelivr.net/gh/theme-next/theme-next-needmoreshare2@1/needsharebutton.min.css"><style>
+#needsharebutton-postbottom {
+  cursor: pointer;
+  height: 26px;
+  margin-top: 10px;
+  position: relative;
+}
+#needsharebutton-postbottom .btn {
+  border: 1px solid $btn-default-border-color;
+  border-radius: 3px;
+  display: initial;
+  padding: 1px 4px;
+}
+</style><style>
+#needsharebutton-float {
+  bottom: 88px;
+  cursor: pointer;
+  left: -8px;
+  position: fixed;
+  z-index: 9999;
+}
+#needsharebutton-float .btn {
+  border: 1px solid $btn-default-border-color;
+  border-radius: 4px;
+  padding: 0 10px 0 14px;
+}
+</style>
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">点滴汇聚</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">不积跬步无以至千里，不积小流无以成江海</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-address-card fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">70</span></a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">9</span></a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">43</span></a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#U-Boot-eMMC%E6%9E%B6%E6%9E%84"><span class="nav-number">1.</span> <span class="nav-text">U-Boot eMMC架构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#eMMC%E9%95%9C%E5%83%8F%E5%88%B6%E4%BD%9C"><span class="nav-number">2.</span> <span class="nav-text">eMMC镜像制作</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#eMMC%E9%AA%8C%E8%AF%81"><span class="nav-number">3.</span> <span class="nav-text">eMMC验证</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#U-Boot%E9%85%8D%E7%BD%AE%E9%80%89%E9%A1%B9"><span class="nav-number">3.1.</span> <span class="nav-text">U-Boot配置选项</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%BF%90%E8%A1%8C%E9%AA%8C%E8%AF%81"><span class="nav-number">3.2.</span> <span class="nav-text">运行验证</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#U-Boot-distro%E9%85%8D%E7%BD%AE"><span class="nav-number">4.</span> <span class="nav-text">U-Boot distro配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Ubuntu%E5%90%AF%E5%8A%A8"><span class="nav-number">5.</span> <span class="nav-text">Ubuntu启动</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Ubuntu%E9%95%9C%E5%83%8F%E5%88%B6%E4%BD%9C"><span class="nav-number">5.1.</span> <span class="nav-text">Ubuntu镜像制作</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%BF%90%E8%A1%8C%E9%AA%8C%E8%AF%81-1"><span class="nav-number">5.2.</span> <span class="nav-text">运行验证</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8EBuildroot%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E5%90%AF%E5%8A%A8"><span class="nav-number">6.</span> <span class="nav-text">基于Buildroot文件系统启动</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#eMMC-RPMB%E8%AE%BF%E9%97%AE"><span class="nav-number">7.</span> <span class="nav-text">eMMC RPMB访问</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#RPMB%E4%BB%8B%E7%BB%8D"><span class="nav-number">7.1.</span> <span class="nav-text">RPMB介绍</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%BF%90%E8%A1%8C%E9%AA%8C%E8%AF%81-2"><span class="nav-number">7.2.</span> <span class="nav-text">运行验证</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Xinlu Wang"
+      src="/images/avatar.jpeg">
+  <p class="site-author-name" itemprop="name">Xinlu Wang</p>
+  <div class="site-description" itemprop="description">不积跬步无以至千里 不积小流无以成江海</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">43</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">70</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/chasinglulu" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;chasinglulu" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:wangkart@aliyun.com" title="E-Mail → mailto:wangkart@aliyun.com" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://weibo.com/5052275150" title="Weibo → https:&#x2F;&#x2F;weibo.com&#x2F;5052275150" rel="noopener me" target="_blank"><i class="fab fa-weibo fa-fw"></i>Weibo</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+    <div class="sidebar-inner sidebar-blogroll">
+      <div class="links-of-blogroll animated">
+        <div class="links-of-blogroll-title"><i class="fa fa-globe fa-fw"></i>
+          链接
+        </div>
+        <ul class="links-of-blogroll-list">
+            <li class="links-of-blogroll-item">
+              <a href="https://lore.kernel.org/qemu-devel/" title="https:&#x2F;&#x2F;lore.kernel.org&#x2F;qemu-devel&#x2F;" rel="noopener" target="_blank">Qemu</a>
+            </li>
+            <li class="links-of-blogroll-item">
+              <a href="https://wiki.linuxfoundation.org/realtime/documentation/start" title="https:&#x2F;&#x2F;wiki.linuxfoundation.org&#x2F;realtime&#x2F;documentation&#x2F;start" rel="noopener" target="_blank">RT_Linux</a>
+            </li>
+        </ul>
+      </div>
+    </div>
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://chasinglulu.github.io/posts/7cba3cf4/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpeg">
+      <meta itemprop="name" content="Xinlu Wang">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="点滴汇聚">
+      <meta itemprop="description" content="不积跬步无以至千里 不积小流无以成江海">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="基于Qemu eMMC模拟设备的启动 | 点滴汇聚">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          基于Qemu eMMC模拟设备的启动
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2023-11-25 01:48:51" itemprop="dateCreated datePublished" datetime="2023-11-25T01:48:51+08:00">2023-11-25</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-09-24 15:39:19" itemprop="dateModified" datetime="2024-09-24T15:39:19+08:00">2024-09-24</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/tools/" itemprop="url" rel="index"><span itemprop="name">tools</span></a>
+        </span>
+    </span>
+
+  
+  
+  <span class="post-meta-item">
+    
+    <span class="post-meta-item-icon">
+      <i class="far fa-comment"></i>
+    </span>
+    <span class="post-meta-item-text">Waline：</span>
+  
+    <a title="waline" href="/posts/7cba3cf4/#waline" itemprop="discussionUrl">
+      <span class="post-comments-count waline-comment-count" data-path="/posts/7cba3cf4/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+    <span class="post-meta-item" title="阅读次数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span class="waline-pageview-count" data-path="/posts/7cba3cf4/"></span>
+    </span>
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>1.5k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>6 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>从eMMC中加载镜像并启动是我们常见开发板的启动方式，通过Qemu模拟eMMC设备，这样我们可以在Qemu上直接验证我们很多相关的逻辑功能，比如eMMC的启动、文件系统的mount、文件读写等。</p>
+<span id="more"></span>
+
+<hr>
+<ul>
+<li><strong>Qemu:</strong> v7.2.0</li>
+<li><strong>U-Boot:</strong> v2022.04</li>
+<li><strong>Linux Kernel:</strong> linux-6.1.12</li>
+</ul>
+<hr>
+<h3 id="U-Boot-eMMC架构"><a href="#U-Boot-eMMC架构" class="headerlink" title="U-Boot eMMC架构"></a>U-Boot eMMC架构</h3><p><img data-src="/images/28/uboot-sdhci-framework.jpg" alt="framework"></p>
+<h3 id="eMMC镜像制作"><a href="#eMMC镜像制作" class="headerlink" title="eMMC镜像制作"></a>eMMC镜像制作</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">dd</span> <span class="keyword">if</span>=/dev/zero of=emmc.img bs=1M count=2048</span><br><span class="line"></span><br><span class="line"><span class="comment"># GPT partition table</span></span><br><span class="line">sudo parted emmc.img mktable gpt</span><br><span class="line"><span class="comment"># msic part 512KiB</span></span><br><span class="line">sudo parted emmc.img mkpart misc 2048KiB 2559KiB</span><br><span class="line"><span class="comment"># ubootenv part 512KiB</span></span><br><span class="line">sudo parted -s -a none emmc.img mkpart ubootenv 2560KiB 3071KiB</span><br><span class="line"><span class="comment"># vbmeta_a part 512KiB</span></span><br><span class="line">sudo parted -s -a none emmc.img mkpart vbmeta_a 3072KiB 3583KiB</span><br><span class="line"><span class="comment"># vbmeta_b part 512KiB</span></span><br><span class="line">sudo parted -s -a none emmc.img mkpart vbmeta_b 3584KiB 4095KiB</span><br><span class="line"><span class="comment"># boot_a partition 150MiB</span></span><br><span class="line">sudo parted -s -a none emmc.img mkpart boot_a 4MiB 154MiB</span><br><span class="line"><span class="comment"># boot_b partition 150MiB</span></span><br><span class="line">sudo parted -s -a none emmc.img mkpart boot_b 154MiB 304MiB</span><br><span class="line">sudo parted emmc.img <span class="built_in">set</span> 5 boot on</span><br><span class="line">sudo parted emmc.img <span class="built_in">set</span> 6 boot on</span><br><span class="line"><span class="comment"># buildroot partition 512MiB</span></span><br><span class="line">sudo parted -s -a none emmc.img mkpart buildroot 304MiB 816MiB</span><br><span class="line"><span class="comment"># ubuntu partition 1024MiB</span></span><br><span class="line">sudo parted -s -a none emmc.img mkpart buildroot 816MiB 2046MiB</span><br><span class="line"><span class="built_in">sync</span></span><br><span class="line"></span><br><span class="line">sudo kpartx -av emmc.img</span><br><span class="line">sudo mkfs.vfat /dev/mapper/loopXp5</span><br><span class="line">sudo mkfs.vfat /dev/mapper/loopXp6</span><br><span class="line">sudo mkfs.ext4 /dev/mapper/loopXp7</span><br><span class="line">sudo mkfs.ext4 /dev/mapper/loopXp8</span><br><span class="line"></span><br><span class="line">sudo tune2fs -f -O ^metadata_csum /dev/mapper/loopXp7</span><br><span class="line">sudo tune2fs -f -O ^metadata_csum /dev/mapper/loopXp8</span><br><span class="line"><span class="built_in">sync</span></span><br><span class="line"></span><br><span class="line">sudo kpartx -dv emmc.img</span><br></pre></td></tr></table></figure>
+
+<p><strong>注意：loopX是kpartx自动生成的，X根据实际情况替换成数字</strong></p>
+<h3 id="eMMC验证"><a href="#eMMC验证" class="headerlink" title="eMMC验证"></a>eMMC验证</h3><h4 id="U-Boot配置选项"><a href="#U-Boot配置选项" class="headerlink" title="U-Boot配置选项"></a>U-Boot配置选项</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">CONFIG_MMC=y</span><br><span class="line">CONFIG_MMC_WRITE=y</span><br><span class="line">CONFIG_DM_MMC=y</span><br><span class="line">CONFIG_MMC_SDHCI_ADMA_HELPERS=y</span><br><span class="line">CONFIG_MMC_HW_PARTITIONING=y</span><br><span class="line">CONFIG_SUPPORT_EMMC_RPMB=y</span><br><span class="line">CONFIG_SUPPORT_EMMC_BOOT=y</span><br><span class="line">CONFIG_CMD_MMC=y</span><br><span class="line">CONFIG_MMC_VERBOSE=y</span><br><span class="line">CONFIG_MMC_SDHCI=y</span><br><span class="line">CONFIG_MMC_SDHCI_SDMA=y</span><br><span class="line">CONFIG_MMC_SDHCI_ADMA=y</span><br><span class="line"># CONFIG_SPL_MMC_SDHCI_ADMA is not <span class="built_in">set</span></span><br><span class="line"># CONFIG_MMC_SDHCI_BCMSTB is not <span class="built_in">set</span></span><br><span class="line">CONFIG_MMC_SDHCI_CADENCE=y</span><br></pre></td></tr></table></figure>
+<h4 id="运行验证"><a href="#运行验证" class="headerlink" title="运行验证"></a>运行验证</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">qemu-system-aarch64 -M hobot-sigi-virt,emmc=on,virt=on -m 4G -display none -device loader,addr=0x3000200000,file=/path/to/u-boot/u-boot-dtb.bin,cpu-num=0 -drive file=/path/to/emmc.img,format=raw,<span class="keyword">if</span>=emmc -serial stdio</span><br></pre></td></tr></table></figure>
+
+<p><img data-src="/images/28/eMMC.svg" alt="eMMC"></p>
+<h3 id="U-Boot-distro配置"><a href="#U-Boot-distro配置" class="headerlink" title="U-Boot distro配置"></a>U-Boot distro配置</h3><p>将<code>U-Boot distro</code>运行需要的文件复制到<code>emmc.img</code>的分区<code>part 5</code>或者<code>part 6</code>，这样U-Boot后面将自动地从eMMC媒介中加载内核等镜像，完成启动引导。</p>
+<p>extlinux.cfg配置文件的内容：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">## /boot/extlinux/extlinux.conf</span><br><span class="line">##</span><br><span class="line"></span><br><span class="line">menu title U-Boot menu</span><br><span class="line">prompt 0</span><br><span class="line">timeout 50</span><br><span class="line"></span><br><span class="line">label sigi-kernel-buildroot</span><br><span class="line">        kernel /Image</span><br><span class="line">        fdt /hobot-sigi-virt.dtb</span><br><span class="line">        append earlycon=uart8250,mmio32,0x39050000,115200n8 console=ttyS0,115200n8 loglevel=10 root=/dev/mmcblk0p7 rootwait init=/init rw</span><br><span class="line"></span><br><span class="line">label sigi-kernel-ubuntu</span><br><span class="line">        kernel /Image</span><br><span class="line">        fdt /hobot-sigi-virt.dtb</span><br><span class="line">        append earlycon=uart8250,mmio32,0x39050000,115200n8 console=ttyS0,115200n8 loglevel=10 root=/dev/mmcblk0p8 rootwait init=/init rw</span><br><span class="line"></span><br><span class="line">label sigi-kernel-nvme</span><br><span class="line">        kernel /Image</span><br><span class="line">        fdt /hobot-sigi-virt.dtb</span><br><span class="line">        append earlycon=uart8250,mmio32,0x39050000,115200n8 console=ttyS0,115200n8 loglevel=10 root=/dev/nvme0n1p7 rootwait init=/init rw</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>下面脚本将Image、initramfs、dtb等文件复制到emmc.img的boot_a分区：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/usr/bin/bash</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">mkdir</span> -p rootfs</span><br><span class="line"><span class="built_in">set</span> -x</span><br><span class="line"></span><br><span class="line">part_map=$(sudo kpartx -av emmc.img)</span><br><span class="line"></span><br><span class="line">sudo mount /dev/mapper/$(<span class="built_in">echo</span> <span class="string">&quot;<span class="variable">$part_map</span>&quot;</span> | sed -n <span class="string">&#x27;5p&#x27;</span> | awk <span class="string">&#x27;&#123;print $3&#125;&#x27;</span>) rootfs/</span><br><span class="line"></span><br><span class="line"><span class="comment"># copy boot config</span></span><br><span class="line">sudo <span class="built_in">mkdir</span> -p rootfs/extlinux/</span><br><span class="line">sudo <span class="built_in">cp</span> extlinux.conf rootfs/extlinux/</span><br><span class="line"></span><br><span class="line"><span class="comment"># copy kernel images</span></span><br><span class="line">sudo <span class="built_in">cp</span> linux/arch/arm64/boot/Image rootfs/</span><br><span class="line">sudo <span class="built_in">cp</span> linux/arch/arm64/boot/Image.gz rootfs/</span><br><span class="line">sudo <span class="built_in">cp</span> linux/arch/arm64/boot/dts/hobot/hobot-sigi-virt.dtb rootfs/</span><br><span class="line"></span><br><span class="line"><span class="comment"># copy initramfs image</span></span><br><span class="line">sudo <span class="built_in">cp</span> buildroot/output/images/rootfs.cpio.lz4 rootfs/</span><br><span class="line"></span><br><span class="line"><span class="comment"># copy xen image</span></span><br><span class="line"><span class="comment"># sudo cp -r xen-tools/4.17/install/boot/xen* rootfs/</span></span><br><span class="line"><span class="comment"># sudo cp xen/xen/xen rootfs/</span></span><br><span class="line"></span><br><span class="line">sudo umount rootfs</span><br><span class="line">sudo kpartx -dv emmc.img</span><br><span class="line"></span><br><span class="line"><span class="built_in">sync</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="Ubuntu启动"><a href="#Ubuntu启动" class="headerlink" title="Ubuntu启动"></a>Ubuntu启动</h3><h4 id="Ubuntu镜像制作"><a href="#Ubuntu镜像制作" class="headerlink" title="Ubuntu镜像制作"></a>Ubuntu镜像制作</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">wget http://cdimage.ubuntu.com/ubuntu-base/releases/20.04.4/release/ubuntu-base-20.04.4-base-arm64.tar.gz</span><br><span class="line"><span class="built_in">dd</span> <span class="keyword">if</span>=/dev/zero of=ubuntu.img bs=1M count=1024 oflag=direct</span><br><span class="line">mkfs.ext4 ubuntu.img</span><br><span class="line"></span><br><span class="line"><span class="built_in">mkdir</span> -p rootfs</span><br><span class="line">sudo mount -t ext4 ubuntu.img rootfs/</span><br><span class="line">sudo tar -xzf ubuntu-base-20.04.4-base-arm64.tar.gz -C rootfs/</span><br><span class="line"></span><br><span class="line">sudo <span class="built_in">cp</span> /usr/bin/qemu-aarch64-static rootfs/usr/bin/</span><br><span class="line">sudo <span class="built_in">cp</span> /etc/resolv.conf rootfs/etc/resolv.conf</span><br><span class="line"></span><br><span class="line">sudo mount -t proc /proc rootfs/proc</span><br><span class="line">sudo mount -t sysfs /sys rootfs/sys</span><br><span class="line">sudo mount -o <span class="built_in">bind</span> /dev rootfs/dev</span><br><span class="line">sudo mount -o <span class="built_in">bind</span> /dev/pts rootfs/dev/pts</span><br><span class="line"></span><br><span class="line">sudo <span class="built_in">chroot</span> rootfs/</span><br><span class="line">apt-get update</span><br><span class="line">apt-get install sudo vim-tiny -y</span><br><span class="line">apt-get install net-tools iputils-ping -y</span><br><span class="line">apt-get install network-manager netplan.io systemd -y</span><br><span class="line">apt-get install kmod net-tools ifupdown -y</span><br><span class="line"></span><br><span class="line">useradd -m -d /home/charley -s /bin/bash -p ubuntu <span class="string">&quot;charley&quot;</span></span><br><span class="line">usermod -a -G sudo charley</span><br><span class="line">/bin/bash -c <span class="string">&quot;echo \&quot;virt\&quot; &gt;/etc/hostname&quot;</span></span><br><span class="line">/bin/bash -c <span class="string">&quot;echo \&quot;127.0.0.1 localhost\&quot; &gt;/etc/hosts&quot;</span></span><br><span class="line">/bin/bash -c <span class="string">&quot;echo \&quot;127.0.0.1 virt\&quot; &gt;&gt;/etc/hosts&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">exit</span></span><br><span class="line"></span><br><span class="line">sudo umount rootfs/proc</span><br><span class="line">sudo umount rootfs/sys</span><br><span class="line">sudo umount rootfs/dev/pts</span><br><span class="line">sudo umount rootfs/dev</span><br><span class="line">sudo umount rootfs/</span><br></pre></td></tr></table></figure>
+<p>将生成的<code>ubuntu.img</code>里面的内容都复制到<code>emmc.img</code>的分区<code>part 8</code>里面，这样U-Boot启动时才能挂载Ubuntu文件系统。</p>
+<h4 id="运行验证-1"><a href="#运行验证-1" class="headerlink" title="运行验证"></a>运行验证</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">qemu-system-aarch64 -M hobot-sigi-virt,emmc=on,virt=on -m 4G -display none -device loader,addr=0x3000200000,file=/path/to/u-boot/u-boot-dtb.bin,cpu-num=0 -drive file=/path/to/emmc.img,format=raw,<span class="keyword">if</span>=emmc -serial stdio</span><br></pre></td></tr></table></figure>
+
+<p><img data-src="/images/28/ubuntu.gif" alt="ubuntu"><br>启动日志附件：<a href="/images/28/ubuntu.txt">U-Boot -&gt; Kernel -&gt; Ubuntu Booting</a></p>
+<h3 id="基于Buildroot文件系统启动"><a href="#基于Buildroot文件系统启动" class="headerlink" title="基于Buildroot文件系统启动"></a>基于Buildroot文件系统启动</h3><p>将buildroot生成的rootfs.cpio.lz4里面的内容展开到<code>emmc.img</code>的分区<code>part 7</code>里面，这样U-Boot启动时才能挂载buildroot根文件系统。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">qemu-system-aarch64 -M hobot-sigi-virt,emmc=on,virt=on -m 4G -display none -device loader,addr=0x3000200000,file=/path/to/u-boot/u-boot-dtb.bin,cpu-num=0 -drive file=/path/to/emmc.img,format=raw,<span class="keyword">if</span>=emmc -serial stdio</span><br></pre></td></tr></table></figure>
+
+<p><img data-src="/images/28/uboot_kernel.gif" alt="buildroot"><br>启动日志附件：<a href="/images/28/uboot_kernel.txt">U-Boot -&gt; Kernel -&gt; Buildroot Booting</a></p>
+<h3 id="eMMC-RPMB访问"><a href="#eMMC-RPMB访问" class="headerlink" title="eMMC RPMB访问"></a>eMMC RPMB访问</h3><h4 id="RPMB介绍"><a href="#RPMB介绍" class="headerlink" title="RPMB介绍"></a>RPMB介绍</h4><p>RPMB(Replay Protected Memory Block) Partition是eMMC中的一个具有安全特性的分区。<br>eMMC在写入数据到RPMB时，会校验数据的合法性，只有指定的Host才能够写入，同时在读数据时，也提供了签名机制，保证Host读取到的数据是RPMB内部数据，而不是攻击者伪造的数据。</p>
+<p>RPMB在实际应用中，通常用于存储一些有防止非法篡改需求的数据，例如手机上指纹支付相关的公钥、序列号等。RPMB可以对写入操作进行鉴权，但是读取并不需要鉴权，任何人都可以进行读取的操作，因此存储到RPMB的数据通常会进行加密后再存储。</p>
+<h4 id="运行验证-2"><a href="#运行验证-2" class="headerlink" title="运行验证"></a>运行验证</h4><p>上面我们制作的emmc.img镜像里面都没有包含rpmb.img镜像，因此我们要制作一个rpmb.img的空间，和emmc.img拼在一起，这样U-Boot才能够访问RPMB的空间。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">dd</span> <span class="keyword">if</span>=/dev/zero of=rpmb.img bs=1M count=2</span><br><span class="line"><span class="built_in">dd</span> <span class="keyword">if</span>=/dev/zero of=emmc.img bs=1M count=2046</span><br><span class="line"><span class="comment">#emmc.img按照上面制作方法进行分区和复制内容</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">cat</span> rpmb.img emmc.img &gt;emmc-with-rpmb.img</span><br></pre></td></tr></table></figure>
+<p><strong>emmc.img大小必须是1G、2G、4G等（要满足2的N次方形式）</strong><br>否者，就会报如下的错误信息：<br><img data-src="/images/28/emmc-size.svg" alt="emmc-size"></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">qemu-system-aarch64 -M hobot-sigi-virt,emmc=on,part-config=0x20,virt=on -m 4G -display none -device loader,addr=0x3000200000,file=/path/to/u-boot/u-boot-dtb.bin,cpu-num=0 -drive file=/path/to/emmc-with-rpmb.img,format=raw,<span class="keyword">if</span>=emmc -serial stdio</span><br></pre></td></tr></table></figure>
+
+<p><img data-src="/images/28/rpmb.gif" alt="rpmb"></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 烧写rpmb key，每个eMMC只能烧写一次</span></span><br><span class="line">load mmc 0:5 0x3090000000 /rpmb-key.txt;mmc rpmb key 0x3090000000</span><br><span class="line"></span><br><span class="line"><span class="comment"># 使用这个key，把data写入到RPMB分区内</span></span><br><span class="line">fatload mmc 0:5 0x3091000000 Image;mmc rpmb write 0x3091000000 0x0 0x10 0x3090000000</span><br><span class="line"></span><br><span class="line">md 0x3092000000 0x10</span><br><span class="line"><span class="comment"># 读取RPMB分区里面的data，可以不用key校验</span></span><br><span class="line">mmc rpmb <span class="built_in">read</span> 0x3092000000 0x0 0x10</span><br><span class="line"></span><br><span class="line"><span class="comment"># 显示两次，做对比，看看数据有没有正确读出来</span></span><br><span class="line">md  0x3092000000 0x10</span><br></pre></td></tr></table></figure>
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer"><div class="post-widgets">
+      <div id="needsharebutton-postbottom">
+        <span class="btn">
+          <i class="fa fa-share-alt" aria-hidden="true"></i>
+        </span>
+      </div>
+    </div>
+          <div class="reward-container">
+  <div>请我一杯咖啡吧！</div>
+  <button>
+    赞赏
+  </button>
+  <div class="post-reward">
+      <div>
+        <img src="/images/wechatpay.png" alt="Xinlu Wang 微信">
+        <span>微信</span>
+      </div>
+      <div>
+        <img src="/images/alipay.jpg" alt="Xinlu Wang 支付宝">
+        <span>支付宝</span>
+      </div>
+
+  </div>
+</div>
+
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>本文作者： </strong>Xinlu Wang
+  </li>
+  <li class="post-copyright-link">
+      <strong>本文链接：</strong>
+      <a href="https://chasinglulu.github.io/posts/7cba3cf4/" title="基于Qemu eMMC模拟设备的启动">https://chasinglulu.github.io/posts/7cba3cf4/</a>
+  </li>
+  <li class="post-copyright-license">
+      <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/qemu/" rel="tag"><i class="fa fa-tag"></i> qemu</a>
+              <a href="/tags/u-boot/" rel="tag"><i class="fa fa-tag"></i> u-boot</a>
+              <a href="/tags/linux/" rel="tag"><i class="fa fa-tag"></i> linux</a>
+              <a href="/tags/ATF/" rel="tag"><i class="fa fa-tag"></i> ATF</a>
+              <a href="/tags/eMMC/" rel="tag"><i class="fa fa-tag"></i> eMMC</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/f7f39ab5/" rel="prev" title="基于Qemu hobot-sigi-virt平台的bringup">
+                  <i class="fa fa-angle-left"></i> 基于Qemu hobot-sigi-virt平台的bringup
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/posts/8ef16649/" rel="next" title="基于Qemu搭建Xen on ARM开发环境">
+                  基于Qemu搭建Xen on ARM开发环境 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments" id="waline"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2018 – 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-anchor"></i>
+    </span><a href="http://abitacc.com/about" rel="noopener" target="_blank">Xinlu Wang</a>
+    <!-- annotation
+    <span class="author" itemprop="copyrightHolder">Xinlu Wang</span>
+    -->
+  </div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+      <span>站点总字数：</span>
+    <span title="站点总字数">82k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span>站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">4:57</span>
+  </span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+  <a href="https://github.com/chasinglulu" class="github-corner" title="在 GitHub 上关注我" aria-label="在 GitHub 上关注我" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script size="300" alpha="0.6" zIndex="-1" src="https://cdnjs.cloudflare.com/ajax/libs/ribbon.js/1.0.2/ribbon.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lozad.js/1.16.0/lozad.min.js" integrity="sha256-mOFREFhqmHeQbXpK2lp4nA3qooVgACfh88fpJftLBbc=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script><script src="/js/bookmark.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/quicklink/2.3.0/quicklink.umd.js" integrity="sha256-yvJQOINiH9fWemHn0vCA5lsHWJaHs6/ZmO+1Ft04SvM=" crossorigin="anonymous"></script>
+  <script class="next-config" data-name="quicklink" type="application/json">{"enable":true,"home":false,"archive":false,"delay":true,"timeout":3000,"priority":true,"url":"https://chasinglulu.github.io/posts/7cba3cf4/"}</script>
+  <script src="/js/third-party/quicklink.js"></script>
+<script class="next-config" data-name="waline" type="application/json">{"lang":"zh-CN","enable":true,"serverURL":"www.chasinglulu.cn","cssUrl":"https://unpkg.com/@waline/client@v2/dist/waline.css","commentCount":true,"pageview":true,"placeholder":"请文明评论呀","avatar":"mm","meta":["nick","mail"],"pageSize":10,"comment_count":true,"requiredFields":["mail"],"libUrl":"https://cdn.jsdelivr.net/npm/@waline/client@2.15.8/dist/waline.js","emoji":["https://cdn.jsdelivr.net/gh/walinejs/emojis@1.1.0/tw-emoji/"],"el":"#waline","comment":true,"path":"/posts/7cba3cf4/"}</script>
+<link rel="stylesheet" href="https://unpkg.com/@waline/client@v2/dist/waline.css">
+<script>
+document.addEventListener('page:loaded', () => {
+  NexT.utils.loadComments(CONFIG.waline.el).then(() =>
+    NexT.utils.getScript(CONFIG.waline.libUrl, { condition: window.Waline })
+  ).then(() => 
+    Waline.init(Object.assign({}, CONFIG.waline,{ el: document.querySelector(CONFIG.waline.el) }))
+  );
+});
+</script>
+<div id="needsharebutton-float">
+      <span class="btn">
+        <i class="fa fa-share-alt" aria-hidden="true"></i>
+      </span>
+    </div>
+  <script src="//cdn.jsdelivr.net/gh/theme-next/theme-next-needmoreshare2@1/needsharebutton.min.js"></script>
+  <script>
+      pbOptions = {};
+        pbOptions.iconStyle = "default";
+        pbOptions.boxForm = "horizontal";
+        pbOptions.position = "bottomCenter";
+        pbOptions.networks = "Weibo,Wechat,Douban,QQZone,Mailto";
+      new needShareButton('#needsharebutton-postbottom', pbOptions);
+      flOptions = {};
+        flOptions.iconStyle = "box";
+        flOptions.boxForm = "vertical";
+        flOptions.position = "topRight";
+        flOptions.networks = "Weibo,Wechat,Douban,QQZone,Mailto";
+      new needShareButton('#needsharebutton-float', flOptions);
+  </script>
+</body>
+</html>

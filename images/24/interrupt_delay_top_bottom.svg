@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- 由 Microsoft Visio, SVG Export 生成 interrupt_delay_top_bottom.svg 页-1 -->
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:ev="http://www.w3.org/2001/xml-events"
+		xmlns:v="http://schemas.microsoft.com/visio/2003/SVGExtensions/" width="5.51102in" height="3.83759in"
+		viewBox="0 0 396.793 276.306" xml:space="preserve" color-interpolation-filters="sRGB" class="st11">
+	<v:documentProperties v:langID="2052" v:metric="true" v:viewMarkup="false"/>
+
+	<style type="text/css">
+	<![CDATA[
+		.st1 {visibility:visible}
+		.st2 {fill:#5b9bd5;fill-opacity:0.22;filter:url(#filter_2);stroke:#5b9bd5;stroke-opacity:0.22}
+		.st3 {fill:#d8d8d8;stroke:#000000;stroke-width:0.25}
+		.st4 {fill:#000000;font-family:Times New Roman;font-size:1.33333em}
+		.st5 {fill:#a5a5a5;stroke:#000000;stroke-width:0.5}
+		.st6 {fill:#000000;font-family:Times New Roman;font-size:1.16666em}
+		.st7 {marker-end:url(#mrkr5-49);stroke:#000000;stroke-linecap:round;stroke-linejoin:round;stroke-width:1}
+		.st8 {fill:#000000;fill-opacity:1;stroke:#000000;stroke-opacity:1;stroke-width:0.28409090909091}
+		.st9 {fill:none;stroke:none;stroke-width:0.25}
+		.st10 {fill:#000000;font-family:宋体;font-size:1.16666em}
+		.st11 {fill:none;fill-rule:evenodd;font-size:12px;overflow:visible;stroke-linecap:square;stroke-miterlimit:3}
+	]]>
+	</style>
+
+	<defs id="Markers">
+		<g id="lend5">
+			<path d="M 2 1 L 0 0 L 1.98117 -0.993387 C 1.67173 -0.364514 1.67301 0.372642 1.98465 1.00043 " style="stroke:none"/>
+		</g>
+		<marker id="mrkr5-49" class="st8" v:arrowType="5" v:arrowSize="2" v:setback="6.16" refX="-6.16" orient="auto"
+				markerUnits="strokeWidth" overflow="visible">
+			<use xlink:href="#lend5" transform="scale(-3.52,-3.52) "/>
+		</marker>
+	</defs>
+	<defs id="Filters">
+		<filter id="filter_2">
+			<feGaussianBlur stdDeviation="2"/>
+		</filter>
+	</defs>
+	<g v:mID="0" v:index="1" v:groupContext="foregroundPage">
+		<title>页-1</title>
+		<v:pageProperties v:drawingScale="0.0393701" v:pageScale="0.0393701" v:drawingUnits="24" v:shadowOffsetX="8.50394"
+				v:shadowOffsetY="-8.50394"/>
+		<v:layer v:name="连接线" v:index="0"/>
+		<g id="group22-1" transform="translate(3.02939,-5.34781)" v:mID="22" v:groupContext="group">
+			<title>工作表.22</title>
+			<g id="shape3-2" v:mID="3" v:groupContext="shape" transform="translate(20.5512,-143.858)">
+				<title>矩形.3</title>
+				<desc>Top-half</desc>
+				<v:userDefs>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197" v:verticalAlign="2"/>
+				<v:textRect cx="170.787" cy="235.204" width="341.58" height="82.2047"/>
+				<g id="shadow3-3" v:groupContext="shadow" v:shadowOffsetX="0.345598" v:shadowOffsetY="-1.97279" v:shadowType="1"
+						transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+					<rect x="0" y="194.102" width="341.575" height="82.2047" rx="11.3386" ry="11.3386" class="st2"/>
+				</g>
+				<rect x="0" y="194.102" width="341.575" height="82.2047" rx="11.3386" ry="11.3386" class="st3"/>
+				<text x="281.6" y="267.51" class="st4" v:langID="2052"><v:paragraph v:indentLeft="28.35" v:horizAlign="2"/><v:tabList/>Top-half</text>			</g>
+			<g id="shape1-8" v:mID="1" v:groupContext="shape" transform="translate(99.2126,-174.685)">
+				<title>矩形</title>
+				<desc>ISR(Interrupt Service Routine)</desc>
+				<v:userDefs>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="92.126" cy="259.476" width="184.26" height="33.6614"/>
+				<g id="shadow1-9" v:groupContext="shadow" v:shadowOffsetX="0.345598" v:shadowOffsetY="-1.97279" v:shadowType="1"
+						transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+					<rect x="0" y="242.645" width="184.252" height="33.6614" rx="11.3386" ry="11.3386" class="st2"/>
+				</g>
+				<rect x="0" y="242.645" width="184.252" height="33.6614" rx="11.3386" ry="11.3386" class="st5"/>
+				<text x="5.43" y="263.68" class="st6" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>ISR(Interrupt Service Routine)</text>			</g>
+			<g id="shape4-14" v:mID="4" v:groupContext="shape">
+				<title>矩形.4</title>
+				<desc>Bottom-half</desc>
+				<v:userDefs>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197" v:verticalAlign="2"/>
+				<v:textRect cx="194.882" cy="235.204" width="389.77" height="82.2047"/>
+				<g id="shadow4-15" v:groupContext="shadow" v:shadowOffsetX="0.345598" v:shadowOffsetY="-1.97279" v:shadowType="1"
+						transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+					<rect x="0" y="194.102" width="389.764" height="82.2047" rx="11.3386" ry="11.3386" class="st2"/>
+				</g>
+				<rect x="0" y="194.102" width="389.764" height="82.2047" rx="11.3386" ry="11.3386" class="st3"/>
+				<text x="307.55" y="267.51" class="st4" v:langID="2052"><v:paragraph v:horizAlign="2"/><v:tabList/>Bottom-half</text>			</g>
+			<g id="shape5-20" v:mID="5" v:groupContext="shape" transform="translate(21.9685,-38.9764)">
+				<title>矩形.5</title>
+				<desc>softirq</desc>
+				<v:userDefs>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="35.4331" cy="263.551" width="70.87" height="25.5118"/>
+				<g id="shadow5-21" v:groupContext="shadow" v:shadowOffsetX="0.345598" v:shadowOffsetY="-1.97279" v:shadowType="1"
+						transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+					<rect x="0" y="250.795" width="70.8661" height="25.5118" rx="11.3386" ry="11.3386" class="st2"/>
+				</g>
+				<rect x="0" y="250.795" width="70.8661" height="25.5118" rx="11.3386" ry="11.3386" class="st5"/>
+				<text x="17.16" y="267.75" class="st6" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>softirq</text>			</g>
+			<g id="shape6-26" v:mID="6" v:groupContext="shape" transform="translate(113.386,-38.9764)">
+				<title>矩形.6</title>
+				<desc>tasklet</desc>
+				<v:userDefs>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="35.4331" cy="263.551" width="70.87" height="25.5118"/>
+				<g id="shadow6-27" v:groupContext="shadow" v:shadowOffsetX="0.345598" v:shadowOffsetY="-1.97279" v:shadowType="1"
+						transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+					<rect x="0" y="250.795" width="70.8661" height="25.5118" rx="11.3386" ry="11.3386" class="st2"/>
+				</g>
+				<rect x="0" y="250.795" width="70.8661" height="25.5118" rx="11.3386" ry="11.3386" class="st5"/>
+				<text x="17.16" y="267.75" class="st6" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>tasklet</text>			</g>
+			<g id="shape7-32" v:mID="7" v:groupContext="shape" transform="translate(190.63,-38.9764)">
+				<title>矩形.7</title>
+				<desc>workqueue</desc>
+				<v:userDefs>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="35.4331" cy="263.551" width="70.87" height="25.5118"/>
+				<g id="shadow7-33" v:groupContext="shadow" v:shadowOffsetX="0.345598" v:shadowOffsetY="-1.97279" v:shadowType="1"
+						transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+					<rect x="0" y="250.795" width="70.8661" height="25.5118" rx="11.3386" ry="11.3386" class="st2"/>
+				</g>
+				<rect x="0" y="250.795" width="70.8661" height="25.5118" rx="11.3386" ry="11.3386" class="st5"/>
+				<text x="4.33" y="267.75" class="st6" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>workqueue</text>			</g>
+			<g id="shape8-38" v:mID="8" v:groupContext="shape" transform="translate(274.961,-38.9764)">
+				<title>矩形.8</title>
+				<desc>Kernel thread</desc>
+				<v:userDefs>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="45.3543" cy="263.551" width="90.71" height="25.5118"/>
+				<g id="shadow8-39" v:groupContext="shadow" v:shadowOffsetX="0.345598" v:shadowOffsetY="-1.97279" v:shadowType="1"
+						transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+					<rect x="0" y="250.795" width="90.7087" height="25.5118" rx="11.3386" ry="11.3386" class="st2"/>
+				</g>
+				<rect x="0" y="250.795" width="90.7087" height="25.5118" rx="11.3386" ry="11.3386" class="st5"/>
+				<text x="7.07" y="267.75" class="st6" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>Kernel thread</text>			</g>
+			<g id="shape9-44" v:mID="9" v:groupContext="shape" v:layerMember="0"
+					transform="translate(-84.9679,28.0978) rotate(-90) scale(-1,1)">
+				<title>直线连接线</title>
+				<v:userDefs>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<path d="M0 276.31 L33.7 276.31" class="st7"/>
+			</g>
+			<g id="shape14-50" v:mID="14" v:groupContext="shape" v:layerMember="0" transform="translate(243.78,-64.4882)">
+				<title>底部到顶部 1</title>
+				<v:userDefs>
+					<v:ud v:nameU="TextPos" v:val="VT0(1):26"/>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<path d="M0 166.11 L0 213.24 A11.3386 11.3386 -180 0 0 11.34 224.57 L65.2 224.57 A11.3386 11.3386 0 0 1 76.54 235.91
+							 L76.54 270.15" class="st7"/>
+			</g>
+			<g id="shape15-55" v:mID="15" v:groupContext="shape" v:layerMember="0" transform="translate(205.512,-64.4882)">
+				<title>底部到顶部 1.15</title>
+				<v:userDefs>
+					<v:ud v:nameU="TextPos" v:val="VT0(1):26"/>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<path d="M0 166.11 L0 223.16 A8.50394 8.50394 -180 0 0 8.5 231.66 L12.05 231.66 A8.50394 8.50394 0 0 1 20.55 240.16
+							 L20.55 270.15" class="st7"/>
+			</g>
+			<g id="shape17-60" v:mID="17" v:groupContext="shape" v:layerMember="0"
+					transform="translate(170.079,-64.4882) scale(-1,1)">
+				<title>底部到顶部 1.17</title>
+				<v:userDefs>
+					<v:ud v:nameU="TextPos" v:val="VT0(1):26"/>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<path d="M0 166.11 L0 223.16 A8.50394 8.50394 -180 0 0 8.5 231.66 L12.76 231.66 A8.50394 8.50394 0 0 1 21.26 240.16
+							 L21.26 270.15" class="st7"/>
+			</g>
+			<g id="shape18-65" v:mID="18" v:groupContext="shape" v:layerMember="0"
+					transform="translate(136.063,-64.4882) scale(-1,1)">
+				<title>底部到顶部 1.18</title>
+				<v:userDefs>
+					<v:ud v:nameU="TextPos" v:val="VT0(1):26"/>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<path d="M0 166.11 L0 213.24 A11.3386 11.3386 -180 0 0 11.34 224.57 L67.32 224.57 A11.3386 11.3386 0 0 1 78.66 235.91
+							 L78.66 270.15" class="st7"/>
+			</g>
+			<g id="shape19-70" v:mID="19" v:groupContext="shape" transform="translate(171.622,-250.709)">
+				<title>工作表.19</title>
+				<desc>中断</desc>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="20.4252" cy="266.306" width="40.86" height="20"/>
+				<rect x="0" y="256.306" width="40.8504" height="20" class="st9"/>
+				<text x="6.43" y="270.51" class="st10" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>中断</text>			</g>
+		</g>
+	</g>
+</svg>

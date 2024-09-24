@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- 由 Microsoft Visio, SVG Export 生成 slub-object-layout-2.svg 页-1 -->
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:ev="http://www.w3.org/2001/xml-events"
+		xmlns:v="http://schemas.microsoft.com/visio/2003/SVGExtensions/" width="4.41986in" height="2.58842in"
+		viewBox="0 0 318.23 186.366" xml:space="preserve" color-interpolation-filters="sRGB" class="st16">
+	<v:documentProperties v:langID="2052" v:metric="true" v:viewMarkup="false"/>
+
+	<style type="text/css">
+	<![CDATA[
+		.st1 {visibility:visible}
+		.st2 {fill:#5b9bd5;fill-opacity:0.22;filter:url(#filter_2);stroke:#5b9bd5;stroke-opacity:0.22}
+		.st3 {fill:#ed7d31;stroke:#000000;stroke-width:0.5}
+		.st4 {fill:#000000;font-family:Times New Roman;font-size:1.00001em}
+		.st5 {fill:#7effff;stroke:#000000;stroke-width:0.5}
+		.st6 {fill:#000000;font-family:Times New Roman;font-size:0.75em}
+		.st7 {fill:#bfbfbf;stroke:#000000;stroke-width:0.5}
+		.st8 {fill:#90aadb;stroke:#000000;stroke-width:0.5}
+		.st9 {stroke:#000000;stroke-linecap:round;stroke-linejoin:round;stroke-width:0.5}
+		.st10 {marker-end:url(#mrkr3-43);marker-start:url(#mrkr3-41);stroke:#000000;stroke-linecap:round;stroke-linejoin:round;stroke-width:0.5}
+		.st11 {fill:#000000;fill-opacity:1;stroke:#000000;stroke-opacity:1;stroke-width:0.16556291390728}
+		.st12 {fill:none;stroke:none;stroke-width:0.25}
+		.st13 {fill:#00b0f0;font-family:Times New Roman;font-size:0.833336em}
+		.st14 {fill:#000000;font-family:Times New Roman;font-size:0.833336em}
+		.st15 {font-size:1em}
+		.st16 {fill:none;fill-rule:evenodd;font-size:12px;overflow:visible;stroke-linecap:square;stroke-miterlimit:3}
+	]]>
+	</style>
+
+	<defs id="Markers">
+		<g id="lend3">
+			<path d="M 2 1 L 0 0 L 2 -1 " style="stroke-linecap:round;stroke-linejoin:round;fill:none"/>
+		</g>
+		<marker id="mrkr3-41" class="st11" v:arrowType="3" v:arrowSize="2" orient="auto" markerUnits="strokeWidth"
+				overflow="visible">
+			<use xlink:href="#lend3" transform="scale(6.04) "/>
+		</marker>
+		<marker id="mrkr3-43" class="st11" v:arrowType="3" v:arrowSize="2" orient="auto" markerUnits="strokeWidth"
+				overflow="visible">
+			<use xlink:href="#lend3" transform="scale(-6.04,-6.04) "/>
+		</marker>
+	</defs>
+	<defs id="Filters">
+		<filter id="filter_2">
+			<feGaussianBlur stdDeviation="2"/>
+		</filter>
+	</defs>
+	<g v:mID="0" v:index="1" v:groupContext="foregroundPage">
+		<title>页-1</title>
+		<v:pageProperties v:drawingScale="0.0393701" v:pageScale="0.0393701" v:drawingUnits="24" v:shadowOffsetX="8.50394"
+				v:shadowOffsetY="-8.50394"/>
+		<v:layer v:name="连接线" v:index="0"/>
+		<g id="group17-1" transform="translate(6.75293,-0.25)" v:mID="17" v:groupContext="group">
+			<title>工作表.17</title>
+			<g id="shape2-2" v:mID="2" v:groupContext="shape" transform="translate(0,-99.5354)">
+				<title>矩形.10</title>
+				<desc>object_size</desc>
+				<v:userDefs>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197" v:verticalAlign="0"/>
+				<v:textRect cx="70.8661" cy="172.193" width="141.74" height="28.3465"/>
+				<g id="shadow2-3" v:groupContext="shadow" v:shadowOffsetX="0.345598" v:shadowOffsetY="-1.97279" v:shadowType="1"
+						transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+					<rect x="0" y="158.02" width="141.732" height="28.3465" rx="1.41732" ry="1.41732" class="st2"/>
+				</g>
+				<rect x="0" y="158.02" width="141.732" height="28.3465" rx="1.41732" ry="1.41732" class="st3"/>
+				<text x="43.88" y="172.82" class="st4" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>object_size</text>			</g>
+			<g id="shape3-8" v:mID="3" v:groupContext="shape" transform="translate(205.512,-99.5354)">
+				<title>矩形</title>
+				<desc>FP</desc>
+				<v:userDefs>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="10.6299" cy="179.28" width="21.26" height="14.1732"/>
+				<g id="shadow3-9" v:groupContext="shadow" v:shadowOffsetX="0.345598" v:shadowOffsetY="-1.97279" v:shadowType="1"
+						transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+					<rect x="0" y="172.193" width="21.2598" height="14.1732" rx="1.41732" ry="1.41732" class="st2"/>
+				</g>
+				<rect x="0" y="172.193" width="21.2598" height="14.1732" rx="1.41732" ry="1.41732" class="st5"/>
+				<text x="5.62" y="181.98" class="st6" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>FP</text>			</g>
+			<g id="shape4-14" v:mID="4" v:groupContext="shape" transform="translate(141.732,-99.5354)">
+				<title>矩形.3</title>
+				<desc>word align</desc>
+				<v:userDefs>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="31.8898" cy="172.193" width="63.78" height="28.3465"/>
+				<g id="shadow4-15" v:groupContext="shadow" v:shadowOffsetX="0.345598" v:shadowOffsetY="-1.97279" v:shadowType="1"
+						transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+					<rect x="0" y="158.02" width="63.7795" height="28.3465" rx="1.41732" ry="1.41732" class="st2"/>
+				</g>
+				<rect x="0" y="158.02" width="63.7795" height="28.3465" rx="1.41732" ry="1.41732" class="st7"/>
+				<text x="6.06" y="175.79" class="st4" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>word align</text>			</g>
+			<g id="shape5-20" v:mID="5" v:groupContext="shape" transform="translate(226.772,-99.5354)">
+				<title>矩形.4</title>
+				<desc>obj align</desc>
+				<v:userDefs>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="38.9764" cy="172.193" width="77.96" height="28.3465"/>
+				<g id="shadow5-21" v:groupContext="shadow" v:shadowOffsetX="0.345598" v:shadowOffsetY="-1.97279" v:shadowType="1"
+						transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+					<rect x="0" y="158.02" width="77.9528" height="28.3465" rx="1.41732" ry="1.41732" class="st2"/>
+				</g>
+				<rect x="0" y="158.02" width="77.9528" height="28.3465" rx="1.41732" ry="1.41732" class="st8"/>
+				<text x="17.81" y="175.79" class="st4" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>obj align</text>			</g>
+			<g id="shape6-26" v:mID="6" v:groupContext="shape" transform="translate(186.366,86.6875) rotate(90)">
+				<title>工作表.6</title>
+				<path d="M0 186.37 L71.01 186.37" class="st9"/>
+			</g>
+			<g id="shape7-29" v:mID="7" v:groupContext="shape" transform="translate(491.091,86.4348) rotate(90)">
+				<title>工作表.7</title>
+				<path d="M0 186.37 L71.53 186.37" class="st9"/>
+			</g>
+			<g id="shape8-32" v:mID="8" v:groupContext="shape" transform="translate(391.878,86.185) rotate(90)">
+				<title>工作表.8</title>
+				<path d="M0 186.37 L28.35 186.37" class="st9"/>
+			</g>
+			<g id="shape9-35" v:mID="9" v:groupContext="shape" v:layerMember="0"
+					transform="translate(0.585515,294.456) rotate(-0.180009) scale(1,-1)">
+				<title>直线连接线</title>
+				<v:userDefs>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<path d="M0 186.37 L205.51 186.37" class="st10"/>
+			</g>
+			<g id="shape10-44" v:mID="10" v:groupContext="shape" v:layerMember="0"
+					transform="translate(0.394883,329.889) rotate(-0.121402) scale(1,-1)">
+				<title>直线连接线.10</title>
+				<v:userDefs>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<path d="M0 186.37 L304.73 186.37" class="st10"/>
+			</g>
+			<g id="shape11-51" v:mID="11" v:groupContext="shape" transform="translate(173.622,-57.0157)">
+				<title>工作表.11</title>
+				<desc>offset=inuse</desc>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="31.8898" cy="178.957" width="63.78" height="14.8189"/>
+				<rect x="0" y="171.547" width="63.7795" height="14.8189" class="st12"/>
+				<text x="7.13" y="181.99" class="st13" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>offset=inuse</text>			</g>
+			<g id="shape12-54" v:mID="12" v:groupContext="shape" transform="translate(70.8661,-78.2756)">
+				<title>工作表.12</title>
+				<desc>inuse</desc>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="17.7165" cy="178.957" width="35.44" height="14.8189"/>
+				<rect x="0" y="171.547" width="35.4331" height="14.8189" class="st12"/>
+				<text x="7.16" y="181.99" class="st13" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>inuse</text>			</g>
+			<g id="shape13-57" v:mID="13" v:groupContext="shape" transform="translate(141.732,-43.1654)">
+				<title>工作表.13</title>
+				<desc>size</desc>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="17.7165" cy="178.957" width="35.44" height="14.8189"/>
+				<rect x="0" y="171.547" width="35.4331" height="14.8189" class="st12"/>
+				<text x="9.94" y="181.99" class="st13" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>size</text>			</g>
+			<g id="shape14-60" v:mID="14" v:groupContext="shape" transform="translate(56.6929,-171.047)">
+				<title>工作表.14</title>
+				<desc>Slub object layout with FP movement</desc>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="106.299" cy="178.957" width="212.6" height="14.8189"/>
+				<rect x="0" y="171.547" width="212.598" height="14.8189" class="st12"/>
+				<text x="29.36" y="181.99" class="st14" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>Slub object layout with  FP movement</text>			</g>
+			<g id="shape15-63" v:mID="15" v:groupContext="shape" transform="translate(99.2126,2.84217E-14)">
+				<title>工作表.15</title>
+				<desc>mm/slub.c :: calculate_sizes</desc>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="63.7795" cy="178.957" width="127.56" height="14.8189"/>
+				<rect x="0" y="171.547" width="127.559" height="14.8189" class="st12"/>
+				<text x="7.55" y="181.96" class="st14" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>mm/slub.c :: calculate_sizes</text>			</g>
+			<g id="shape16-66" v:mID="16" v:groupContext="shape" transform="translate(0,-128.528)">
+				<title>工作表.16</title>
+				<desc>&#60;3&#62; CONFIG_SLUB_DEBUG is set and slub_debug=P or SLAB_TYPESAF...</desc>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="152.362" cy="163.894" width="304.73" height="44.9441"/>
+				<rect x="0" y="141.422" width="304.724" height="44.9441" class="st12"/>
+				<text x="4" y="160.82" class="st14" v:langID="2052"><v:paragraph/><v:tabList/>&#60;3&#62; CONFIG_SLUB_DEBUG is set and slub_debug=P or <tspan
+							x="4" dy="1.211em" class="st15" v:langID="1033">SLAB</tspan><tspan class="st15" v:langID="1033">_</tspan><tspan
+							class="st15" v:langID="1033">TYPESAFE</tspan><tspan class="st15" v:langID="1033">_</tspan><tspan
+							class="st15" v:langID="1033">BY</tspan><tspan class="st15" v:langID="1033">_</tspan><tspan class="st15"
+							v:langID="1033">RCU</tspan> flag exist or callback function ctor is set</text>			</g>
+		</g>
+	</g>
+</svg>

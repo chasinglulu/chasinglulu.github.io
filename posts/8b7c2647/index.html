@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 7.0.0">
+<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+<link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/blog.svg">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/blog.svg">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta name="google-site-verification" content="vuSkRYPVceK1DXhqZWm7wVxYV4YmmnI1Dv_C1M8rJJM">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Georgia:300,300italic,400,400italic,700,700italic%7CCourier+New:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha256-CTSx/A06dm1B063156EVh15m6Y67pAjZZaQc89LLSrU=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"chasinglulu.github.io","root":"/","images":"/images","scheme":"Mist","darkmode":false,"version":"8.18.2","exturl":false,"sidebar":{"position":"right","display":"hide","padding":18,"offset":12},"copycode":{"enable":true,"style":"mac"},"fold":{"enable":true,"height":500},"bookmark":{"enable":true,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="&ensp;&ensp;&ensp;&ensp;&ensp;时间是构建事件时间轴的基石，用于识别正在发生的和已发生的事件。定时器是一种特殊的时钟，可用于测量事件的处理时间和控制一系列事件的发生。因此在Linux内核中，时间和定时器管理是至关重要的组成部分，可按功能将其分为如下几方面：  支持时间管理的计时「timekeeping」 时钟管理和同步 时间表达方式 定时器的事件中断处理  对于这些功能">
+<meta property="og:type" content="article">
+<meta property="og:title" content="时间管理「time management」">
+<meta property="og:url" content="https://chasinglulu.github.io/posts/8b7c2647/index.html">
+<meta property="og:site_name" content="点滴汇聚">
+<meta property="og:description" content="&ensp;&ensp;&ensp;&ensp;&ensp;时间是构建事件时间轴的基石，用于识别正在发生的和已发生的事件。定时器是一种特殊的时钟，可用于测量事件的处理时间和控制一系列事件的发生。因此在Linux内核中，时间和定时器管理是至关重要的组成部分，可按功能将其分为如下几方面：  支持时间管理的计时「timekeeping」 时钟管理和同步 时间表达方式 定时器的事件中断处理  对于这些功能">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://chasinglulu.github.io/images/20/SoC_clock_arch.svg">
+<meta property="article:published_time" content="2019-07-15T13:21:50.000Z">
+<meta property="article:modified_time" content="2024-09-24T07:39:19.294Z">
+<meta property="article:author" content="Xinlu Wang">
+<meta property="article:tag" content="time management">
+<meta property="article:tag" content="timer">
+<meta property="article:tag" content="clock">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://chasinglulu.github.io/images/20/SoC_clock_arch.svg">
+
+
+<link rel="canonical" href="https://chasinglulu.github.io/posts/8b7c2647/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://chasinglulu.github.io/posts/8b7c2647/","path":"posts/8b7c2647/","title":"时间管理「time management」"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>时间管理「time management」 | 点滴汇聚</title>
+  
+
+
+
+
+
+
+
+<link rel="dns-prefetch" href="www.chasinglulu.cn"><link rel="stylesheet" href="//cdn.jsdelivr.net/gh/theme-next/theme-next-needmoreshare2@1/needsharebutton.min.css"><style>
+#needsharebutton-postbottom {
+  cursor: pointer;
+  height: 26px;
+  margin-top: 10px;
+  position: relative;
+}
+#needsharebutton-postbottom .btn {
+  border: 1px solid $btn-default-border-color;
+  border-radius: 3px;
+  display: initial;
+  padding: 1px 4px;
+}
+</style><style>
+#needsharebutton-float {
+  bottom: 88px;
+  cursor: pointer;
+  left: -8px;
+  position: fixed;
+  z-index: 9999;
+}
+#needsharebutton-float .btn {
+  border: 1px solid $btn-default-border-color;
+  border-radius: 4px;
+  padding: 0 10px 0 14px;
+}
+</style>
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">点滴汇聚</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">不积跬步无以至千里，不积小流无以成江海</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-address-card fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">70</span></a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">9</span></a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">43</span></a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%80%9A%E7%94%A8%E6%97%B6%E9%92%9F%E6%A1%86%E6%9E%B6%E3%80%8Ccommon-clock-framework%EF%BC%8C-CCF%E3%80%8D"><span class="nav-number">1.</span> <span class="nav-text">通用时钟框架「common clock framework， CCF」</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%97%B6%E9%92%9F%E3%80%8Cclock%E3%80%8D"><span class="nav-number">1.1.</span> <span class="nav-text">时钟「clock」</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#SoC%E6%97%B6%E9%92%9F"><span class="nav-number">1.1.1.</span> <span class="nav-text">SoC时钟</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%BF%85%E8%A6%81%E7%9A%84%E6%97%B6%E9%92%9F%E7%BB%84%E4%BB%B6"><span class="nav-number">1.2.</span> <span class="nav-text">必要的时钟组件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%92%8CAPI"><span class="nav-number">1.3.</span> <span class="nav-text">数据结构和API</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%9B%B8%E5%85%B3%E7%9A%84%E5%88%9D%E5%A7%8B%E5%8C%96%E5%87%BD%E6%95%B0"><span class="nav-number">1.4.</span> <span class="nav-text">相关的初始化函数</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#of-clk-init-%EF%BC%9A%E5%88%9D%E5%A7%8B%E5%8C%96CCF"><span class="nav-number">1.4.1.</span> <span class="nav-text">of_clk_init()：初始化CCF</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%97%B6%E9%97%B4%E5%AD%90%E7%B3%BB%E7%BB%9F%E3%80%8Ctime-subsystem%E3%80%8D"><span class="nav-number">2.</span> <span class="nav-text">时间子系统「time subsystem」</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%9F%BA%E7%A1%80%E9%85%8D%E7%BD%AE%E6%A6%82%E8%BF%B0"><span class="nav-number">2.1.</span> <span class="nav-text">基础配置概述</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%97%B6%E9%92%9F%E6%BA%90%E3%80%8Cclock-source%E3%80%8D"><span class="nav-number">2.2.</span> <span class="nav-text">时钟源「clock source」</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%97%B6%E9%92%9F%E4%BA%8B%E4%BB%B6%E3%80%8Cclock-event%E3%80%8D"><span class="nav-number">2.3.</span> <span class="nav-text">时钟事件「clock event」</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%BB%B4%E7%AD%94%E8%AE%BE%E5%A4%87%E3%80%8Ctick-device%E3%80%8D"><span class="nav-number">2.4.</span> <span class="nav-text">滴答设备「tick device」</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E6%97%B6%E9%92%9F%E6%BA%90%E3%80%8Cclock-source%E3%80%8D%E5%88%9D%E5%A7%8B%E5%8C%96timekeeper"><span class="nav-number">2.4.1.</span> <span class="nav-text">使用时钟源「clock source」初始化timekeeper</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#time-init"><span class="nav-number">2.4.2.</span> <span class="nav-text">time_init()</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%9A%E6%97%B6%E5%99%A8%E7%AE%A1%E7%90%86%E3%80%8Ctimer-management%E3%80%8D"><span class="nav-number">3.</span> <span class="nav-text">定时器管理「timer management」</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AE%9A%E6%97%B6%E5%99%A8%E3%80%8Ctimer%E3%80%8D%E6%A6%82%E8%BF%B0"><span class="nav-number">3.1.</span> <span class="nav-text">定时器「timer」概述</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BD%8E%E7%B2%BE%E5%BA%A6%E5%AE%9A%E6%97%B6%E5%99%A8%E3%80%8Clow-resolution-timer%E3%80%8D"><span class="nav-number">3.2.</span> <span class="nav-text">低精度定时器「low resolution timer」</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%AB%98%E7%B2%BE%E5%BA%A6%E5%AE%9A%E6%97%B6%E5%99%A8%E3%80%8Chigh-resolution-timer%E3%80%8D"><span class="nav-number">3.3.</span> <span class="nav-text">高精度定时器「high resolution timer」</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Xinlu Wang"
+      src="/images/avatar.jpeg">
+  <p class="site-author-name" itemprop="name">Xinlu Wang</p>
+  <div class="site-description" itemprop="description">不积跬步无以至千里 不积小流无以成江海</div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">43</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories/">
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">70</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/chasinglulu" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;chasinglulu" rel="noopener me" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:wangkart@aliyun.com" title="E-Mail → mailto:wangkart@aliyun.com" rel="noopener me" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://weibo.com/5052275150" title="Weibo → https:&#x2F;&#x2F;weibo.com&#x2F;5052275150" rel="noopener me" target="_blank"><i class="fab fa-weibo fa-fw"></i>Weibo</a>
+      </span>
+  </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+    <div class="sidebar-inner sidebar-blogroll">
+      <div class="links-of-blogroll animated">
+        <div class="links-of-blogroll-title"><i class="fa fa-globe fa-fw"></i>
+          链接
+        </div>
+        <ul class="links-of-blogroll-list">
+            <li class="links-of-blogroll-item">
+              <a href="https://lore.kernel.org/qemu-devel/" title="https:&#x2F;&#x2F;lore.kernel.org&#x2F;qemu-devel&#x2F;" rel="noopener" target="_blank">Qemu</a>
+            </li>
+            <li class="links-of-blogroll-item">
+              <a href="https://wiki.linuxfoundation.org/realtime/documentation/start" title="https:&#x2F;&#x2F;wiki.linuxfoundation.org&#x2F;realtime&#x2F;documentation&#x2F;start" rel="noopener" target="_blank">RT_Linux</a>
+            </li>
+        </ul>
+      </div>
+    </div>
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://chasinglulu.github.io/posts/8b7c2647/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpeg">
+      <meta itemprop="name" content="Xinlu Wang">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="点滴汇聚">
+      <meta itemprop="description" content="不积跬步无以至千里 不积小流无以成江海">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="时间管理「time management」 | 点滴汇聚">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          时间管理「time management」
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2019-07-15 21:21:50" itemprop="dateCreated datePublished" datetime="2019-07-15T21:21:50+08:00">2019-07-15</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2024-09-24 15:39:19" itemprop="dateModified" datetime="2024-09-24T15:39:19+08:00">2024-09-24</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/time-management/" itemprop="url" rel="index"><span itemprop="name">time management</span></a>
+        </span>
+    </span>
+
+  
+  
+  <span class="post-meta-item">
+    
+    <span class="post-meta-item-icon">
+      <i class="far fa-comment"></i>
+    </span>
+    <span class="post-meta-item-text">Waline：</span>
+  
+    <a title="waline" href="/posts/8b7c2647/#waline" itemprop="discussionUrl">
+      <span class="post-comments-count waline-comment-count" data-path="/posts/8b7c2647/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+    <span class="post-meta-item" title="阅读次数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span class="waline-pageview-count" data-path="/posts/8b7c2647/"></span>
+    </span>
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>1.5k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>6 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><p>&ensp;&ensp;&ensp;&ensp;&ensp;时间是构建事件时间轴的基石，用于识别正在发生的和已发生的事件。定时器是一种特殊的时钟，可用于测量事件的处理时间和控制一系列事件的发生。因此在Linux内核中，时间和定时器管理是至关重要的组成部分，可按功能将其分为如下几方面：</p>
+<ul>
+<li>支持时间管理的计时「timekeeping」</li>
+<li>时钟管理和同步</li>
+<li>时间表达方式</li>
+<li>定时器的事件中断处理</li>
+</ul>
+<p>对于这些功能的实现都需要利用时钟装置，不过它们还与系统资源及其他硬件设备密切相关，并且还不能忽悠它们对体系架构的依赖，因此内核代码尽可能尝试对体系架构相关的部分进行抽象以利于时间管理和使用。在以前Linux内核中，已经使用基于HZ的低精度定时器实现了上述这些功能，然而由于物理限制产生的误差，所以要求高精度定时器控制的事件并不能保证在确切时间内处理。为了弥补缺陷和不足，内核在实现高精度定时器时引入了通用时间子系统「generic time subsystem」，同时还尝试修改多个API，使它们能够统一无差别地使用两种截然不同的定时器。本文将讨论通用时钟框架CCF「Common Clock Framework」、通用时间子系统以及定时器，它们都是时间和定时器管理的重要基础。</p>
+<span id="more"></span>
+
+<hr>
+<ul>
+<li><strong>Target Platform:</strong> <a target="_blank" rel="noopener" href="https://www.96boards.org/product/rock960c/">Rock960c</a></li>
+<li><strong>ARCH:</strong> arm64</li>
+<li><strong>Linux Kernel:</strong> linux-4.19.27</li>
+</ul>
+<hr>
+<h3 id="通用时钟框架「common-clock-framework，-CCF」"><a href="#通用时钟框架「common-clock-framework，-CCF」" class="headerlink" title="通用时钟框架「common clock framework， CCF」"></a>通用时钟框架「common clock framework， CCF」</h3><p>在以前的内核中，每种SoC都实现了一套操控时钟的API，而且每种SoC的时钟API都是单独自成体系的，从而导致相关代码大量冗余重复且分散，因此这对时钟管理带来极大不利。为了解决这种问题，在2012年5月发布的kernel 3.4版本内添加了一个新的时钟框架，并为该框架取名为CCF「Common Clock Framework」，其思想最初是由Jeremy Kerr（Canonical）提出的，代码实现却是由Mike Turquette（Texas Instruments）主导完成的。</p>
+<h4 id="时钟「clock」"><a href="#时钟「clock」" class="headerlink" title="时钟「clock」"></a>时钟「clock」</h4><p>时钟「时钟控制器」是SoC系统中集成的必要硬件，它能够驱动系统中各种设备正常工作，但为了能够使用时钟，就必须为SoC另外提供能驱使时钟运转的其他硬件。</p>
+<h5 id="SoC时钟"><a href="#SoC时钟" class="headerlink" title="SoC时钟"></a>SoC时钟</h5><p>SoC内外的各个硬件通过连接在时钟树的不同分支上以获得不同的时钟输出信号，因此它们能够在不同频率下运行。SoC的时钟树是由多个时钟组件构成的，并且父时钟组件的输出信号可用作子时钟组件的输入信号。大多数时钟组件都是可以软件编程配置的，并且能够在运行时改变以进行电源管理。由于时钟的父子层级结构，时钟的操作需遵守如下约束：</p>
+<ul>
+<li>当激活下面子时钟时，必须先激活上面父时钟</li>
+<li>如果所有后代都被禁用了，则应该禁用父时钟</li>
+<li>必须知道什么时候能够启用&#x2F;禁用时钟</li>
+</ul>
+<h4 id="必要的时钟组件"><a href="#必要的时钟组件" class="headerlink" title="必要的时钟组件"></a>必要的时钟组件</h4><p>组成时钟树的基础组件是fixed时钟、gate时钟、mux时钟、rate可变时钟等，通常SoC所用的时钟树如图1所示。由于使用的设备千差万别，所以供给设备的时钟频率也要适当改变。尽管PLL「锁相环」能够产生固定或可变频率的时钟信号，但是为了使设备更灵活地使用时钟输出信号，还要使用mux时钟和gate时钟等基础组件完成时钟信号的后处理「post」和选择。内核对这些时钟组件进行抽象得出一组标准数据结构，其名称取决于自身的使用方式和特点，如表1所示。</p>
+<p><img data-src="/images/20/SoC_clock_arch.svg" alt="SoC_clock_arch"></p>
+<center>图1 SoC常用的clock结构</center>
+
+<h4 id="数据结构和API"><a href="#数据结构和API" class="headerlink" title="数据结构和API"></a>数据结构和API</h4><p>为了实现CLK框架结构，内核定义声明了用于描述时钟的多种数据结构以及注册和使用它们的API。如图3所示，以树的形式展示了定义的多个时钟数据结构。</p>
+<p>图3 描述时钟的数据结构</p>
+<h4 id="相关的初始化函数"><a href="#相关的初始化函数" class="headerlink" title="相关的初始化函数"></a>相关的初始化函数</h4><h5 id="of-clk-init-：初始化CCF"><a href="#of-clk-init-：初始化CCF" class="headerlink" title="of_clk_init()：初始化CCF"></a>of_clk_init()：初始化CCF</h5><p><strong>dirvers&#x2F;clk&#x2F;clk.c的of_clk_init()</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> __init <span class="title function_">of_clk_init</span><span class="params">(<span class="type">const</span> <span class="keyword">struct</span> of_device_id *matches)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="type">const</span> <span class="class"><span class="keyword">struct</span> <span class="title">of_device_id</span> *<span class="title">match</span>;</span></span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">device_node</span> *<span class="title">np</span>;</span></span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">clock_provider</span> *<span class="title">clk_provider</span>, *<span class="title">next</span>;</span></span><br><span class="line">	<span class="type">bool</span> is_init_done;</span><br><span class="line">	<span class="type">bool</span> force = <span class="literal">false</span>;</span><br><span class="line">	LIST_HEAD(clk_provider_list);</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> (!matches)</span><br><span class="line">		matches = &amp;__clk_of_table;</span><br><span class="line"></span><br><span class="line">	<span class="comment">/* First prepare the list of the clocks providers */</span></span><br><span class="line">	for_each_matching_node_and_match(np, matches, &amp;match) &#123;</span><br><span class="line">		<span class="class"><span class="keyword">struct</span> <span class="title">clock_provider</span> *<span class="title">parent</span>;</span></span><br><span class="line"></span><br><span class="line">		<span class="keyword">if</span> (!of_device_is_available(np))</span><br><span class="line">			<span class="keyword">continue</span>;</span><br><span class="line"></span><br><span class="line">		parent = kzalloc(<span class="keyword">sizeof</span>(*parent), GFP_KERNEL);</span><br><span class="line">		<span class="keyword">if</span> (!parent) &#123;</span><br><span class="line">			list_for_each_entry_safe(clk_provider, next,</span><br><span class="line">						 &amp;clk_provider_list, node) &#123;</span><br><span class="line">				list_del(&amp;clk_provider-&gt;node);</span><br><span class="line">				of_node_put(clk_provider-&gt;np);</span><br><span class="line">				kfree(clk_provider);</span><br><span class="line">			&#125;</span><br><span class="line">			of_node_put(np);</span><br><span class="line">			<span class="keyword">return</span>;</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		parent-&gt;clk_init_cb = match-&gt;data;</span><br><span class="line">		parent-&gt;np = of_node_get(np);</span><br><span class="line">		list_add_tail(&amp;parent-&gt;node, &amp;clk_provider_list);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">while</span> (!list_empty(&amp;clk_provider_list)) &#123;</span><br><span class="line">		is_init_done = <span class="literal">false</span>;</span><br><span class="line">		list_for_each_entry_safe(clk_provider, next,</span><br><span class="line">					&amp;clk_provider_list, node) &#123;</span><br><span class="line">			<span class="keyword">if</span> (force || parent_ready(clk_provider-&gt;np)) &#123;</span><br><span class="line"></span><br><span class="line">				<span class="comment">/* Don&#x27;t populate platform devices */</span></span><br><span class="line">				of_node_set_flag(clk_provider-&gt;np,</span><br><span class="line">						 OF_POPULATED);</span><br><span class="line"></span><br><span class="line">				clk_provider-&gt;clk_init_cb(clk_provider-&gt;np);</span><br><span class="line">				of_clk_set_defaults(clk_provider-&gt;np, <span class="literal">true</span>);</span><br><span class="line"></span><br><span class="line">				list_del(&amp;clk_provider-&gt;node);</span><br><span class="line">				of_node_put(clk_provider-&gt;np);</span><br><span class="line">				kfree(clk_provider);</span><br><span class="line">				is_init_done = <span class="literal">true</span>;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		<span class="comment">/*</span></span><br><span class="line"><span class="comment">		 * We didn&#x27;t manage to initialize any of the</span></span><br><span class="line"><span class="comment">		 * remaining providers during the last loop, so now we</span></span><br><span class="line"><span class="comment">		 * initialize all the remaining ones unconditionally</span></span><br><span class="line"><span class="comment">		 * in case the clock parent was not mandatory</span></span><br><span class="line"><span class="comment">		 */</span></span><br><span class="line">		<span class="keyword">if</span> (!is_init_done)</span><br><span class="line">			force = <span class="literal">true</span>;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="时间子系统「time-subsystem」"><a href="#时间子系统「time-subsystem」" class="headerlink" title="时间子系统「time subsystem」"></a>时间子系统「time subsystem」</h3><h4 id="基础配置概述"><a href="#基础配置概述" class="headerlink" title="基础配置概述"></a>基础配置概述</h4><h4 id="时钟源「clock-source」"><a href="#时钟源「clock-source」" class="headerlink" title="时钟源「clock source」"></a>时钟源「clock source」</h4><h4 id="时钟事件「clock-event」"><a href="#时钟事件「clock-event」" class="headerlink" title="时钟事件「clock event」"></a>时钟事件「clock event」</h4><h4 id="滴答设备「tick-device」"><a href="#滴答设备「tick-device」" class="headerlink" title="滴答设备「tick device」"></a>滴答设备「tick device」</h4><h5 id="使用时钟源「clock-source」初始化timekeeper"><a href="#使用时钟源「clock-source」初始化timekeeper" class="headerlink" title="使用时钟源「clock source」初始化timekeeper"></a>使用时钟源「clock source」初始化timekeeper</h5><p><em><strong>timekeeping_init()：设置xtime</strong></em></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> __init <span class="title function_">timekeeping_init</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">timespec64</span> <span class="title">wall_time</span>, <span class="title">boot_offset</span>, <span class="title">wall_to_mono</span>;</span></span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">timekeeper</span> *<span class="title">tk</span> =</span> &amp;tk_core.timekeeper;</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">clocksource</span> *<span class="title">clock</span>;</span></span><br><span class="line">	<span class="type">unsigned</span> <span class="type">long</span> flags;</span><br><span class="line"></span><br><span class="line">	read_persistent_wall_and_boot_offset(&amp;wall_time, &amp;boot_offset);</span><br><span class="line">	<span class="keyword">if</span> (timespec64_valid_strict(&amp;wall_time) &amp;&amp;</span><br><span class="line">	    timespec64_to_ns(&amp;wall_time) &gt; <span class="number">0</span>) &#123;</span><br><span class="line">		persistent_clock_exists = <span class="literal">true</span>;</span><br><span class="line">	&#125; <span class="keyword">else</span> <span class="keyword">if</span> (timespec64_to_ns(&amp;wall_time) != <span class="number">0</span>) &#123;</span><br><span class="line">		pr_warn(<span class="string">&quot;Persistent clock returned invalid value&quot;</span>);</span><br><span class="line">		wall_time = (<span class="keyword">struct</span> timespec64)&#123;<span class="number">0</span>&#125;;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> (timespec64_compare(&amp;wall_time, &amp;boot_offset) &lt; <span class="number">0</span>)</span><br><span class="line">		boot_offset = (<span class="keyword">struct</span> timespec64)&#123;<span class="number">0</span>&#125;;</span><br><span class="line"></span><br><span class="line">	<span class="comment">/*</span></span><br><span class="line"><span class="comment">	 * We want set wall_to_mono, so the following is true:</span></span><br><span class="line"><span class="comment">	 * wall time + wall_to_mono = boot time</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	wall_to_mono = timespec64_sub(boot_offset, wall_time);</span><br><span class="line"></span><br><span class="line">	raw_spin_lock_irqsave(&amp;timekeeper_lock, flags);</span><br><span class="line">	write_seqcount_begin(&amp;tk_core.seq);</span><br><span class="line">	ntp_init();</span><br><span class="line"></span><br><span class="line">	clock = clocksource_default_clock();</span><br><span class="line">	<span class="keyword">if</span> (clock-&gt;enable)</span><br><span class="line">		clock-&gt;enable(clock);</span><br><span class="line">	tk_setup_internals(tk, clock);</span><br><span class="line"></span><br><span class="line">	tk_set_xtime(tk, &amp;wall_time);</span><br><span class="line">	tk-&gt;raw_sec = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">	tk_set_wall_to_mono(tk, wall_to_mono);</span><br><span class="line"></span><br><span class="line">	timekeeping_update(tk, TK_MIRROR | TK_CLOCK_WAS_SET);</span><br><span class="line"></span><br><span class="line">	write_seqcount_end(&amp;tk_core.seq);</span><br><span class="line">	raw_spin_unlock_irqrestore(&amp;timekeeper_lock, flags);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h5 id="time-init"><a href="#time-init" class="headerlink" title="time_init()"></a>time_init()</h5><p><strong>arch&#x2F;arm64&#x2F;kernel&#x2F;time.c的time_init()</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> __init <span class="title function_">time_init</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">	u32 arch_timer_rate;</span><br><span class="line"></span><br><span class="line">	of_clk_init(<span class="literal">NULL</span>);</span><br><span class="line">	timer_probe();</span><br><span class="line"></span><br><span class="line">	tick_setup_hrtimer_broadcast();</span><br><span class="line"></span><br><span class="line">	arch_timer_rate = arch_timer_get_rate();</span><br><span class="line">	<span class="keyword">if</span> (!arch_timer_rate)</span><br><span class="line">		panic(<span class="string">&quot;Unable to initialise architected timer.\n&quot;</span>);</span><br><span class="line"></span><br><span class="line">	<span class="comment">/* Calibrate the delay loop directly */</span></span><br><span class="line">	lpj_fine = arch_timer_rate / HZ;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+<h3 id="定时器管理「timer-management」"><a href="#定时器管理「timer-management」" class="headerlink" title="定时器管理「timer management」"></a>定时器管理「timer management」</h3><h4 id="定时器「timer」概述"><a href="#定时器「timer」概述" class="headerlink" title="定时器「timer」概述"></a>定时器「timer」概述</h4><h4 id="低精度定时器「low-resolution-timer」"><a href="#低精度定时器「low-resolution-timer」" class="headerlink" title="低精度定时器「low resolution timer」"></a>低精度定时器「low resolution timer」</h4><h4 id="高精度定时器「high-resolution-timer」"><a href="#高精度定时器「high-resolution-timer」" class="headerlink" title="高精度定时器「high resolution timer」"></a>高精度定时器「high resolution timer」</h4>
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer"><div class="post-widgets">
+      <div id="needsharebutton-postbottom">
+        <span class="btn">
+          <i class="fa fa-share-alt" aria-hidden="true"></i>
+        </span>
+      </div>
+    </div>
+          <div class="reward-container">
+  <div>请我一杯咖啡吧！</div>
+  <button>
+    赞赏
+  </button>
+  <div class="post-reward">
+      <div>
+        <img src="/images/wechatpay.png" alt="Xinlu Wang 微信">
+        <span>微信</span>
+      </div>
+      <div>
+        <img src="/images/alipay.jpg" alt="Xinlu Wang 支付宝">
+        <span>支付宝</span>
+      </div>
+
+  </div>
+</div>
+
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>本文作者： </strong>Xinlu Wang
+  </li>
+  <li class="post-copyright-link">
+      <strong>本文链接：</strong>
+      <a href="https://chasinglulu.github.io/posts/8b7c2647/" title="时间管理「time management」">https://chasinglulu.github.io/posts/8b7c2647/</a>
+  </li>
+  <li class="post-copyright-license">
+      <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/time-management/" rel="tag"><i class="fa fa-tag"></i> time management</a>
+              <a href="/tags/timer/" rel="tag"><i class="fa fa-tag"></i> timer</a>
+              <a href="/tags/clock/" rel="tag"><i class="fa fa-tag"></i> clock</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/a0d0775f/" rel="prev" title="中断「interrupt」">
+                  <i class="fa fa-angle-left"></i> 中断「interrupt」
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/posts/undefined/" rel="next" title="中断延迟处理机制「interrupt delay processing」">
+                  中断延迟处理机制「interrupt delay processing」 <i class="fa fa-angle-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments" id="waline"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 2018 – 
+    <span itemprop="copyrightYear">2024</span>
+    <span class="with-love">
+      <i class="fa fa-anchor"></i>
+    </span><a href="http://abitacc.com/about" rel="noopener" target="_blank">Xinlu Wang</a>
+    <!-- annotation
+    <span class="author" itemprop="copyrightHolder">Xinlu Wang</span>
+    -->
+  </div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+      <span>站点总字数：</span>
+    <span title="站点总字数">82k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span>站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">4:57</span>
+  </span>
+</div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+  <a href="https://github.com/chasinglulu" class="github-corner" title="在 GitHub 上关注我" aria-label="在 GitHub 上关注我" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+  
+  <script size="300" alpha="0.6" zIndex="-1" src="https://cdnjs.cloudflare.com/ajax/libs/ribbon.js/1.0.2/ribbon.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lozad.js/1.16.0/lozad.min.js" integrity="sha256-mOFREFhqmHeQbXpK2lp4nA3qooVgACfh88fpJftLBbc=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script><script src="/js/bookmark.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hexo-generator-searchdb/1.4.1/search.js" integrity="sha256-1kfA5uHPf65M5cphT2dvymhkuyHPQp5A53EGZOnOLmc=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/quicklink/2.3.0/quicklink.umd.js" integrity="sha256-yvJQOINiH9fWemHn0vCA5lsHWJaHs6/ZmO+1Ft04SvM=" crossorigin="anonymous"></script>
+  <script class="next-config" data-name="quicklink" type="application/json">{"enable":true,"home":false,"archive":false,"delay":true,"timeout":3000,"priority":true,"url":"https://chasinglulu.github.io/posts/8b7c2647/"}</script>
+  <script src="/js/third-party/quicklink.js"></script>
+<script class="next-config" data-name="waline" type="application/json">{"lang":"zh-CN","enable":true,"serverURL":"www.chasinglulu.cn","cssUrl":"https://unpkg.com/@waline/client@v2/dist/waline.css","commentCount":true,"pageview":true,"placeholder":"请文明评论呀","avatar":"mm","meta":["nick","mail"],"pageSize":10,"comment_count":true,"requiredFields":["mail"],"libUrl":"https://cdn.jsdelivr.net/npm/@waline/client@2.15.8/dist/waline.js","emoji":["https://cdn.jsdelivr.net/gh/walinejs/emojis@1.1.0/tw-emoji/"],"el":"#waline","comment":true,"path":"/posts/8b7c2647/"}</script>
+<link rel="stylesheet" href="https://unpkg.com/@waline/client@v2/dist/waline.css">
+<script>
+document.addEventListener('page:loaded', () => {
+  NexT.utils.loadComments(CONFIG.waline.el).then(() =>
+    NexT.utils.getScript(CONFIG.waline.libUrl, { condition: window.Waline })
+  ).then(() => 
+    Waline.init(Object.assign({}, CONFIG.waline,{ el: document.querySelector(CONFIG.waline.el) }))
+  );
+});
+</script>
+<div id="needsharebutton-float">
+      <span class="btn">
+        <i class="fa fa-share-alt" aria-hidden="true"></i>
+      </span>
+    </div>
+  <script src="//cdn.jsdelivr.net/gh/theme-next/theme-next-needmoreshare2@1/needsharebutton.min.js"></script>
+  <script>
+      pbOptions = {};
+        pbOptions.iconStyle = "default";
+        pbOptions.boxForm = "horizontal";
+        pbOptions.position = "bottomCenter";
+        pbOptions.networks = "Weibo,Wechat,Douban,QQZone,Mailto";
+      new needShareButton('#needsharebutton-postbottom', pbOptions);
+      flOptions = {};
+        flOptions.iconStyle = "box";
+        flOptions.boxForm = "vertical";
+        flOptions.position = "topRight";
+        flOptions.networks = "Weibo,Wechat,Douban,QQZone,Mailto";
+      new needShareButton('#needsharebutton-float', flOptions);
+  </script>
+</body>
+</html>

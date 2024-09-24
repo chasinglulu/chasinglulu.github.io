@@ -1,0 +1,553 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- 由 Microsoft Visio, SVG Export 生成 difference-between-process-and-thread.svg 页-1 -->
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:ev="http://www.w3.org/2001/xml-events"
+		xmlns:v="http://schemas.microsoft.com/visio/2003/SVGExtensions/" width="10.7237in" height="2.95092in"
+		viewBox="0 0 772.104 212.466" xml:space="preserve" color-interpolation-filters="sRGB" class="st15">
+	<v:documentProperties v:langID="2052" v:metric="true" v:viewMarkup="false"/>
+
+	<style type="text/css">
+	<![CDATA[
+		.st1 {visibility:visible}
+		.st2 {fill:none;filter:url(#filter_2);stroke:#5b9bd5;stroke-opacity:0.22}
+		.st3 {fill:#5b9bd5;filter:url(#filter_2);font-family:Times New Roman;font-size:0.916672em;opacity:0.219608}
+		.st4 {fill:none;stroke:#000000;stroke-width:0.75}
+		.st5 {fill:#000000;font-family:Times New Roman;font-size:0.916672em}
+		.st6 {fill:#5b9bd5;fill-opacity:0.22;filter:url(#filter_2);stroke:#5b9bd5;stroke-opacity:0.22}
+		.st7 {fill:#fff2cc;stroke:#000000;stroke-width:0.75}
+		.st8 {fill:#000000;font-family:宋体;font-size:0.916672em}
+		.st9 {font-family:Times New Roman;font-size:1em}
+		.st10 {fill:#c5e0b3;stroke:#000000;stroke-width:0.75}
+		.st11 {font-family:宋体;font-size:1em}
+		.st12 {fill:#f7cbac;stroke:#000000;stroke-width:0.75}
+		.st13 {fill:#7effff;stroke:#000000;stroke-width:0.75}
+		.st14 {fill:none;stroke:#c00000;stroke-width:0.5}
+		.st15 {fill:none;fill-rule:evenodd;font-size:12px;overflow:visible;stroke-linecap:square;stroke-miterlimit:3}
+	]]>
+	</style>
+
+	<defs id="Filters">
+		<filter id="filter_2">
+			<feGaussianBlur stdDeviation="2"/>
+		</filter>
+	</defs>
+	<g v:mID="0" v:index="1" v:groupContext="foregroundPage">
+		<title>页-1</title>
+		<v:pageProperties v:drawingScale="0.0393701" v:pageScale="0.0393701" v:drawingUnits="24" v:shadowOffsetX="8.50394"
+				v:shadowOffsetY="-8.50394"/>
+		<g id="group49-1" transform="translate(3.0294,-5.55246)" v:mID="49" v:groupContext="group">
+			<title>工作表.49</title>
+			<g id="group10-2" v:mID="10" v:groupContext="group">
+				<title>工作表.10</title>
+				<g id="shape9-3" v:mID="9" v:groupContext="shape">
+					<title>矩形.9</title>
+					<desc>Process 1 = Task 1</desc>
+					<v:userDefs>
+						<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+					</v:userDefs>
+					<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197" v:verticalAlign="2"/>
+					<v:textRect cx="120.472" cy="109.711" width="240.95" height="205.512"/>
+					<g id="shadow9-4" v:groupContext="shadow" v:shadowOffsetX="0.345598" v:shadowOffsetY="-1.97279"
+							v:shadowType="1" transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+						<rect x="0" y="6.95467" width="240.945" height="205.512" class="st2"/>
+						<text x="78.88" y="205.17" class="st3" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>Process 1 = Task 1</text>					</g>
+					<rect x="0" y="6.95467" width="240.945" height="205.512" class="st4"/>
+					<text x="78.88" y="205.17" class="st5" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>Process 1 = Task 1</text>				</g>
+				<g id="shape1-11" v:mID="1" v:groupContext="shape" transform="translate(7.08661,-170.079)">
+					<title>矩形</title>
+					<desc>程序代码 program code</desc>
+					<v:userDefs>
+						<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+					</v:userDefs>
+					<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+					<v:textRect cx="35.4331" cy="198.293" width="70.87" height="28.3465"/>
+					<g id="shadow1-12" v:groupContext="shadow" v:shadowOffsetX="0.345598" v:shadowOffsetY="-1.97279"
+							v:shadowType="1" transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+						<rect x="0" y="184.12" width="70.8661" height="28.3465" rx="1.41732" ry="1.41732" class="st6"/>
+					</g>
+					<rect x="0" y="184.12" width="70.8661" height="28.3465" rx="1.41732" ry="1.41732" class="st7"/>
+					<text x="13.43" y="195.31" class="st8" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>程序代码<v:newlineChar/><tspan
+								x="5.04" dy="1.229em" class="st9">program code</tspan></text>				</g>
+				<g id="shape2-18" v:mID="2" v:groupContext="shape" transform="translate(85.0394,-170.079)">
+					<title>矩形.2</title>
+					<desc>共享数据 shared data</desc>
+					<v:userDefs>
+						<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+					</v:userDefs>
+					<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+					<v:textRect cx="35.4331" cy="198.293" width="70.87" height="28.3465"/>
+					<g id="shadow2-19" v:groupContext="shadow" v:shadowOffsetX="0.345598" v:shadowOffsetY="-1.97279"
+							v:shadowType="1" transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+						<rect x="0" y="184.12" width="70.8661" height="28.3465" rx="1.41732" ry="1.41732" class="st6"/>
+					</g>
+					<rect x="0" y="184.12" width="70.8661" height="28.3465" rx="1.41732" ry="1.41732" class="st7"/>
+					<text x="13.43" y="195.31" class="st8" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>共享数据<v:newlineChar/><tspan
+								x="10.54" dy="1.229em" class="st9">shared data</tspan></text>				</g>
+				<g id="shape3-25" v:mID="3" v:groupContext="shape" transform="translate(162.992,-170.079)">
+					<title>矩形.3</title>
+					<desc>堆区 Heap area</desc>
+					<v:userDefs>
+						<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+					</v:userDefs>
+					<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+					<v:textRect cx="35.4331" cy="198.293" width="70.87" height="28.3465"/>
+					<g id="shadow3-26" v:groupContext="shadow" v:shadowOffsetX="0.345598" v:shadowOffsetY="-1.97279"
+							v:shadowType="1" transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+						<rect x="0" y="184.12" width="70.8661" height="28.3465" rx="1.41732" ry="1.41732" class="st6"/>
+					</g>
+					<rect x="0" y="184.12" width="70.8661" height="28.3465" rx="1.41732" ry="1.41732" class="st7"/>
+					<text x="24.43" y="195.31" class="st8" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>堆区<v:newlineChar/><tspan
+								x="13.3" dy="1.229em" class="st9">Heap area</tspan></text>				</g>
+				<g id="shape4-32" v:mID="4" v:groupContext="shape" transform="translate(7.08661,-127.559)">
+					<title>矩形.4</title>
+					<desc>CPU 寄存器信息</desc>
+					<v:userDefs>
+						<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+					</v:userDefs>
+					<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+					<v:textRect cx="113.386" cy="194.75" width="226.78" height="35.4331"/>
+					<g id="shadow4-33" v:groupContext="shadow" v:shadowOffsetX="0.345598" v:shadowOffsetY="-1.97279"
+							v:shadowType="1" transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+						<rect x="0" y="177.033" width="226.772" height="35.4331" rx="1.41732" ry="1.41732" class="st6"/>
+					</g>
+					<rect x="0" y="177.033" width="226.772" height="35.4331" rx="1.41732" ry="1.41732" class="st10"/>
+					<text x="73.81" y="198.37" class="st5" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>CPU <tspan
+								class="st11">寄存器信息</tspan></text>				</g>
+				<g id="shape5-39" v:mID="5" v:groupContext="shape" transform="translate(7.08661,-85.0394)">
+					<title>矩形.5</title>
+					<desc>内核栈 kernel stack</desc>
+					<v:userDefs>
+						<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+					</v:userDefs>
+					<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+					<v:textRect cx="113.386" cy="194.75" width="226.78" height="35.4331"/>
+					<g id="shadow5-40" v:groupContext="shadow" v:shadowOffsetX="0.345598" v:shadowOffsetY="-1.97279"
+							v:shadowType="1" transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+						<rect x="0" y="177.033" width="226.772" height="35.4331" rx="1.41732" ry="1.41732" class="st6"/>
+					</g>
+					<rect x="0" y="177.033" width="226.772" height="35.4331" rx="1.41732" ry="1.41732" class="st12"/>
+					<text x="96.89" y="191.77" class="st8" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>内核栈<v:newlineChar/><tspan
+								x="86.97" dy="1.229em" class="st9">kernel stack</tspan></text>				</g>
+				<g id="shape6-46" v:mID="6" v:groupContext="shape" transform="translate(7.08661,-28.3465)">
+					<title>矩形.6</title>
+					<desc>task_struct 数据结构</desc>
+					<v:userDefs>
+						<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+					</v:userDefs>
+					<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+					<v:textRect cx="35.4331" cy="187.663" width="70.87" height="49.6063"/>
+					<g id="shadow6-47" v:groupContext="shadow" v:shadowOffsetX="0.345598" v:shadowOffsetY="-1.97279"
+							v:shadowType="1" transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+						<rect x="0" y="162.86" width="70.8661" height="49.6063" rx="1.41732" ry="1.41732" class="st6"/>
+					</g>
+					<rect x="0" y="162.86" width="70.8661" height="49.6063" rx="1.41732" ry="1.41732" class="st13"/>
+					<text x="11.6" y="183.72" class="st5" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>task_struct<v:newlineChar/><tspan
+								x="13.43" dy="1.287em" class="st11">数据结构</tspan></text>				</g>
+				<g id="shape7-53" v:mID="7" v:groupContext="shape" transform="translate(85.0394,-28.3465)">
+					<title>矩形.7</title>
+					<desc>thread_info 数据结构</desc>
+					<v:userDefs>
+						<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+					</v:userDefs>
+					<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+					<v:textRect cx="35.4331" cy="187.663" width="70.87" height="49.6063"/>
+					<g id="shadow7-54" v:groupContext="shadow" v:shadowOffsetX="0.345598" v:shadowOffsetY="-1.97279"
+							v:shadowType="1" transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+						<rect x="0" y="162.86" width="70.8661" height="49.6063" rx="1.41732" ry="1.41732" class="st6"/>
+					</g>
+					<rect x="0" y="162.86" width="70.8661" height="49.6063" rx="1.41732" ry="1.41732" class="st13"/>
+					<text x="10.08" y="183.72" class="st5" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>thread_info<v:newlineChar/><tspan
+								x="13.43" dy="1.287em" class="st11">数据结构</tspan></text>				</g>
+				<g id="shape8-60" v:mID="8" v:groupContext="shape" transform="translate(162.992,-28.3465)">
+					<title>矩形.8</title>
+					<desc>thread_struct 数据结构</desc>
+					<v:userDefs>
+						<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+					</v:userDefs>
+					<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+					<v:textRect cx="35.4331" cy="187.663" width="70.87" height="49.6063"/>
+					<g id="shadow8-61" v:groupContext="shadow" v:shadowOffsetX="0.345598" v:shadowOffsetY="-1.97279"
+							v:shadowType="1" transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+						<rect x="0" y="162.86" width="70.8661" height="49.6063" rx="1.41732" ry="1.41732" class="st6"/>
+					</g>
+					<rect x="0" y="162.86" width="70.8661" height="49.6063" rx="1.41732" ry="1.41732" class="st13"/>
+					<text x="6.72" y="183.72" class="st5" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>thread_struct<v:newlineChar/><tspan
+								x="13.43" dy="1.287em" class="st11">数据结构</tspan></text>				</g>
+			</g>
+			<g id="group11-67" transform="translate(248.031,-5.68434E-14)" v:mID="11" v:groupContext="group">
+				<title>工作表.11</title>
+				<g id="shape12-68" v:mID="12" v:groupContext="shape">
+					<title>矩形.9</title>
+					<desc>Process 2 = Task 2</desc>
+					<v:userDefs>
+						<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+					</v:userDefs>
+					<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197" v:verticalAlign="2"/>
+					<v:textRect cx="120.472" cy="109.711" width="240.95" height="205.512"/>
+					<g id="shadow12-69" v:groupContext="shadow" v:shadowOffsetX="0.345598" v:shadowOffsetY="-1.97279"
+							v:shadowType="1" transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+						<rect x="0" y="6.95467" width="240.945" height="205.512" class="st2"/>
+						<text x="78.88" y="205.17" class="st3" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>Process 2 = Task 2</text>					</g>
+					<rect x="0" y="6.95467" width="240.945" height="205.512" class="st4"/>
+					<text x="78.88" y="205.17" class="st5" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>Process 2 = Task 2</text>				</g>
+				<g id="shape13-76" v:mID="13" v:groupContext="shape" transform="translate(7.08661,-170.079)">
+					<title>矩形</title>
+					<desc>程序代码 program code</desc>
+					<v:userDefs>
+						<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+					</v:userDefs>
+					<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+					<v:textRect cx="35.4331" cy="198.293" width="70.87" height="28.3465"/>
+					<g id="shadow13-77" v:groupContext="shadow" v:shadowOffsetX="0.345598" v:shadowOffsetY="-1.97279"
+							v:shadowType="1" transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+						<rect x="0" y="184.12" width="70.8661" height="28.3465" rx="1.41732" ry="1.41732" class="st6"/>
+					</g>
+					<rect x="0" y="184.12" width="70.8661" height="28.3465" rx="1.41732" ry="1.41732" class="st7"/>
+					<text x="13.43" y="195.31" class="st8" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>程序代码<v:newlineChar/><tspan
+								x="5.04" dy="1.229em" class="st9">program code</tspan></text>				</g>
+				<g id="shape14-83" v:mID="14" v:groupContext="shape" transform="translate(85.0394,-170.079)">
+					<title>矩形.2</title>
+					<desc>共享数据 shared data</desc>
+					<v:userDefs>
+						<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+					</v:userDefs>
+					<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+					<v:textRect cx="35.4331" cy="198.293" width="70.87" height="28.3465"/>
+					<g id="shadow14-84" v:groupContext="shadow" v:shadowOffsetX="0.345598" v:shadowOffsetY="-1.97279"
+							v:shadowType="1" transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+						<rect x="0" y="184.12" width="70.8661" height="28.3465" rx="1.41732" ry="1.41732" class="st6"/>
+					</g>
+					<rect x="0" y="184.12" width="70.8661" height="28.3465" rx="1.41732" ry="1.41732" class="st7"/>
+					<text x="13.43" y="195.31" class="st8" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>共享数据<v:newlineChar/><tspan
+								x="10.54" dy="1.229em" class="st9">shared data</tspan></text>				</g>
+				<g id="shape15-90" v:mID="15" v:groupContext="shape" transform="translate(162.992,-170.079)">
+					<title>矩形.3</title>
+					<desc>堆区 Heap area</desc>
+					<v:userDefs>
+						<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+					</v:userDefs>
+					<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+					<v:textRect cx="35.4331" cy="198.293" width="70.87" height="28.3465"/>
+					<g id="shadow15-91" v:groupContext="shadow" v:shadowOffsetX="0.345598" v:shadowOffsetY="-1.97279"
+							v:shadowType="1" transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+						<rect x="0" y="184.12" width="70.8661" height="28.3465" rx="1.41732" ry="1.41732" class="st6"/>
+					</g>
+					<rect x="0" y="184.12" width="70.8661" height="28.3465" rx="1.41732" ry="1.41732" class="st7"/>
+					<text x="24.43" y="195.31" class="st8" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>堆区<v:newlineChar/><tspan
+								x="13.3" dy="1.229em" class="st9">Heap area</tspan></text>				</g>
+				<g id="shape16-97" v:mID="16" v:groupContext="shape" transform="translate(7.08661,-127.559)">
+					<title>矩形.4</title>
+					<desc>CPU 寄存器信息</desc>
+					<v:userDefs>
+						<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+					</v:userDefs>
+					<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+					<v:textRect cx="113.386" cy="194.75" width="226.78" height="35.4331"/>
+					<g id="shadow16-98" v:groupContext="shadow" v:shadowOffsetX="0.345598" v:shadowOffsetY="-1.97279"
+							v:shadowType="1" transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+						<rect x="0" y="177.033" width="226.772" height="35.4331" rx="1.41732" ry="1.41732" class="st6"/>
+					</g>
+					<rect x="0" y="177.033" width="226.772" height="35.4331" rx="1.41732" ry="1.41732" class="st10"/>
+					<text x="73.81" y="198.37" class="st5" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>CPU <tspan
+								class="st11">寄存器信息</tspan></text>				</g>
+				<g id="shape17-104" v:mID="17" v:groupContext="shape" transform="translate(7.08661,-85.0394)">
+					<title>矩形.5</title>
+					<desc>内核栈 kernel stack</desc>
+					<v:userDefs>
+						<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+					</v:userDefs>
+					<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+					<v:textRect cx="113.386" cy="194.75" width="226.78" height="35.4331"/>
+					<g id="shadow17-105" v:groupContext="shadow" v:shadowOffsetX="0.345598" v:shadowOffsetY="-1.97279"
+							v:shadowType="1" transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+						<rect x="0" y="177.033" width="226.772" height="35.4331" rx="1.41732" ry="1.41732" class="st6"/>
+					</g>
+					<rect x="0" y="177.033" width="226.772" height="35.4331" rx="1.41732" ry="1.41732" class="st12"/>
+					<text x="96.89" y="191.77" class="st8" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>内核栈<v:newlineChar/><tspan
+								x="86.97" dy="1.229em" class="st9">kernel stack</tspan></text>				</g>
+				<g id="shape18-111" v:mID="18" v:groupContext="shape" transform="translate(7.08661,-28.3465)">
+					<title>矩形.6</title>
+					<desc>task_struct 数据结构</desc>
+					<v:userDefs>
+						<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+					</v:userDefs>
+					<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+					<v:textRect cx="35.4331" cy="187.663" width="70.87" height="49.6063"/>
+					<g id="shadow18-112" v:groupContext="shadow" v:shadowOffsetX="0.345598" v:shadowOffsetY="-1.97279"
+							v:shadowType="1" transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+						<rect x="0" y="162.86" width="70.8661" height="49.6063" rx="1.41732" ry="1.41732" class="st6"/>
+					</g>
+					<rect x="0" y="162.86" width="70.8661" height="49.6063" rx="1.41732" ry="1.41732" class="st13"/>
+					<text x="11.6" y="183.72" class="st5" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>task_struct<v:newlineChar/><tspan
+								x="13.43" dy="1.287em" class="st11">数据结构</tspan></text>				</g>
+				<g id="shape19-118" v:mID="19" v:groupContext="shape" transform="translate(85.0394,-28.3465)">
+					<title>矩形.7</title>
+					<desc>thread_info 数据结构</desc>
+					<v:userDefs>
+						<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+					</v:userDefs>
+					<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+					<v:textRect cx="35.4331" cy="187.663" width="70.87" height="49.6063"/>
+					<g id="shadow19-119" v:groupContext="shadow" v:shadowOffsetX="0.345598" v:shadowOffsetY="-1.97279"
+							v:shadowType="1" transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+						<rect x="0" y="162.86" width="70.8661" height="49.6063" rx="1.41732" ry="1.41732" class="st6"/>
+					</g>
+					<rect x="0" y="162.86" width="70.8661" height="49.6063" rx="1.41732" ry="1.41732" class="st13"/>
+					<text x="10.08" y="183.72" class="st5" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>thread_info<v:newlineChar/><tspan
+								x="13.43" dy="1.287em" class="st11">数据结构</tspan></text>				</g>
+				<g id="shape20-125" v:mID="20" v:groupContext="shape" transform="translate(162.992,-28.3465)">
+					<title>矩形.8</title>
+					<desc>thread_struct 数据结构</desc>
+					<v:userDefs>
+						<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+					</v:userDefs>
+					<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+					<v:textRect cx="35.4331" cy="187.663" width="70.87" height="49.6063"/>
+					<g id="shadow20-126" v:groupContext="shadow" v:shadowOffsetX="0.345598" v:shadowOffsetY="-1.97279"
+							v:shadowType="1" transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+						<rect x="0" y="162.86" width="70.8661" height="49.6063" rx="1.41732" ry="1.41732" class="st6"/>
+					</g>
+					<rect x="0" y="162.86" width="70.8661" height="49.6063" rx="1.41732" ry="1.41732" class="st13"/>
+					<text x="6.72" y="183.72" class="st5" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>thread_struct<v:newlineChar/><tspan
+								x="13.43" dy="1.287em" class="st11">数据结构</tspan></text>				</g>
+			</g>
+			<g id="shape22-132" v:mID="22" v:groupContext="shape" transform="translate(503.15,0)">
+				<title>矩形.9</title>
+				<desc>Multi-thread process</desc>
+				<v:userDefs>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197" v:verticalAlign="2"/>
+				<v:textRect cx="131.102" cy="109.711" width="262.21" height="205.512"/>
+				<g id="shadow22-133" v:groupContext="shadow" v:shadowOffsetX="0.345598" v:shadowOffsetY="-1.97279" v:shadowType="1"
+						transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+					<rect x="0" y="6.95467" width="262.205" height="205.512" class="st2"/>
+					<text x="85.43" y="205.17" class="st3" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>Multi-thread process</text>				</g>
+				<rect x="0" y="6.95467" width="262.205" height="205.512" class="st4"/>
+				<text x="85.43" y="205.17" class="st5" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>Multi-thread process</text>			</g>
+			<g id="shape23-140" v:mID="23" v:groupContext="shape" transform="translate(510.236,-170.079)">
+				<title>矩形</title>
+				<desc>程序代码 program code</desc>
+				<v:userDefs>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="35.4331" cy="198.293" width="70.87" height="28.3465"/>
+				<g id="shadow23-141" v:groupContext="shadow" v:shadowOffsetX="0.345598" v:shadowOffsetY="-1.97279" v:shadowType="1"
+						transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+					<rect x="0" y="184.12" width="70.8661" height="28.3465" rx="1.41732" ry="1.41732" class="st6"/>
+				</g>
+				<rect x="0" y="184.12" width="70.8661" height="28.3465" rx="1.41732" ry="1.41732" class="st7"/>
+				<text x="13.43" y="195.31" class="st8" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>程序代码<v:newlineChar/><tspan
+							x="5.04" dy="1.229em" class="st9">program code</tspan></text>			</g>
+			<g id="shape24-147" v:mID="24" v:groupContext="shape" transform="translate(598.819,-170.079)">
+				<title>矩形.2</title>
+				<desc>共享数据 shared data</desc>
+				<v:userDefs>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="35.4331" cy="198.293" width="70.87" height="28.3465"/>
+				<g id="shadow24-148" v:groupContext="shadow" v:shadowOffsetX="0.345598" v:shadowOffsetY="-1.97279" v:shadowType="1"
+						transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+					<rect x="0" y="184.12" width="70.8661" height="28.3465" rx="1.41732" ry="1.41732" class="st6"/>
+				</g>
+				<rect x="0" y="184.12" width="70.8661" height="28.3465" rx="1.41732" ry="1.41732" class="st7"/>
+				<text x="13.43" y="195.31" class="st8" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>共享数据<v:newlineChar/><tspan
+							x="10.54" dy="1.229em" class="st9">shared data</tspan></text>			</g>
+			<g id="shape25-154" v:mID="25" v:groupContext="shape" transform="translate(687.402,-170.079)">
+				<title>矩形.3</title>
+				<desc>堆区 Heap area</desc>
+				<v:userDefs>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="35.4331" cy="198.293" width="70.87" height="28.3465"/>
+				<g id="shadow25-155" v:groupContext="shadow" v:shadowOffsetX="0.345598" v:shadowOffsetY="-1.97279" v:shadowType="1"
+						transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+					<rect x="0" y="184.12" width="70.8661" height="28.3465" rx="1.41732" ry="1.41732" class="st6"/>
+				</g>
+				<rect x="0" y="184.12" width="70.8661" height="28.3465" rx="1.41732" ry="1.41732" class="st7"/>
+				<text x="24.43" y="195.31" class="st8" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>堆区<v:newlineChar/><tspan
+							x="13.3" dy="1.229em" class="st9">Heap area</tspan></text>			</g>
+			<g id="shape34-161" v:mID="34" v:groupContext="shape" transform="translate(514.513,-117.638)">
+				<title>矩形.34</title>
+				<desc>CPU 寄存器信息</desc>
+				<v:userDefs>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="21.382" cy="191.207" width="42.77" height="42.5197"/>
+				<g id="shadow34-162" v:groupContext="shadow" v:shadowOffsetX="0.345598" v:shadowOffsetY="-1.97279" v:shadowType="1"
+						transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+					<rect x="0" y="169.947" width="42.7641" height="42.5197" rx="1.41732" ry="1.41732" class="st6"/>
+				</g>
+				<rect x="0" y="169.947" width="42.7641" height="42.5197" rx="1.41732" ry="1.41732" class="st10"/>
+				<text x="10.68" y="180.67" class="st5" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>CPU <tspan
+							x="4.88" dy="1.2em" class="st11">寄存器</tspan><tspan x="10.38" dy="1.287em" class="st11">信息</tspan></text>			</g>
+			<g id="shape35-169" v:mID="35" v:groupContext="shape" transform="translate(564.404,-117.354)">
+				<title>矩形.35</title>
+				<desc>内核栈 kernel stack</desc>
+				<v:userDefs>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="32.073" cy="191.207" width="64.15" height="42.5197"/>
+				<g id="shadow35-170" v:groupContext="shadow" v:shadowOffsetX="0.345598" v:shadowOffsetY="-1.97279" v:shadowType="1"
+						transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+					<rect x="0" y="169.947" width="64.1461" height="42.5197" rx="1.41732" ry="1.41732" class="st6"/>
+				</g>
+				<rect x="0" y="169.947" width="64.1461" height="42.5197" rx="1.41732" ry="1.41732" class="st12"/>
+				<text x="15.57" y="188.23" class="st8" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>内核栈<v:newlineChar/><tspan
+							x="5.66" dy="1.229em" class="st9">kernel stack</tspan></text>			</g>
+			<g id="shape36-176" v:mID="36" v:groupContext="shape" transform="translate(514.513,-92.126)">
+				<title>矩形.36</title>
+				<desc>task_struct数据结构</desc>
+				<v:userDefs>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="57.0187" cy="201.837" width="114.04" height="21.2598"/>
+				<g id="shadow36-177" v:groupContext="shadow" v:shadowOffsetX="0.345598" v:shadowOffsetY="-1.97279" v:shadowType="1"
+						transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+					<rect x="0" y="191.207" width="114.037" height="21.2598" rx="1.41732" ry="1.41732" class="st6"/>
+				</g>
+				<rect x="0" y="191.207" width="114.037" height="21.2598" rx="1.41732" ry="1.41732" class="st13"/>
+				<text x="11.19" y="205.46" class="st5" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>task_struct<tspan
+							class="st11">数据结构</tspan></text>			</g>
+			<g id="shape37-183" v:mID="37" v:groupContext="shape" transform="translate(514.513,-66.6142)">
+				<title>矩形.37</title>
+				<desc>thread_info数据结构</desc>
+				<v:userDefs>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="57.0187" cy="201.837" width="114.04" height="21.2598"/>
+				<g id="shadow37-184" v:groupContext="shadow" v:shadowOffsetX="0.345598" v:shadowOffsetY="-1.97279" v:shadowType="1"
+						transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+					<rect x="0" y="191.207" width="114.037" height="21.2598" rx="1.41732" ry="1.41732" class="st6"/>
+				</g>
+				<rect x="0" y="191.207" width="114.037" height="21.2598" rx="1.41732" ry="1.41732" class="st13"/>
+				<text x="9.67" y="205.46" class="st5" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>thread_info<tspan
+							class="st11">数据结构</tspan></text>			</g>
+			<g id="shape38-190" v:mID="38" v:groupContext="shape" transform="translate(514.228,-41.1024)">
+				<title>矩形.38</title>
+				<desc>thread_struct数据结构</desc>
+				<v:userDefs>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="57.0187" cy="201.837" width="114.04" height="21.2598"/>
+				<g id="shadow38-191" v:groupContext="shadow" v:shadowOffsetX="0.345598" v:shadowOffsetY="-1.97279" v:shadowType="1"
+						transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+					<rect x="0" y="191.207" width="114.037" height="21.2598" rx="1.41732" ry="1.41732" class="st6"/>
+				</g>
+				<rect x="0" y="191.207" width="114.037" height="21.2598" rx="1.41732" ry="1.41732" class="st13"/>
+				<text x="6.31" y="205.46" class="st5" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>thread_struct<tspan
+							class="st11">数据结构</tspan></text>			</g>
+			<g id="shape39-197" v:mID="39" v:groupContext="shape" transform="translate(510.236,-21.2598)">
+				<title>矩形.39</title>
+				<desc>Thread 1 = Task 3</desc>
+				<v:userDefs>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197" v:verticalAlign="2"/>
+				<v:textRect cx="61.2951" cy="141.6" width="122.6" height="141.732"/>
+				<g id="shadow39-198" v:groupContext="shadow" v:shadowOffsetX="0.345598" v:shadowOffsetY="-1.97279" v:shadowType="1"
+						transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+					<rect x="0" y="70.7342" width="122.59" height="141.732" class="st2"/>
+					<text x="20.93" y="205.17" class="st3" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>Thread 1 = Task 3</text>				</g>
+				<rect x="0" y="70.7342" width="122.59" height="141.732" class="st14"/>
+				<text x="20.93" y="205.17" class="st5" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>Thread 1 = Task 3</text>			</g>
+			<g id="shape42-205" v:mID="42" v:groupContext="shape" transform="translate(639.954,-117.638)">
+				<title>矩形.4</title>
+				<desc>CPU 寄存器信息</desc>
+				<v:userDefs>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="21.382" cy="191.207" width="42.77" height="42.5197"/>
+				<g id="shadow42-206" v:groupContext="shadow" v:shadowOffsetX="0.345598" v:shadowOffsetY="-1.97279" v:shadowType="1"
+						transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+					<rect x="0" y="169.947" width="42.7641" height="42.5197" rx="1.41732" ry="1.41732" class="st6"/>
+				</g>
+				<rect x="0" y="169.947" width="42.7641" height="42.5197" rx="1.41732" ry="1.41732" class="st10"/>
+				<text x="10.68" y="180.67" class="st5" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>CPU <tspan
+							x="4.88" dy="1.2em" class="st11">寄存器</tspan><tspan x="10.38" dy="1.287em" class="st11">信息</tspan></text>			</g>
+			<g id="shape43-213" v:mID="43" v:groupContext="shape" transform="translate(689.845,-117.354)">
+				<title>矩形.5</title>
+				<desc>内核栈 kernel stack</desc>
+				<v:userDefs>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="32.073" cy="191.207" width="64.15" height="42.5197"/>
+				<g id="shadow43-214" v:groupContext="shadow" v:shadowOffsetX="0.345598" v:shadowOffsetY="-1.97279" v:shadowType="1"
+						transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+					<rect x="0" y="169.947" width="64.1461" height="42.5197" rx="1.41732" ry="1.41732" class="st6"/>
+				</g>
+				<rect x="0" y="169.947" width="64.1461" height="42.5197" rx="1.41732" ry="1.41732" class="st12"/>
+				<text x="15.57" y="188.23" class="st8" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>内核栈<v:newlineChar/><tspan
+							x="5.66" dy="1.229em" class="st9">kernel stack</tspan></text>			</g>
+			<g id="shape44-220" v:mID="44" v:groupContext="shape" transform="translate(639.954,-92.126)">
+				<title>矩形.6</title>
+				<desc>task_struct数据结构</desc>
+				<v:userDefs>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="57.0187" cy="201.837" width="114.04" height="21.2598"/>
+				<g id="shadow44-221" v:groupContext="shadow" v:shadowOffsetX="0.345598" v:shadowOffsetY="-1.97279" v:shadowType="1"
+						transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+					<rect x="0" y="191.207" width="114.037" height="21.2598" rx="1.41732" ry="1.41732" class="st6"/>
+				</g>
+				<rect x="0" y="191.207" width="114.037" height="21.2598" rx="1.41732" ry="1.41732" class="st13"/>
+				<text x="11.19" y="205.46" class="st5" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>task_struct<tspan
+							class="st11">数据结构</tspan></text>			</g>
+			<g id="shape45-227" v:mID="45" v:groupContext="shape" transform="translate(639.954,-66.6142)">
+				<title>矩形.7</title>
+				<desc>thread_info数据结构</desc>
+				<v:userDefs>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="57.0187" cy="201.837" width="114.04" height="21.2598"/>
+				<g id="shadow45-228" v:groupContext="shadow" v:shadowOffsetX="0.345598" v:shadowOffsetY="-1.97279" v:shadowType="1"
+						transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+					<rect x="0" y="191.207" width="114.037" height="21.2598" rx="1.41732" ry="1.41732" class="st6"/>
+				</g>
+				<rect x="0" y="191.207" width="114.037" height="21.2598" rx="1.41732" ry="1.41732" class="st13"/>
+				<text x="9.67" y="205.46" class="st5" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>thread_info<tspan
+							class="st11">数据结构</tspan></text>			</g>
+			<g id="shape46-234" v:mID="46" v:groupContext="shape" transform="translate(639.669,-41.1024)">
+				<title>矩形.8</title>
+				<desc>thread_struct数据结构</desc>
+				<v:userDefs>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197"/>
+				<v:textRect cx="57.0187" cy="201.837" width="114.04" height="21.2598"/>
+				<g id="shadow46-235" v:groupContext="shadow" v:shadowOffsetX="0.345598" v:shadowOffsetY="-1.97279" v:shadowType="1"
+						transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+					<rect x="0" y="191.207" width="114.037" height="21.2598" rx="1.41732" ry="1.41732" class="st6"/>
+				</g>
+				<rect x="0" y="191.207" width="114.037" height="21.2598" rx="1.41732" ry="1.41732" class="st13"/>
+				<text x="6.31" y="205.46" class="st5" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>thread_struct<tspan
+							class="st11">数据结构</tspan></text>			</g>
+			<g id="shape47-241" v:mID="47" v:groupContext="shape" transform="translate(635.677,-21.2598)">
+				<title>矩形.31</title>
+				<desc>Thread 1 = Task 4</desc>
+				<v:userDefs>
+					<v:ud v:nameU="visVersion" v:val="VT0(15):26"/>
+				</v:userDefs>
+				<v:textBlock v:margins="rect(4,4,4,4)" v:tabSpace="42.5197" v:verticalAlign="2"/>
+				<v:textRect cx="61.2951" cy="141.6" width="122.6" height="141.732"/>
+				<g id="shadow47-242" v:groupContext="shadow" v:shadowOffsetX="0.345598" v:shadowOffsetY="-1.97279" v:shadowType="1"
+						transform="matrix(1,0,0,1,0.345598,1.97279)" class="st1">
+					<rect x="0" y="70.7342" width="122.59" height="141.732" class="st2"/>
+					<text x="20.93" y="205.17" class="st3" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>Thread 1 = Task 4</text>				</g>
+				<rect x="0" y="70.7342" width="122.59" height="141.732" class="st14"/>
+				<text x="20.93" y="205.17" class="st5" v:langID="2052"><v:paragraph v:horizAlign="1"/><v:tabList/>Thread 1 = Task 4</text>			</g>
+		</g>
+	</g>
+</svg>
